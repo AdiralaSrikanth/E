@@ -410,6 +410,6 @@ First we will see the embedded approach,
     ]
 }
 
-But the issue here is author may get marry and change the change so for the 
+But the issue here is author may get marry and change the name so for the 
 futurebook printing we need to update the author name and age
 we have to update all the places/books where this author name is used. 
