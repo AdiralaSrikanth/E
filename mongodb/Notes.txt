@@ -1,0 +1,415 @@
+Dec16
+
+Ubuntu - starting mongodb as service
+
+sudo service mongod start
+mongo
+
+Structure in mongoDB == DB-->Collection--->Documents
+
+CRUD:
+Create:
+insertOne(data, options)
+insertMany(data, options)
+
+Read:
+find(filter, options)
+findOne(filter, options)
+
+Update:
+updateOne(filter, data, options)
+updateMany(filter, data, options)
+replaceOne(filter, data, options)
+
+Delete:
+deleteOne(filter, options)
+deleteMany(filter, options)
+
+deleteOne ex: 
+db.flightData.deleteOne({key:value pair})
+
+db - Ref to current db
+flightData - Collection Name
+{key:value pair} - filter options, delete's first find match document
+
+
+updateOne ex: updateOne(filter, data, options)
+db.flightData.updateOne({distance: 12000}, {marker: "delete"})
+
+filter== distance:12000
+data== marker:"delete"
+
+distance: 12000 --> searches for this key:value pair in entire Collection (in each document), then updates document
+with marker field value, if there is no key with marker it creates a new field.
+
+Important**** db.flightData.updateOne({distance: 12000}, {marker: "delete"})
+Using above command we cannot update the value as mongodb do not understand it, we have to use
+reserve command "{$set: {}}" to update value
+key : $set , value : document
+
+correct example: db.flightData.updateOne({distance: 12000}, {$set : {marker: "delete"}})
+
+
+updateMany:
+db.flightData.updateMany({}, {$set: {marker: "delete"}})
+here the filter is {}, it matches all documents
+
+deleteMany:
+db.flightData.deleteMany({}) == matches and deletes all documents
+db.flightData.deleteMany({marker: "delete"}) == matches the filtered condition nd deletes all documents
+
+insertMany:
+db.flightData.insertMany([{},{}]) == takes array of documents
+
+
+
+find:
+db.flightData.find({}) == {}---> filter
+
+db.flightData.find({distance: {$gt: 900}}).pretty() == finds & retrives all documents whose distance is greater than 900 value
+
+{} -- filter
+{distance: {value}} -- distance is a key in document and value is a document
+{distance: {$gt: 900}}--- $gt is a reserve keyword which stands for greaterthan
+
+
+db.flightData.findOne({distance: {$gt: 900}}) -- finds and retrives first match based on filter
+pretty() method does not work on findOne as it returns only one document
+
+update vs updateMany
+if we do not use $set command in updateOne or updateMany commands it throw error
+but using update command it wont and updates the entire document with given value
+ex: db.flightData.update({filter}, {somenewValue: "test"})
+
+here it overwrites all the data in the filtered document (Except _id) and updates with somenewValue field
+
+To avoid above issue use updateMany or updateOne
+
+If you want to replace the values you can use replaceOne ex: replaceOne({filter}, {key:value pairs})
+
+
+find() -- cursor object
+
+find method does not retrive all the documents instead it retrives first 20 documents which is called cursor
+to cycle through all the documents we need to enter it in shell
+
+we get all the documents we can type in db.Collection.find().toArray() --- displays all the documents in array
+==> shell is based on JS 
+
+db.flightData.find().forEach((doc)=> {
+    printJson(doc)
+})
+
+//prints all the documents in json format. Basically on cursor we are writing forEach loop
+same with pretty, we execute it on cursor
+
+
+Projection : if we have four fields in a doc and want only two fields, we can achieve it using Projection
+
+db.Collection.find({}, {})
+first {} - is filter
+second {} - Projection
+
+lets say we have name and age fields in doc and we only want name field, to get it
+==> db.Collection.find({}, {name: 1, age: 0, _id:0}) 
+1 - include
+0-exclude in results
+
+By default _id will be return so not to return use _id:0
+we do not need to specify age:0, by default only 1 condition fields will be displayed.
+
+Embedded documents
+1. Can store 100 levels of nested documents
+2. Each document size should limit 16mb
+
+db.collection.updateMany({}, {$set: {desc: "sometext", dateandtime: {date:"today", time:"time"}}}) //Nested/Embedded doc
+db.collection.updateMany({}, {$set: {desc: "sometext", hobbies: ["cricket", "tv"]}}) //Array
+
+Accessing Structured data:
+
+db.collection.findOne({desc:"sometext"}).hobbies
+//prints hobbies Array
+
+db.collection.find({hobbies: "cricket"})
+
+//Returns the documents who has cricket as value in hobbies array
+
+To access Structure data in Embedded doc
+1. Use dot notation to traverse to the required key value ex: dateandtime.date
+2. Wrap that under "" ex: "dateandtime.date"
+3. and enter value, (retrives the matched document)
+
+db.collection.find({"dateandtime.date": "today"})
+
+Dec17
+mongodb is schemaless. we can store diff types of data in same collection
+db.products.insertOne({name:"book",price:12.99 })
+We can also store/increase fields in one doc
+db.products.insertOne({name:"computer",price:1299, details: "Good computer" })
+
+
+Sql follows schema. All the fields should be same in each table
+
+we can set the value of a field to null, if we want to follow sql approach i.e maintaining
+same Structure through out the collection
+db.products.insertOne({name:"computer",price:1299, details: "null" })
+
+db.products.insertOne({name:"computer",price:1299, details: "Good computer" })
+
+
+Datatypes:
+Text: "Sri"
+Boolean:  true/false
+Number: 1,2 - Integer 
+int32 -32bits long
+int64 - NumberLong
+Normal shell treats numbers as 64bit float value
+Decimal value = 12.99 {high precision values} - ex: prices of products
+
+Timestamp
+Timestamp(1145245) - current time
+ISODate
+ISODate("2019-12-12")
+
+Embedded doc
+{a: {..}}
+Arrays:
+{b:[..]}
+
+DropDatabase - deletes the database
+db.dropDatabase()
+To Drop collection
+db.collectionName.drop()
+
+
+Dec18
+foundingDate: new Date() --- gives current date
+insertedAt: new Timestamp() -- current time in ms
+
+provided by shell.
+
+db.companies.insertOne({name: "ct", isStartup: true, funding: 12345678901234567890, 
+details: {ceo:"abc"}, tags: ["super", "product", "av"], foundingDate: new Date(), 
+insertedAt: new Timestamp()}) 
+
+db.companies.findOne()
+{
+	"_id" : ObjectId("5df9a011952c7bbc5aec2236"),
+	"name" : "ct",
+	"isStartup" : true,
+	"funding" : 12345678901234567000,
+	"details" : {
+		"ceo" : "abc"
+	},
+	"tags" : [
+		"super",
+		"product",
+		"av"
+	],
+	"foundingDate" : ISODate("2019-12-18T03:42:09.535Z"),
+	"insertedAt" : Timestamp(1576640529, 1)
+}
+current date is given along with the Timestamp
+There is a issue with the number. Entered number is funding: 12345678901234567890, but saved "funding" : 12345678901234567000,
+It exceeded the limit of int64 (JS stores 64bit floating number bydefault)
+
+db.numbers.insertOne({a:1})
+
+db.stats() -- to prints stats of the db
+
+observe it is giving the avgObjsize which is 33
+db.numbers.insertOne({a: NumberInt(1)}) -- NumberInt() given by shell check the syntax for app driver.
+observe it is giving the avgObjsize which is 29
+We decreased the size of the doc by using NumberInt() (functions provided) than by default 64bit floating no.
+
+
+You can get the typeof element by typing
+typeof  db.numbers.findOne().a  -- a is the element
+
+limit: MongoDB has a couple of hard limits - most importantly, a single document in a 
+collection (including all embedded documents it might have) must be <= 16mb. Additionally, 
+you may only have 100 levels of embedded documents
+
+NumberInt creates a int32 value => NumberInt(55)
+
+NumberLong creates a int64 value => NumberLong(7489729384792)
+
+NumberDecimal creates a high-precision double value => NumberDecimal("12.99") => This can be helpful for cases 
+where you need (many) exact decimal places for calculations.
+
+
+****Imp one - DataSchemas and Data Modelling:
+
+Q1: Which data does my app need or generate?
+Mobile/Website/Smart device which generates data. fitness tracker like fitbit. cordinates it second
+UserInformation, Product Information, Orders, Coordinates - this will define the fields you need (how they relate)
+
+Ex: A user may order products {Required collections - user info, prod info, order}
+
+
+Q2: Where do I need my data?
+Which page - Welcome Page, Products Page, Orders Page - which kind of data do I need in all these pages.
+Idea of mongoDB is store the data as you like as per ur app req.
+Ex: same data in diff formats as per pages or split the data in diff collections
+Defines the collections and field grouping.
+
+Q3: Which Kind of data do I want to display?
+On the pages which kind of data should I display, single product or multiple/list of products.
+This defines the queries you will required.find() or findOne()
+
+
+Q4: How often do I fetch data?
+On every page reload or every sec or not that often. 
+
+product metadata is same but orders keeps on changing
+product metadata is not changing but the orders changing. We should put orders in one 
+collections as the orders data is changing and 
+get product metadata from diff collections as data is not changing often.
+
+Defines whether you should optimize for eazy writing. {here we are writing data in orders collection}
+
+*****Relations - options
+1. Nested/Embedded documents
+A user with address
+{
+    name: "srk",
+    age: 25,
+    address : {
+        street: "kk",
+        state: "hyd"
+    }
+}
+We can store address in new collection but the address is totally related to customer so embedded approach is fine.
+2. References
+A User and his favbooks
+user:
+{
+    name: "srikanth",
+    favbooks: ['id1', 'id2']
+}
+books:
+{
+    _id1: 'id1',
+    name: 'Lord of rings'
+
+}
+
+we can store books in same collections by following nested approach but lots of duplication.
+same book may be the favbook for diff users. 
+if we want to change/modify one book prop we have to change it to all users.
+reference appraoch is good in this case.
+
+Ids are unique so we wont be changing it in user collection. 
+
+*****One to one relations - Embedded:
+
+Ex: patient and diseases
+It is not the best idea to create separate patient and diseases collections 
+instead we can embed patient and diseases
+{
+    _id:ObjectId("5dcsdc"),
+    name: "srk"
+    diseaseSummary: {
+        diseases: ["cold", "fever"]
+    }
+}
+
+*****One to one relations - References: Person - Car
+Person A - car1
+Person B - car2
+Person C - car2
+
+we can embed person and car in one document. But our app needs only cars data so fetching persons data is unnessary sending data through wire
+we can split it to two documents. person and car collections
+ex:
+db.persons.insertOne({name: "srk", salary: 2222})
+{
+
+}
+Inserts and generates ObjectId - ObjectId("56ed...")
+
+db.cars.insertOne({car:"bmw-1", price: 8888, owner: ObjectId("56ed...")})
+we are linking owner of the document under cars collection to persons collection
+
+we can store owner prop in a var
+ var owner = db.cars.findOne({car: "bmw-1})
+
+ and search/query in persons collection to get the username
+ like: db.persons.findOne({_id: owner}) === owner holds the value as ObjectId("56ed...")
+
+ ***One to Many - Embedded
+ Ex: Udemy question and answer threads
+ we can have a question and answers will be array of elements embedded. we want to retrive question with all the answers
+ so embedded appraoch is good one. Creating answers in separate column and linking it to question is not a feasible one.
+
+ {
+     creator: "max",
+     question: "how does that work?",
+     answer: [
+         {text: "Its syntax}, {text: "thanks"}
+     ]
+ }
+ ***One to Many - References
+ Ex: city and citizens
+
+ we cannot do embedded here as city will have many citizens this may exceed 16mb/doc limit
+
+ we can create city collection and then create citizens collection
+ Get the city id from city collection and map it to city under citizens collection
+city:
+ {
+     name: "New york",
+     cordinates: {
+         lat: 21,
+         long: 22
+     }
+ }
+inserted and objectid will be generated like _id: ObjectId("56rt..)
+
+citizens: 
+{
+name: "srk",
+city: ObjectId("56rt..)
+}
+{
+    name: test,
+    city: ObjectId("56rt..)
+}
+New york city is mapped to both srk and test users/citizens
+
+
+ ***Many to Many - Embedded
+ we can create 3 collections - customer, product and orders (sql appraoch)
+or we can create 2 collections - customer embed orders and in orders reference product id, product {combination of
+embed and reference}
+or we can embed products data in orders field -- 1 collection - customer--orders field - product meta data
+
+Issue here is user can order same product couple of times and data is getting duplicated
+we need to question our app need, how often we change the change, if the order is placed and 
+we do not change the previous order data that is OK. if we really want to update order data 
+we should follow ref appraoch
+
+
+****Many to Many - References
+Books and Authors
+One book can be written by many authors and one author can write many books - many to many relations
+
+First we will see the embedded approach,
+{
+    bookName: "abc",
+    price: 1222,
+    authors: [
+        {
+            name: authorone,
+            age: 29
+         }, 
+         {
+             name: authortwo,
+             age: 30
+         }
+    ]
+}
+
+But the issue here is author may get marry and change the change so for the 
+futurebook printing we need to update the author name and age
+we have to update all the places/books where this author name is used. 
