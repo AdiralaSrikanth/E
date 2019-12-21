@@ -1,0 +1,37 @@
+De21
+
+Why should I learn react?
+1. React library itself -
+up and running with fundamentals of react in short time.
+Core idea - Components. 
+login, application header. Multiple Components together end up a complete application 
+Components based arch forces you to break complex app into small peices ehich are easy to maintian test debug
+React is fast. Renders and e=rerenders app very quickly. keep up to date with the latest changees in ur app data
+
+Can build web and mobile apps
+
+2. React Community
+Active Community. You dont have to reinvent the wheel again. you will have react libraries like calendar picker, drag and drop
+Great resources - tutorials etc.
+
+
+NPM - node pkg manager
+helps installing various dependencies like yarn, react etc
+npm and yarn are similar
+
+npm install -g yarn - we are installing yarn globally
+
+
+
+Indecision app
+Create a public folder - assets that we going to serve up
+
+install live-server
+yarn global add liver-server {adding globally}
+
+***Load React library using CDN.
+react - can be used in diff context - react-vr , react-native
+react-dom - react in browser
+
+JSX - Javascript XML {Javascript syntax extension}, provided by react. define template, we can insert data
+scss,less - variable support, lang extensions for css

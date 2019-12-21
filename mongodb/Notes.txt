@@ -413,3 +413,108 @@ First we will see the embedded approach,
 But the issue here is author may get marry and change the name so for the 
 futurebook printing we need to update the author name and age
 we have to update all the places/books where this author name is used. 
+
+Better approach is to use reference appraoch
+{
+    bookName: "abc",
+    price: 1222,
+    authors: [ObjectId("56ee.."),ObjectId("56ee..")]
+}
+
+Summary - Relations - options
+Nested/Embedded 
+1. Group data together logically
+2. Great for data that belongs together and is not really overlapping with other data
+3. Avoid super deep Nesting (100+ levels) or extremly long arrays (161MB limit size per doc)
+
+References:
+1. split data accross collections
+2. Allows to overcome nesting and limits 
+
+*****Schema Validation
+let say we are building a blog application where title is mandatory then we can set Schema Validation
+
+insertOne({}) --> collection ---> Validation schema ---> validate incoming data based on our 
+schema validation--> It Accepts or Rejects
+
+Define Schema validation --> Validation level and Validation Action
+which documents gets validated ?                         what happens if validation fails
+strict : performs on all inserts and updates are checked   throws error on validation fail. Not insert/update data to db
+
+moderate : earlier wrong/corrupted data will be there and can be changed/updated. new ones will go through validation level. Logs warning and proceed. Can change the data.
+
+
+d19
+Adding collection document validation.
+Best way to add validation is at the time of creating a collection
+
+1. To create a collection use db.createCollection ('collectionName', {validator}). 
+if you only want to create collection, do not add validator. validator is for conifguration
+2. key is validator and its value is object/doc 
+3. here we are using jsonSchema validator {there are other schema validators} and it is for whole doc.
+4. jsonSchema is key and has value as object. In this obj we define validations
+5. bsonType" object - all the incoming request should be an object {whole doc}
+6. we can set required fields . required: ['title', 'creator'] --post collection
+7. for all the required fields we can set conifgurations under properties key. bsonType should be string/array and description 
+
+db.createCollection('posts', {
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['title', 'text', 'creator', 'comments'],
+      properties: {
+        title: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        text: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        creator: {
+          bsonType: 'objectId',
+          description: 'must be an objectid and is required'
+        },
+        comments: {
+          bsonType: 'array',
+          description: 'must be an array and is required',
+          items: {
+            bsonType: 'object',
+            required: ['text', 'author'],
+            properties: {
+              text: {
+                bsonType: 'string',
+                description: 'must be a string and is required'
+              },
+              author: {
+                bsonType: 'objectId',
+                description: 'must be an objectid and is required'}}} }} }}});
+
+if validation fails, errmsg: Document failed validation else gets inserted
+
+we can change the validation Action
+
+1. db.runCommand({})
+collMod - collection modifier
+2. db.runCommand({collMod: 'collectionName', validator : {...}, validationAction: 'warn'/'error' })
+by default validationAction is error, it will let insert/update data. 
+if validationAction is warn, allows to update the data of previously stored documents which did not follow the newly created validations and logs error in error log
+
+----> we have insert() command to insert single as well as multiple documents (array of doc),
+it is more error prone so ppl use insertOne and insertMany. insert was first version
+
+*****Ordered Insert:
+We cannot add a doc with same id twice, we will get writeError. errmsg: "duplicate key error collection"
+MongoDB follows Ordered inserts
+so if we create a collection with 3 docs {1}, {2}, {3} and on next try if 
+we try to add doc with same id which was inserted before
+{4}, {2}, {5} ...it gives write error while processing {2} doc. new data in collection be like {1},{2},{3},{4}
+{5} will not get inserted because we got an error at {2}, **it wont rollback but inserts {4} which is an issue
+
+
+To overcome this issue we can pass another doc while inserting doc
+db.posts.insertMany([{},{}], {ordered: false}) -- This will throw error for the duplicates and inserts unique data
+by default {ordered:true} which is ordered insert we overwrite it to unordered inserted by setting {ordered:false}
+
+
+****writeConcern:
