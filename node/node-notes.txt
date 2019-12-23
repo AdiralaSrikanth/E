@@ -1,0 +1,76 @@
+D22
+what is Node js
+Before the introduction of node js, at that point javascript really run in browser.
+and limited to browser allowed to do. click event to button, redirect user to other page etc
+creating webserver, connecting db was not possible
+with the introduction of node js, developers can use javascript on the server side,
+creating webservers, application backend and command line applications
+
+D23
+Summary from nodejs official page. 
+Node js is a Javascript runtime built on chromes v8 javascript engine.
+every browser has their own js engine. nodejs uses chrome v8 js engine.
+
+Job of any js engine is to take in javascript code and compile to machine code.
+v8 is written in c++ lang.
+anyone can write c++ app, incorporate v8 javascript engine into their app and
+extend the functionalities that JS provide.
+
+chrome and v8 do the same. chrome and nodejs are written in c++.
+nodejs is a js runtime. It is not a programming lang. we write js code.
+
+runtime provides custom functionalities- various tools and libraries specific to an environment
+
+chrome provides V8 with various objects and functions. that allow js dev in the chrome browser to do things, add click events and manipulate dom
+node doesnt provide those instead
+node runtimme provides tools/libraries that node dev need. libraries for setting up server,
+integrating with file system so that you can read and write from disc.
+
+At the end of the day, both chrome and node are creating modified version of javascript
+
+chrome browser uses v8 engine. when chrome needs to run a js for a particular webpage it does not run the javascript itself and It can'take
+instead it uses v8 engine to get that done.
+It passes js code to v8 and it gets the results back.
+
+
+It is also same with node. node doesnt know how to run js code. it passes to v8 and get the results
+
+
+v8 does not know how to interact with DOM and filesystem. Its node and chrome job to provide implementations
+for those when running v8.
+
+
+chrome, node are written in C++ its not a coincidence
+
+JS (chrome)             C++
+localStorage.getItem   some C++ function
+document.querySelector some C++ function
+
+localStorage and querySelector are not part of Javascript lang. 
+These are implemented by chrome run time. 
+when chrome run a js file which has these methods, 
+in the end of the day some C++ program is executed behind the scenes.
+
+chrome tells v8 to do something when these methods are called. Chrome not only sending javascript code to v8
+it also sends c++ code (C++ bindings - localStorage etc methods)to get the job done.
+
+Same with node js.
+
+Javascript (node js)   C++
+fs.readFile             some c++ func.
+os. platform            some c++ func.
+Above methods are not part of javascript lang. also v8 does not understand them.
+Those functionalities are implemented by node which is written in C++, 
+when v8 excute js file with those methods. v8 diifers to node js c++ code to execute.
+
+
+
+
+
+
+
+
+
+
+
+
