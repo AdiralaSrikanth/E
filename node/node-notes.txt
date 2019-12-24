@@ -16,7 +16,7 @@ v8 is written in c++ lang.
 anyone can write c++ app, incorporate v8 javascript engine into their app and
 extend the functionalities that JS provide.
 
-chrome and v8 do the same. chrome and nodejs are written in c++.
+chrome and v8 do the same. chrome and nodejs are largely written in c++.
 nodejs is a js runtime. It is not a programming lang. we write js code.
 
 runtime provides custom functionalities- various tools and libraries specific to an environment
@@ -61,7 +61,119 @@ fs.readFile             some c++ func.
 os. platform            some c++ func.
 Above methods are not part of javascript lang. also v8 does not understand them.
 Those functionalities are implemented by node which is written in C++, 
-when v8 excute js file with those methods. v8 diifers to node js c++ code to execute.
+when v8 excute js file with those methods. v8 differs to node js c++ code to execute.
+
+"test".toUpperCase()
+Js code can be executed in console or in node repl. Will get the same results. provided by v8 engine
+
+
+in console -window or document
+will get methods. but when you type the same in node repl you will get error {undefined}
+window is provided by chrome when running javascript in browser
+
+simillarly we have variable called global in node and the other one is process object (will have prop and methods, one method is exit {process.exit()}). will have prop and methods. 
+When you type in console/browser will get error
+
+why nodejs
+walmart, netflix, uber uses node in prod.
+remainining statement from official nodejs page : Node js uses an event-driven, non blocking I/O model
+that makes it light weight and efficient.
+
+Nodejs package ecosystem, npm is largest ecosystem of open source libraries in the world
+
+I/O - input output
+communicate with machine that it is running on. ex: reading some data from a file on the filesystem
+quering a db to fetch records for a given user
+I/o operation takes time 
+with nodejs we get non blocking io. can do other things while we are waiting for I/O operation
+
+Non blocking code will not wait for IO oeperation results, it will start the other process and waits for IO operation result in backgroung
+
+*** Node module system
+Importing Nodejs core modules
+
+ex: console.log('abc'), doesnt require to load anything. global modules come along with installation
+
+filesystem:
+fs.writeFileSync {synchronous version}- allows write some data to a file on our filesystem from nodejs app
+
+fs.writeFileSync('nameofthefile', 'datatowrite')  --
+fs.writeFileSync('abc.txt', 'test123')  --gets error {fs is not defined} because we did not load file system in the file 
+
+before the above step, type const fs = require('fs') ---inside require('modulename')
+to load in node module system call require func. require returns prop and 
+methods from the fs module
+
+if the file exists it writes data in that file. if doesnt exist create new file n writes data. Overwrites the data if we write some more data
+use appendFileSync to append the data in file instead of Overwriting the data.
+
+D24
+Importing your modules:
+define a function in utils.js and import it in app.js
+
+use require('./utils.js) ---this file executes first then app.js
+
+./ relative path to that file
+
+every file has it own scope. we cannot access variables directly. 
+we have to export var/methods from the file using module.exports. It returns something
+
+**Importing npm modules:
+validating data like email, sending an email. we dont have to reinvent wheel again
+there are npm libraries which can do above tasks
+
+npm comes along with Nodejs.
+
+1. initialize npm in our project - 
+creates one configuration file, we can use it to manage dependencies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
