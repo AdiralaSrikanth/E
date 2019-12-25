@@ -107,7 +107,7 @@ methods from the fs module
 if the file exists it writes data in that file. if doesnt exist create new file n writes data. Overwrites the data if we write some more data
 use appendFileSync to append the data in file instead of Overwriting the data.
 
-D24
+D24 - ***Notes app
 Importing your modules:
 define a function in utils.js and import it in app.js
 
@@ -125,7 +125,332 @@ there are npm libraries which can do above tasks
 npm comes along with Nodejs.
 
 1. initialize npm in our project - 
-creates one configuration file, we can use it to manage dependencies
+creates one configuration file, we can use it to manage dependencies.
+
+creates package.json file.
+
+install validator library.
+validator: library validates and sanitizes strings only.
+
+npm i validator
+when we run above command , goes to npm servers, grabs all of the code for that pkg 
+and adds it to our application. 
+
+node_modules folder is created. contains all of the code for the dependencies we install.
+pkglock.json - contains extra info making npm bit faster and secure. lists exact version of dependencies
+where they fetched from. shaw code...
+
+load in module using require
+validator.isEmail('foo@bar.com') //true/false
+isUrl('https://www.google.com') //true/false
+
+node_modules directory is imp. when you do require(''), its gonna look in that node_modules folder
+else error cannot find module validator etc
+
+
+npm install - it looks at pkg and pkglock.json to determine which dependencies our proj is using.
+it creates node_modules from scratch.
+
+--> for large project node_modules can be bigger so delete it while sharing it with friend.
+your friend should type npm install to get all of the dependencies required to run the proj.
+
+chalk -- color tool.
+
+All the previous libraries are locally installed. Ex: validator and chalk libraries/modules
+
+Global module
+npm i nodemon -g === -g flag install module globally, at the os level
+we do not have to use require to load in module in file.
+
+Run the script like we normally do node app.js but use nodemon app.js
+
+restarts the server for every save
+
+D25
+command line arguments
+****Getting input from users
+
+process is a object provided by nodejs runtime. contains methods and properties.
+All the command line arguments are stored as a property in process.
+
+node app.js test
+test is stored under process
+process.argv - (argument vector). It is an array contains all the arguments provided
+
+when you type in node app.js test
+console: returns array with values
+1. path to node executable(nvm) in ur machine
+2. path of the executed file.
+3. passed argument
+process.env[2] -- grabbing the 3rd value by index. if we pass argument and to get that argument value which is here - add
+use this argument "add" and perform operation in file.
+likewise sub/mul etc.
+
+
+we can add more information. lets say user wants to add a note along with the title or
+user want to delete note based on title.
+
+node app.js add --title="this is my note"
+--title is command line options
+it gets stored as it as --title="this is my note" in process.argv property
+it is not parsed. we cannot get --title value directly we will have to write code for it but
+do not have to reinvent the wheel. we can use 'yargs' library to parse arguments
+
+yargs
+npm i yargs
+require('yargs') in ur app.
+console.log(process.argv)
+console.log(yargs.argv)
+
+type in console : node app.js add --title: "this is my note"
+
+yargs output: {_: ['add], title: 'Things to buy', '$0': 'app.js'}
+notice that title is parsed.
+ _: is the array of passed commands
+ title: 
+ $0 - file that is executed.
+
+ //add,read,remove, list.
+
+ //add command
+//we can achieve it using command method in yargs. it takes object
+ yargs.command({
+ })
+ 1. name command - add/edit etc and description of that command
+ yargs.command({
+     name: 'add',
+     describe: 'add a new note'
+ })
+ 2. add 'handler' command that is actually going to run when user uses 'add' command
+ It's value is a function.
+yargs.command({
+     name: 'add',
+     describe: 'add a new note',
+     handler: function(){
+         console.log('adding a new command')
+     }
+ })
+
+when you type - node app.js --help,
+it will show add command as available commands along with the description.
+
+***Add command needs title and body to add a note
+***delete command needs title to remove the Notes
+
+we need to use the options
+builder: {} takes object as value, in that we can define the options
+
+
+yargs.command({
+     name: 'add',
+     describe: 'add a new note',
+     builder: {
+         title: {
+             describe: "Note title",
+             demandOption: true //by default it is false. we can set to true. 
+                                //bascially telling that this option is required/mandatory.
+                                //if we type node app.js add --without title option/argument, it 
+                                throws error Missing required argument: title 
+         
+            type: 'string' //if we dont specify type, by default it is true
+                            //node ap.js add --title results in true whe you set type it changes it to string
+         }
+     }
+     handler: function(argv){ //when you define options, those are accessible in handler as argv
+         console.log('adding a new command', argv) //prints available/enetered arguments
+                                                    //argv.title --gets the title value
+     }
+ })
+
+At the end of the file we need to set ******yargs.parse() so that yargs parses all the commands.
+this is also can be done using  yargs.argv
+
+
+
+Adding body option
+yargs.command({
+     name: 'add',
+     describe: 'add a new note',
+     builder: {
+         title: {
+             describe: "Note title",
+             demandOption: true, 
+            type: 'string'
+         },
+         body: {
+             describe: 'Note body',
+             demandOption: true,
+             type: 'string'
+         }
+     }
+     handler: function(argv){ 
+         console.log('accessing notes body', argv.body) 
+     }
+ })
+
+
+**Storing data with json:
+We need to store notes, when a user adds a note today and comes 2mrw to edit/delete/read note
+we use fs module to store notes to file. data going to that file is JSON data
+
+JSON has native support in javascript. will learn about json now.
+
+create a js object
+ const book = {
+     title: 'The untold hearts',
+     author: 'Md. Ravoof'
+ }
+convert it json which is a string. fs core module only knows how to work with string data
+
+JSON.stringify(array/object) -- converts to json string representation.
+
+const bookJSON = JSON.stringify(book)
+console.log(bookJSON.title) //you will get undefined, we cannot access json string value (converted from obj to json string)
+
+JSON - js object which has both prop and value as strings.
+
+const bookObj = JSON.parse(bookJSON) // takes json and converts it to object
+console.localStorage(bookObj.title) //gets the title value
+
+Now, we will write data to file using fs core module. we use writeFileSync method.
+
+
+const bookJSON = JSON.stringify(book)
+fs.writeFileSync('1-json'.json', bookJSON) //stores bookJSON data to the file.
+
+Load JSON data::::::
+const bufferData = fs.readFileSync('1-json.json') //returns content of the file
+
+here bufferData is because data is retrieved in the form string, 
+it return in the form of chunks/buffer.
+<buffer 7b 55 48 75 12 >    bits/bytes Binary data.
+
+use toString() to get the actual data.
+
+const bufferData = fs.readFileSync('1-json.json')
+const datajson = bufferData.toString()
+const data = JSON.parse(datajson) // converts json string data to object
+console.log(data.title) //prints title
+ 
+try-catch block:
+try{
+}catch(e) {
+}
+if there is an error in try block, immediately stops and runs catch block.
+put readFileSync code in try block, if there is no file to read, it goes to catch block 
+
+Arrow functions::::::
+
+const square = function(x) {
+    return x * x
+}
+console.log(square(3)) //9
+
+Above function can be rewritten in arrow function
+1. const square = (x) => {
+    return x * x 
+} 
+we do not function keyword instead use () and => arrow
+
+2. if we have only one return statement we can omit return keyword and {}
+const square = (x) => x * x 
+
+Arrow function in methods:
+
+const event = {
+    name: 'Birthday party',
+    printGuestList: function(){
+        console.log('guest list for' + this.name) //we can access obj prop under obj method using this keyword.
+    }                                           //this is reference to the obj.
+}
+event.printGuestList()
+
+for the above example if we use arrow function 
+    name: 'Birthday party',
+    printGuestList: ()=> {
+        console.log('guest list for' + this.name) //we will get undefined
+    }  
+arrow function do not bind their this value. this currently pointing to global window obj. 
+
+****Arrow functions aren't suited for methods when you want to access this. best case is to use normal func
+
+or we can use es6 shorthand syntax.
+
+name: 'Birthday party',
+    printGuestList(){
+        console.log('guest list for' + this.name) //we will get the correct ans.
+    } 
+
+
+*** Why we want to use arrow function.
+
+const event = {
+    name: 'Birthday party',
+    guestList: ['andi', 'mike', 'test']
+    printGuestList: function(){
+        console.log('guest list for' + this.name)
+
+        this.guestList.forEach(function (guest){
+            console.log(guest + 'attending' + this.name )
+        })
+    }                                        
+}
+
+output: 
+in the loop:
+andi attending undefined
+mike attending undefined
+because 1. normal func bind their this value
+solution:
+1. arrow func do not bind their this value
+
+
+
+filter vs find.
+if we are checking for duplicates in an array (1000records), and the duplicate match is at 89record
+filter function finds at 89 record and loops till 1000 where
+find function finds record at 89 and stops/return the execution. {undefined if it did not find}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
