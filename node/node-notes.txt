@@ -370,7 +370,7 @@ for the above example if we use arrow function
     printGuestList: ()=> {
         console.log('guest list for' + this.name) //we will get undefined
     }  
-arrow function do not bind their this value. this currently pointing to global window obj. 
+arrow function do not bind their this value. 
 
 ****Arrow functions aren't suited for methods when you want to access this. best case is to use normal func
 
@@ -405,14 +405,17 @@ solution:
 1. arrow func do not bind their this value
 
 
-
 filter vs find.
 if we are checking for duplicates in an array (1000records), and the duplicate match is at 89record
 filter function finds at 89 record and loops till 1000 where
 find function finds record at 89 and stops/return the execution. {undefined if it did not find}
 
+D26
+Skipping weather app for now.
 
 
+install mongodb , robo 3t - follow configuration videos
+ 
 
 
 

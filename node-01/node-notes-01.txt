@@ -1,0 +1,85 @@
+D26
+what is node js?
+A javascript runtime.
+typically use in browser to manipulate ur dom, mamipulate the page loaded.
+open a popup or modal.
+
+interactive UI interfaces
+
+Node js is a diff version of JS. built in js. add features to it. 
+
+allows js code on the server.
+
+node js uses v8 engine built by google that runs js in the browser.
+takes js code and compiles to machine code
+browser is also same.
+
+v8 written in c++
+
+takes v8 code base and adds certain features like open and read files. not possible in browser
+adds these features to v8.
+
+install nodejs
+
+node js official web and download. installer just click next next ...
+in console type in node -v  to see the version.
+
+in console type in : node
+opens repl - real evaluate print loop
+
+install vs code
+
+
+On the server, we perform operations like,
+connect to database
+Authentication
+input validation - correct email.
+
+all these we cannot do in browser for security we do all these in server side.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

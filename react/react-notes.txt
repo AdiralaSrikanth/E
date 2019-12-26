@@ -67,19 +67,20 @@ reactDOM.render(template, appRoot)
 
 we will get the error as unexpected token <
 
-chrome does not know what jsx is. jsx is not js its a extension.
-solution for above issue  is take in JSX and convert it to Javascript
+chrome does not know what jsx is. jsx is not js, its a extension.
+solution for above issue is take in JSX and convert it to Javascript
 we use tool Babel to do this. (babel is a Javascript compiler.)
 
 babel takes ES6 and Es7 code and compiles to ES5 code
-Browsers like IE8 or 9 do not add latest features like arrow functions etc. using babel we can write arrow 
+Browsers like IE8 or 9 do not add latest features like arrow functions etc. 
+using babel we can write arrow 
 functions but at the end of the day it is es5 code in browser 
 
 In babel,
 
 var template = <p>This is JSX from app.js</p>
 
-convert to old js functions which browser can understand.
+converts to old js functions which browser can understand.
 
 var template = React.createElement(
     'p',
@@ -102,14 +103,19 @@ preset - is a group of plugins
 
 we need to include react-preset to convert jsx to react.createElement which browsers can understand
 
-go to babel site and then doc then plugins page.
+go to babel site > doc > plugins page.
 
 1. click on react preset, it has plugins part of it. 
 all these sub plugins are responsible for to convert jsx to react.createElement
 2. preset -env which has es2015,16,17. now we can use latest js features.
 
+D26
 
+yarn global add babel-cli
 
+Gives access to command line interface to use babel compiler. but it does not give latest js features.
+
+Getting erros while installing babel. will check later.
 
 
 
