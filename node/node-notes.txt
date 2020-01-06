@@ -8,7 +8,7 @@ creating webservers, application backend and command line applications
 
 D23
 Summary from nodejs official page. 
-Node js is a Javascript runtime built on chromes v8 javascript engine.
+Node js is a Javascript runtime built on chrome's v8 javascript engine.
 every browser has their own js engine. nodejs uses chrome v8 js engine.
 
 Job of any js engine is to take in javascript code and compile to machine code.
@@ -87,7 +87,7 @@ quering a db to fetch records for a given user
 I/o operation takes time 
 with nodejs we get non blocking io. can do other things while we are waiting for I/O operation
 
-Non blocking code will not wait for IO oeperation results, it will start the other process and waits for IO operation result in backgroung
+Non blocking code will not wait for IO operation results, it will start the other process and waits for IO operation result in background
 
 *** Node module system
 Importing Nodejs core modules
@@ -104,7 +104,7 @@ before the above step, type const fs = require('fs') ---inside require('modulena
 to load in node module system call require func. require returns prop and 
 methods from the fs module
 
-if the file exists it writes data in that file. if doesnt exist create new file n writes data. Overwrites the data if we write some more data
+if file exists it writes data in that file. if doesnt exist create new file n writes data. Overwrites the data if we write some more data
 use appendFileSync to append the data in file instead of Overwriting the data.
 
 D24 - ***Notes app
@@ -204,7 +204,7 @@ console.log(yargs.argv)
 
 type in console : node app.js add --title: "this is my note"
 
-yargs output: {_: ['add], title: 'Things to buy', '$0': 'app.js'}
+yargs output: {_: ['add'], title: 'Things to buy', '$0': 'app.js'}
 notice that title is parsed.
  _: is the array of passed commands
  title: 
@@ -316,12 +316,12 @@ Now, we will write data to file using fs core module. we use writeFileSync metho
 
 
 const bookJSON = JSON.stringify(book)
-fs.writeFileSync('1-json'.json', bookJSON) //stores bookJSON data to the file.
+fs.writeFileSync('1-json.json', bookJSON) //stores bookJSON data to the file.
 
 Load JSON data::::::
 const bufferData = fs.readFileSync('1-json.json') //returns content of the file
 
-here bufferData is because data is retrieved in the form string, 
+here bufferData is because data is not retrieved in the form of string, 
 it return in the form of chunks/buffer.
 <buffer 7b 55 48 75 12 >    bits/bytes Binary data.
 
@@ -334,7 +334,7 @@ console.log(data.title) //prints title
  
 try-catch block:
 try{
-}catch(e) {
+}catch(e) {,
 }
 if there is an error in try block, immediately stops and runs catch block.
 put readFileSync code in try block, if there is no file to read, it goes to catch block 
@@ -350,7 +350,7 @@ Above function can be rewritten in arrow function
 1. const square = (x) => {
     return x * x 
 } 
-we do not function keyword instead use () and => arrow
+we do not need function keyword instead use () and => arrow
 
 2. if we have only one return statement we can omit return keyword and {}
 const square = (x) => x * x 
@@ -414,7 +414,868 @@ D26
 Skipping weather app for now.
 
 
-install mongodb , robo 3t - follow configuration videos
+install mongodb , robo 3t - follow configuration videos.
+***database needs to be in running in order us to connect.
+
+mongodb.com>docs>mongodb drivers> node js driver.
+
+Drivers are libraries that allow you to interact with mongodb database
+from a wide range of prog. lang.
+
+1. Create task-manager app folder and do npm init
+2. install mongodb - npm i mongodb
+Generates node_modules folder. from here we are actually ready to use
+the driver to connect to our database and insert some documents.
+
+** const mongodb = require('mongodb')
+returns object. on that object, one thing we need to initialize the connection.
+
+known as mongo client
+
+MongoClient = mongodb.MongoClient
+
+gives the function neccessary to connect to the ddatabase so that we can perofm crud operations
+
+D29 - revised above content from beginning. 
+continuing the course - webapp.
+
+D30
+Debugging Nodejs.
+Everyone who is writing software making mistakes, the real goal is to recover 
+them quickly and get back on track so we can work on continue to be productive.
+
+
+1. console.log()
+2. debugger
+
+use "debugger" text in between the script. halts the execution on that line.
+we need to use inspect command like "node inspect filename" to use debugger.
+In the console it shows like debug>
+
+Now open chrome browser and type chrome://inspect
+
+node debugger uses built in v8 debugger tools also chrome uses same debugger v8 tools. other browser
+debugger tools will be different.
+
+
+Remote target: click on inspect, opens new instance.
+if you dont see ur app under remote target. click on configuration and check localhost an ip 
+if those two fields are not there then add localhost:9229 and 127..0.1.9229.
+
+Notice that nodejs scripts are wrapped inside a function.
+In other prog lang, you will have main func which executes first. In node js we do not have it
+node considers it as main func and provides required or another files.
+
+import files to chrome inspect. Loads every file.
+Click on play button to resume execution. script halts on the line where we mentioned debugger
+
+Under scope tab we can see all the variables and values
+In the console you can get the values of the variables ex: notes[1] , grabs the index of 1 value from notes array
+
+click on play button it continues all the statements in the script and finishes the execution.
+
+to restart the execution again, type in restart command and go shut down the process by control c.
+
+Logic errors -Debugging helps
+When you do typo errors, 
+Stack trace
+Reference error : datajspn is not defined //gives you the info of the error.
+
+next to it, it gives the file name where error occured. 
+at saveNotes (//path of the file: lineno and column number) 
+Next lines gives you, where exactly this method called
+(here saveNotes called in add Notes and add notes called in handler)
+
+*****Nodejs
+    Asynchronous
+    Non blocking
+    single threaded
+    event driven
+
+console.log('starting')
+
+//Asynchronous func node js provided
+setTimeout() - allows to run some code after specific amount of time passed.
+takes two arguments. first argument is the function and the second is of time in milliseconds
+
+setTimeout(()=>{
+    console.log('setTimeout -2secs timer')
+}, 2000)
+
+2000 milli seconds - 2secs, we are telling that wait for 2secs and then run the func.
+console.log('stopping')
+
+In the synchronous model, the order of execution is one by one 
+i.e 1. starting 2. 2secs timer (here code waits for 2secs - halts execution for 2secs) 3. stopping
+
+if we are performing any IO operation, querying db and getting a record of a user, it takes lot of time
+till that time we are unable to perform other operations.
+
+whereas in Asynchronous node js, the order we gonna get is
+1 starting
+(here 2secs timer process starts and do not halt the execution)
+2. stopping (waits for 2secs)
+3. 2secs timer gets printed.
+
+Consider the below example
+console.log('starting)
+setTimeout(()=>{
+    console.log('0 sec timer)
+}, 0)
+console.log('stopping)
+
+output : 1. starting 2. stopping 3. 0 sec timer
+
+why is it 0 secs timer is printed at last (not printed in second)?
+we have to understand, the internals of node js that are responsible for getting asynchronous programming
+to work.
+
+
+Node js file has the following code
+
+const x = 1
+const y = x + 2
+console.log('sum is ' + y)
+
+above code is of synchronous code example, lets see the execution process.
+
+Call Stack is a data structure provided by js v8 engine. The job of the call stack is to track the 
+execution of our program. It does by tracking all the functions that are currently running.
+
+FIFO - first in first out. (Ex:  tennis ball tin, you add balls in it and when you want to
+remove last ball you will have to remove the first one first.)
+
+will see the above code snippet execution,
+
+first thing nodejs do is wrap all the code of our script inside a function. {other prog lang's
+have a main func nd that main func is executed first, in nodejs we do not have main func, nodejs
+itself creates/wraps our code into a function and that function is executed
+} 
+
+1. Main func is pushed into call Stack
+If something is added to call stack then it is going to execute
+we created const x with value 1 and other const y with value x + 2 ,i.e 3
+
+console.log('sum is ' + y)
+
+log is a func and whenever there is a func call it gets added to call stack.
+
+2. log('sum' + y), then is going to execute and get executes and prints value in console
+after execution of log method it pops out of the Stack
+
+3. Moves to next line of the program. here there is no code after the console.log('').
+
+so the main func is pop-ed out of the call stack.
+
+
+Example 2:
+const listLocations = (locations) => {
+    locations.forEach((location)=>{
+        console.log(location)
+    })
+}
+
+const myLocations = ['philly', 'nyc']
+
+listLocations(myLocations)
+
+1. Main func is pushed into call stack - this allows to start script execution
+2. first line of above code - listLocations is a function but it is not func call, so it 
+   is not going to add it to call stack now.
+3. defined myLocations and assigns value which is array
+4. comes to last line listLocations(myLocations), here it is a func call so its gets add to call stack
+
+Now call stack looks like below
+listLocations(myLocations)
+main()
+
+listLocations([...]) is in call stack now so the listLocations func execution starts
+
+There is func inside the listLocations func
+    i) forEach gets added to call stack
+        a) anonymous func(inside forEach - callback) gets added to call stack 
+        b) console.log - log is a function call , adds it to call stack
+            i) prints first location from the array to console
+        c) anonymous func pops out of the call stack
+
+    Going to repeat the step a) for remainining elements in the array. after finishing
+    all the elements in array forEach pops out.
+
+Once the forEach func is poped out, listLocations is also pops out from call stack because no other lines are there inside
+listLocations func.
+
+After listLocations pops out, main func pops out as there are no other functions to execute.
+
+
+Example 3 : Asynchronous code snippet.
+
+The ouptut we saw for the below code is
+1. starting
+2. stopping
+3. 0 sec timer
+4. 2 sec timer
+
+2secs timer is getting excuted after all func is fine because we are putting 2sec delay in execution
+but why is 0 sec timer is getting executed afte stopping? why is it not getting print in second line
+
+console.log('starting)
+
+setTimeout(()=>{
+    console.log('2 sec timer)
+}, 2000)
+
+setTimeout(()=>{
+    console.log('0 sec timer)
+}, 0)
+
+console.log('stopping)
+
+Execution process: 
+1. main func pushed into call stack
+2. log func is pushed into call stack and executes and prints "starting" message to console.
+removed from call stack after the execution.
+
+3. setTimeout is a func, observe setTimeout() - func call, inside it has another func but it a first a func call
+as setTimeout is func call it is pushed into call stack.
+
+setTimeout is not part of Javascript programming language. Not gonna find it JS spec and 
+V8 has no implementation for it.
+
+instead it is node js which creates an implementation of setTimeout using c++ and provides
+to nodejs scripts to use.
+
+when we call setTimeout, it is registering an event with nodejs api's . that is an event call back pair.
+
+event here is to wait 2 secs
+and callback is the func to run
+callback excutes when the timer of 2secs finishes.
+
+when you call setTimeout, a event is register with node apis, 
+and will have setTimeout callback waiting for 2secs. the process of 2secs gets started
+
+
+while we are waiting for that 2 secs to finish, we can do other things.
+Javascript is single threaded programming language. You can do one thing at a time and the call stack
+enforces that. first one in call stack gets executed first, no way to execute multiple things at same time
+
+
+it doesnt mean Node js is completely single threaded. code you run is single threaded but nodejs
+uses other threads in C++ behind the scenes to manage events. 
+this allows us to run our app while we are waiting for 2secs . we dont have to wait for complete 2secs
+it is non blocking nature of node. not blocking rest of the app to run. {setTimeout example}
+
+Summary : when you call setTimeout, call stack registers event with node apis and 2secs timer here gets started. 
+{event-callback pair, callback func excutes after the event. here event is 2secs }
+
+4. execution moves to next line. another setTimeout func call. follows same steps as step 3
+
+5. Nodeapis, callback queques, event loop.
+
+all the registered event-callback pair moves to node apis
+callback queque - after finishing the event {2sec timer or 0 secs timer}
+, callbacks are moved to callback queque
+
+job of callback queque is to list all the callbacks
+
+job of event loop is to get the first callback from callback queque and push to call stack when call stack is empty.
+
+here call stack is not empty, main func is there so event loop do not push callbacks from callback queque to call stack
+execution moves to next line
+
+6. console.log('stopping'), log moves to call stack, executes and prints to console.
+
+7. after finishing the log, there are no func. calls left so main func pops out.
+
+8. now the call stack is empty, now event loop comes into picture. it now looks into callback queque for any callbacks,
+we have two callbacks in callback queque 1. setTimeout 0 secs n 2. setTimeout 2 secs
+
+eventloop pushes first setTimeout 0secs to call stack, callstack execute it and prints 0 secs and pops out 0secs setTimeout
+
+next eventloop pushes setTimeout 2secs to call stack , callstack execute it and prints 2 secs and pops out 2secs setTimeout
+
+Code execution finishes now.
+
+
+Making HTTP requests.
+make http requests from nodejs application.
+
+1. If you want to get whether data into your app, you gonna have to make http request.
+2. If you want to send email to some one from your app, its gonna another http request
+3. if you want to send some one a text message using twilio , that is also a http request.
+
+our app server doing http request to some other company server to get some task done.
+
+Darksky.net/dev --api
+application gives forecast based on coordinates. 
+
+signup in the app. app gives secret key. 
+this key helps app developers to track the requests made by the user, limit: 1000requests/per day for one user
+
+sample api call : url/secretkey/lat,long ---returns json with weather information. 
+JSON is the standard data while exchanging data between the services
+
+we will make this api call from our nodejs app.
+
+To make http requests, we can use core nodejs modules to make http request but they 
+are very low level. You will have to write lot of code to get things done.
+
+we will use npm module that is wrapper around core modules and make it easier and more streamlined process to make http requests
+
+npm init
+install request module from npm. 
+npm i request {dependency gets installed under node_modules}
+
+
+const request = require('request')
+
+request({}, ()=>{})
+request takes two argyments
+1. options object, where we pass options here in this case url - api
+2. call back, it executes when we get some respone/data. callback takes two arguments
+    a) error, if something goes wrong from that api {ex: you are not connected to url or wrong api url etc}
+    b) response obj, if we succesfully hit the api and api returns the data.
+request({url: url}, (error, response)=>{ // if we get correct respone then error value is undefined
+    console.log(respone)
+})
+
+data gets in the form of json, convert json to obj using JSON.parse(respone.data)-->body prop has required data
+
+** we can parse json in request module itself. pass json: true in request options object
+
+install json formatter plugin in chrome and add extension.
+
+****To add options to the url, we have to url/lat,long?key=value&key=value
+ex:lang=it&units=si ---> response comes in italian and units in si units. 
+
+We have hardcoded the lat and long in darksly api but in our web app user enter 
+location and gets the forecast. we need another api which takes in location
+and gives the cordinates.
+
+Geocoding - takes location and gives the co ordinates.
+we use mapbox api for Geocoding and pass the coordinates to Darksky api.
+
+D31
+signup - mapbox, gives access token, limit 50000 requests/month.
+
+mapbox web services --> we are using Geocoding services {search service - Geocoding}
+
+forward geocoding - address -> coordinates
+reverse geocoding - cordinates -> address.
+
+required parameters - endpoint and search_text
+endpoint here - mapbox.places , mapbox.places-permananent (commercial/enterprise)
+
+
+query string: ?key=value&key=value
+
+Handling errors:
+
+request({url:url}, (error, response)=>{
+    if(error){
+        console.log("unable to connect to ----service") //we get error when 1. we do not have internet connection. low level error
+    }else if (respone.body.error){
+        console.log('unable to find location') //something wrong in api url that we written - given wrong/removed cordinates. - input error
+    }else {
+        console.log(respone.body.features)
+    }
+})
+
+
+CallBack function: A function passed as argument to another function. Intension to call later
+setTimeout(()=>{
+
+}, 2000)
+Above example we are using callback in asynchronous way. setTimeout is node provided api
+Not every callback func is asynchronous. array methods filter uses call back pattern but are indeed synchronous.
+
+const names = ['andy', 'jes', 'jesp']
+const shortnames = names.filter((name)=>{ //passing a callback func to func intension to call later
+    return name.length <= 3
+})
+we are using callback pattern in above example but there is nothing asynchronous. It is not reacting with native
+node api.
+
+we can create our own callback functions.
+
+const geoCode = (address, callback) => {
+    const data = {
+        lat: 0,
+        long: 0
+    }
+    return data
+}
+const cordinates = geoCode('philly')
+
+usually if we want to get data object when we call geocode func is by returning data obj from geoCode func
+
+but what if we have asynchronous func like setTimeout?
+
+const geoCode = (address, callback) => {
+    setTimeout(()=>{
+        const data = {
+        lat: 0,
+        long: 0
+    }
+    return data
+    }, 2000)
+}
+const cordinates = geoCode('philly')
+This will not work, because we are returning from setTimeout func not from geoCode func.
+also we are expecting to get the data from asynchronous func (setTimeout) in our synchronous func i.e main func
+this wont happen because event loop pushes callback funcs only when callstack is empty. 
+
+here we need to use callback func
+
+
+const geoCode = (address, callback) => {
+    setTimeout(()=>{
+        const data = {
+        lat: 0,
+        long: 0
+    }
+    callback(data)
+    }, 2000)
+}
+geoCode('philly', (geoCodeData)=>{ //when you call geoCode with philly as address - one argument and the
+                                //other argument as callback func. it is not going to execute first
+                                //callback func passed as argument is going to execute under setTimeout func
+                                // we are passing data obj as argument to callback func
+                                //setTimeout callback trigger after the 2secs timer event finishes.
+
+    console.log(geoCode)
+})
+
+callback under setTimeout gets called when the timer finsihes and we can access data object 
+in callbackfunc which is passed to geoCode.
+
+ why are we using setTimeout under geoCode?? because we need to get the coordinates
+  when we call geocode with location. this is done by doing http request to map box api which is asynchronous
+
+  so here the pattern of the example ---> under geocode func we make api request via http request to mapbox which is asynchronous one
+  and use callback to send coordinates. geocode returns cordinates via callback func and we use callback func in geocode func call to use those cordinates
+  and give forecast info to the user for that location
+
+we will use callback in geocode func
+
+callback abstraction: 
+const geocode = (address, callback) => {
+    const url = "url/+address+" //we can send diff address as we are using dynamic address
+
+    request({url:url, json:true}, (error, respone)=> {
+        if(error){
+            callback('unable to connect to --service' , undefined) //instead of doing console.log, we are sending
+                                                                // error message to callback func, so that callback func
+                                                                //can do with that error/response --send error msg as email to client etc                                                 
+        } else if(respone.body.features.length === 0){
+            callback('unable to search location', undefined) //if there is no response it is automatically set to undefined but it is good approach to send undefined value for respone
+        } else {
+            callback(undefined, {
+                lat: respone.body.features[0].center[1]
+                long: respone.body.features[0].center[2]
+                location: respone.body.features[0].place_name
+            })
+        }
+    })
+}
+*****we cannot return under request method as it is asynchronous one so using callbacks
+
+geocode('philly', (error, data)=> { //every callback is called with error and data
+        console.log('Error', error)
+        console.log('Data' , data)
+})
+pattern same with mapbox -- create separate files for geocode and forecast and require them in app.js
+
+final version
+
+geocode('philly', (error, data)=> { 
+        console.log('Error', error)
+        console.log('Data' , data)
+})
+
+forecast(70.11,44.154,(error, data)=>{
+        console.log('Error', error)
+        console.log('Data' , data)
+})
+
+callback chaining:
+we are performing two asynchronous io operations. problem is they are operating independently.
+
+we get the coordinates from geocode data object so pass them to forecast by calling forecast inside of geocode
+
+geocode('philly', (error, data)=> { 
+        if(error) {
+            ***return console.log('Error', error) //return terminates the func. can skip else statement below if we use return
+        } else {
+            //console.log('Data' , data)
+            const lat = data.lat
+            const long = data.long
+
+            forecast(lat,long,(error, forecastdata)=>{
+                if(error){
+                  return  console.log('Error', error)
+                }
+                console.log(data.location) //location we get from data object when we execute geoCode
+                console.log(forecastdata) //string text of forecast
+            })
+        }
+})
+es6 - objects
+Object property shorthand. 
+
+const name ='srk'
+const userAge = 25
+
+const user = {
+    name: name,
+    age: userAge,
+    location: "hyd"
+}
+we are not using es6 object prop shorthand
+
+we can use es6 object shorthand, when we are setting a property with value which comes from a variable with same name
+
+ex: const user = {
+    name,           //creates name prop and looks for name var and assigns name var value to name prop under obj
+    age: userAge, //cannot use shorthand because names should match, here variable is userAge not age
+    location: 'hh'
+}
+
+J1
+Object destructuring : A object and you are trying to access object properties
+
+const product = {
+    label: 'Note book',
+    price: 3,
+    stock: 201,
+    salesPrice: undefined
+}
+
+Can access obj prop as 
+const label = product.label
+const price = product.price
+
+but we end up writing many lines of code, using latest syntax (object destructuring) we can create individual variables like
+
+const {label, price} = product
+
+creates individual variables lable, price ect from product object.
+
+console.log(label) //Note book
+
+we can rename the variable names, by putting colon infront of obj prop. 
+const {label:productLabel, price} = product
+
+we can set default values to the variables
+
+const {label, price, rating =5} = product
+
+creates rating variable and assigns 5 as value. if rating is defined as prop under product object then
+default values are not applicable.
+
+destructuring can be used while passing obj as func arguments.
+
+const transaction = (type, myProduct) => {
+    const {} = myProduct
+}
+
+transaction('order',  product).
+
+Instead of destructuring the object inside the method we can destructure on func argument itself.
+
+const transaction = (type, {label, stock}) => { //we can access product obj properties label and stock
+    console.log(label)
+}
+transaction('order',  product).
+
+*****HTTP requests without a library {earlier we acheived http requests using request npm library}
+libraries make process a lot easier.
+ Learning what exactly request module is doing --
+
+Navigate to node official documentation - 
+we have two modules - http and https to perform standard and secure http request.
+whereas using request npm library, we dont have to use two modules. request module abstracts all these behing the scenes
+
+http and https - we can use these two modules to create server and make request to existing server
+
+Geocode is a https request. Load in https module in our app. 
+it is core module so we dont have to install anything.
+
+const https = require('https')
+
+https.request(url, (response)=> { //request module to fireoff request
+                                 //takes two arguments, one url and another argument as callback
+                                //callback takes one argument which is response {this we get when we hit url}
+
+
+//core modules operate at low level, we get data in the form of chunks based on response not complete response at Once
+//Listen to individual chunk to come in.
+
+    response.on('data', (chunk)=> { //response.on() is a func that allows us to register a handler
+                                    //we have diff events that we can resgister, here the event is data
+                                    //callback fires when the new data comes in  and can access the data by the argument chunk
+    })
+
+    response.on('end', ()=> { //when we get all the data this 'end' event gets fired
+    })
+})
+
+the data we get in chunk is of buffer data and we get individual chunks based on the response that server is sending
+we need to store in one var and then convert to string and then parse it object
+
+--> use event and end events together - get the complete data json, parse it 
+
+const https = require('https')
+https.request(url, (response)=> { 
+    let data = ''
+    response.on('data', (chunk)=> { 
+        data = data + chunk.toString() //we get multiple chunks (buffered data) so converting it to string and
+                                        //storing it var data
+    })
+    response.on('end', ()=> { 
+        const parsedObj = data.parse(data)
+    })
+})
+the above do not work because we need to tell that we are ready to send final request(complete request) 
+this is done by
+request returns request object, stored it in a variable
+tell that we are done with request by calling end method
+
+const https = require('https')
+const request = https.request(url, (response)=> { 
+    let data = ''
+    response.on('data', (chunk)=> { 
+        data = data + chunk.toString() //we get multiple chunks (buffered data) so converting it to string and
+                                        //storing it var data
+    })
+    response.on('end', ()=> { 
+        const parsedObj = data.parse(data)
+    })
+})
+
+//before sending final request, we need to handle errors
+
+request.on('error', (error)=> { //error event
+    console.log(error)
+})
+request.end()
+This is what it takes to send http and https requests using core modules.
+
+core node modules are supposed to provide with low level implementations. node comes with npm bundle so we can use
+npm modules.
+
+what ever apps we build till now are accessible via CLI (notes app, partial weather app), but we
+need to access them vial url. user can enter url in the browser and can access our application.
+
+webservers: express - npm library
+express makes very easy to Create webservers using node. 
+serve up all the assets for webapp - html, css and client side JS
+
+1. visit a url in the browser, to interact with ur app in the browser
+node server - serves up browser with all of the assets to load - html,css, client side js and also images.
+2. instead of serving up a website we could serve up http json based api {similar to mapbox or darksky api - exchanging jsondata back n forth with the server}
+
+****
+npm init
+npm i express.
+
+instead of putting all the files under root. create and put all the node files under src folder. Bit organised now.
+or else it would be complex when you have more files when the app is scaled.
+
+src-->app.js
+
+const express = require('express')
+return function., we call it to create express application.
+
+const app = express()
+//app.com --> homepage etc
+//app.com/help
+//app.com/about --->routes
+
+setup our server to send a response when someone get something at specific route. we set that up by using get method.
+
+app.get() //lets us configure, what the server should do when someone get the resource at a specific url. {may be we are
+sending html or may be we are sending json}
+
+app.get('/', (req,res)=> {  //get method takes two arguments 1. route - '' or '/' 2. callback, what we want to do/send back to them when someone visit the route
+    
+                    //callback takes two arguments 1.req, 2.res
+                    //req obj - containing information about the incoming request to the server
+                    //res - contains bunch of methods allowing us to customize what we gonna send back to the requestor.
+    
+    res.send('hello express') //sends to browser
+})
+we need to start the server. currently server is not up and running
+to start the server
+app.listen(3000, ()=>{ // starts the server and listen to specific port. common dev port - 3000, for http default-8080
+                        //callback runs when the server is up and running. callback is optional.
+})
+node process is running, thats why cursor is still running not retured to terminal.
+J2
+localhost:3000 
+when we visited that url in the browser, it went off to the server, the express server found the matching route
+and returned the text response.
+
+In reality we will not send string we either send json or html
+HTML as res
+res.send('<h1>This is some heading</h>') //html under string
+
+JSON as res
+res.send({         //json can be array of objects - [{},{}]
+    name: "json"
+})
+express gonna detect that we provided an object, automatically stringify and renders json
+
+We are adding a html inside a string in js file. It would be difficult manage if we add more html elements in res.send
+It would be nice if we add separate files and express server those files
+
+configure express to serve up entire folder that would contain html,css, js and images 
+
+Create a directory
+public ---> anything under this folder served up as part of express server
+
+public>index.html
+
+index.html is a special file. by default servers serve index.html as root route.
+
+Goal is to teach express how to serve up the contents of the directory, we need the path to the public directory.
+It cant be a relative path but it needs be of absolute path from the root of ur machine.
+
+Node provides two variables
+
+1. __dirname -- gives the path of the directory
+2. __filename -- gives the path of the file
+
+These two values are provided by that wrapper func (debugger - main func created / wrapped all our code inside a func )
+that func various things to our code like require func.
+
+currently __dirname is ponting towards src/index.js we need to point to public folder.
+
+we have a core node module "path" & has a method "join" - 
+
+load core module -- const path = require('path')
+
+path.join(__dirname, '../public') //join is a func and returns the final path. we send individual pieces it does manipulating the
+paths/string
+
+const publicDirectoryPath = path.join(__dirname, '../public')
+app.use(express.static(publicDirectoryPath))
+
+app.use() --> way of configure/customize ur express server.
+express.static() --> severs public folder.
+
+localhost:3000/index.html also works 
+
+app.get('', ()=>{}) - root route is not needed now as we server up index.html in public folder, so server by default picks up that file
+
+create css folder > css file and link it in all html files. same with js and images.
+
+./ --> relative path
+/ -> absolute path
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------==============-----------------=================
+Application deployment::
+git, github and heroku.
+git: allows us to put our app under version control. allows us to track our changes over time.
+github: allows to back up our source code and collabrate with others
+heroku - deploy our app to production server. Everyone can access.
+
+
+signup github - a development platform. allows us to manage our project. track changes over time. collabrate with team
+track bugs/issues and feature requests. host public or private projects. most of the npm modules are hosted on github
+
+signup - heroku
+heroku cli - article devcenter heroku - install in ur machine
+
+type in console
+heroku -v -- to get the heroku version.
+
+heroku login
+links the commands we run from the terminal to our heroku account {allows us to manage our project from vs code}
+
+press q space and login to heroku account in browser {close that tab}
+
+in console it display - logged in as xxxxxxx
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
