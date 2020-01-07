@@ -29,7 +29,6 @@ opens repl - real evaluate print loop
 
 install vs code
 
-
 On the server, we perform operations like,
 connect to database
 Authentication

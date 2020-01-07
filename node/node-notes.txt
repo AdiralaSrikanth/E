@@ -28,17 +28,14 @@ integrating with file system so that you can read and write from disc.
 
 At the end of the day, both chrome and node are creating modified version of javascript
 
-chrome browser uses v8 engine. when chrome needs to run a js for a particular webpage it does not run the javascript itself and It can'take
+chrome browser uses v8 engine. when chrome needs to run a js for a particular webpage it does not run the javascript itself and It can't
 instead it uses v8 engine to get that done.
 It passes js code to v8 and it gets the results back.
 
-
 It is also same with node. node doesnt know how to run js code. it passes to v8 and get the results
-
 
 v8 does not know how to interact with DOM and filesystem. Its node and chrome job to provide implementations
 for those when running v8.
-
 
 chrome, node are written in C++ its not a coincidence
 
@@ -66,15 +63,14 @@ when v8 excute js file with those methods. v8 differs to node js c++ code to exe
 "test".toUpperCase()
 Js code can be executed in console or in node repl. Will get the same results. provided by v8 engine
 
-
 in console -window or document
 will get methods. but when you type the same in node repl you will get error {undefined}
 window is provided by chrome when running javascript in browser
 
 simillarly we have variable called global in node and the other one is process object (will have prop and methods, one method is exit {process.exit()}). will have prop and methods. 
-When you type in console/browser will get error
+When you type them in console/browser will get error
 
-why nodejs
+why nodejs?
 walmart, netflix, uber uses node in prod.
 remainining statement from official nodejs page : Node js uses an event-driven, non blocking I/O model
 that makes it light weight and efficient.
@@ -100,11 +96,12 @@ fs.writeFileSync {synchronous version}- allows write some data to a file on our 
 fs.writeFileSync('nameofthefile', 'datatowrite')  --
 fs.writeFileSync('abc.txt', 'test123')  --gets error {fs is not defined} because we did not load file system in the file 
 
-before the above step, type const fs = require('fs') ---inside require('modulename')
-to load in node module system call require func. require returns prop and 
-methods from the fs module
+before the above step, type const fs = require('fs') ---inside require('modulename').
+To load in node module system, call require function. 
+require returns prop and methods from the fs module
 
-if file exists it writes data in that file. if doesnt exist create new file n writes data. Overwrites the data if we write some more data
+if file exists it writes data in that file. if doesnt exist create new file n writes data. 
+Overwrites the data if we write some more data
 use appendFileSync to append the data in file instead of Overwriting the data.
 
 D24 - ***Notes app
@@ -136,7 +133,7 @@ npm i validator
 when we run above command , goes to npm servers, grabs all of the code for that pkg 
 and adds it to our application. 
 
-node_modules folder is created. contains all of the code for the dependencies we install.
+node_modules folder is created. contains all of the code for the dependencies that we install.
 pkglock.json - contains extra info making npm bit faster and secure. lists exact version of dependencies
 where they fetched from. shaw code...
 
@@ -145,8 +142,7 @@ validator.isEmail('foo@bar.com') //true/false
 isUrl('https://www.google.com') //true/false
 
 node_modules directory is imp. when you do require(''), its gonna look in that node_modules folder
-else error cannot find module validator etc
-
+else we will get error cannot find module validator etc
 
 npm install - it looks at pkg and pkglock.json to determine which dependencies our proj is using.
 it creates node_modules from scratch.
@@ -159,7 +155,7 @@ chalk -- color tool.
 All the previous libraries are locally installed. Ex: validator and chalk libraries/modules
 
 Global module
-npm i nodemon -g === -g flag install module globally, at the os level
+npm i nodemon -g ===> -g flag install module globally, at the os level
 we do not have to use require to load in module in file.
 
 Run the script like we normally do node app.js but use nodemon app.js
@@ -177,7 +173,7 @@ node app.js test
 test is stored under process
 process.argv - (argument vector). It is an array contains all the arguments provided
 
-when you type in node app.js test
+when you type in node app.js add
 console: returns array with values
 1. path to node executable(nvm) in ur machine
 2. path of the executed file.
@@ -186,14 +182,13 @@ process.env[2] -- grabbing the 3rd value by index. if we pass argument and to ge
 use this argument "add" and perform operation in file.
 likewise sub/mul etc.
 
-
 we can add more information. lets say user wants to add a note along with the title or
 user want to delete note based on title.
 
 node app.js add --title="this is my note"
 --title is command line options
 it gets stored as it as --title="this is my note" in process.argv property
-it is not parsed. we cannot get --title value directly we will have to write code for it but
+it is not parsed. we cannot get --title value directly we will have to write code for it but we
 do not have to reinvent the wheel. we can use 'yargs' library to parse arguments
 
 yargs
@@ -240,7 +235,6 @@ it will show add command as available commands along with the description.
 we need to use the options
 builder: {} takes object as value, in that we can define the options
 
-
 yargs.command({
      name: 'add',
      describe: 'add a new note',
@@ -251,9 +245,8 @@ yargs.command({
                                 //bascially telling that this option is required/mandatory.
                                 //if we type node app.js add --without title option/argument, it 
                                 throws error Missing required argument: title 
-         
             type: 'string' //if we dont specify type, by default it is true
-                            //node ap.js add --title results in true whe you set type it changes it to string
+                            //node ap.js add --title results in true when you set type it changes it to string
          }
      }
      handler: function(argv){ //when you define options, those are accessible in handler as argv
@@ -261,11 +254,8 @@ yargs.command({
                                                     //argv.title --gets the title value
      }
  })
-
 At the end of the file we need to set ******yargs.parse() so that yargs parses all the commands.
-this is also can be done using  yargs.argv
-
-
+this is also can be done using yargs.argv
 
 Adding body option
 yargs.command({
@@ -288,19 +278,17 @@ yargs.command({
      }
  })
 
-
 **Storing data with json:
 We need to store notes, when a user adds a note today and comes 2mrw to edit/delete/read note
 we use fs module to store notes to file. data going to that file is JSON data
 
 JSON has native support in javascript. will learn about json now.
-
 create a js object
  const book = {
      title: 'The untold hearts',
      author: 'Md. Ravoof'
  }
-convert it json which is a string. fs core module only knows how to work with string data
+convert it to json which is a string. fs core module only knows how to work with string data
 
 JSON.stringify(array/object) -- converts to json string representation.
 
@@ -313,7 +301,6 @@ const bookObj = JSON.parse(bookJSON) // takes json and converts it to object
 console.localStorage(bookObj.title) //gets the title value
 
 Now, we will write data to file using fs core module. we use writeFileSync method.
-
 
 const bookJSON = JSON.stringify(book)
 fs.writeFileSync('1-json.json', bookJSON) //stores bookJSON data to the file.
@@ -352,7 +339,7 @@ Above function can be rewritten in arrow function
 } 
 we do not need function keyword instead use () and => arrow
 
-2. if we have only one return statement we can omit return keyword and {}
+2. if we have only one return statement then we can omit return keyword and {}
 const square = (x) => x * x 
 
 Arrow function in methods:
@@ -360,7 +347,7 @@ Arrow function in methods:
 const event = {
     name: 'Birthday party',
     printGuestList: function(){
-        console.log('guest list for' + this.name) //we can access obj prop under obj method using this keyword.
+        console.log('guest list for' + this.name) //we can access obj prop's under obj method using this keyword.
     }                                           //this is reference to the obj.
 }
 event.printGuestList()
@@ -380,8 +367,6 @@ name: 'Birthday party',
     printGuestList(){
         console.log('guest list for' + this.name) //we will get the correct ans.
     } 
-
-
 *** Why we want to use arrow function.
 
 const event = {
@@ -404,23 +389,20 @@ because 1. normal func bind their this value
 solution:
 1. arrow func do not bind their this value
 
-
 filter vs find.
 if we are checking for duplicates in an array (1000records), and the duplicate match is at 89record
 filter function finds at 89 record and loops till 1000 where
-find function finds record at 89 and stops/return the execution. {undefined if it did not find}
+find function finds record at 89 and stops/return the execution. {undefined if it do not find}
 
 D26
 Skipping weather app for now.
-
 
 install mongodb , robo 3t - follow configuration videos.
 ***database needs to be in running in order us to connect.
 
 mongodb.com>docs>mongodb drivers> node js driver.
 
-Drivers are libraries that allow you to interact with mongodb database
-from a wide range of prog. lang.
+Drivers are libraries that allow you to interact with mongodb database from a wide range of prog. lang.
 
 1. Create task-manager app folder and do npm init
 2. install mongodb - npm i mongodb
@@ -434,7 +416,7 @@ known as mongo client
 
 MongoClient = mongodb.MongoClient
 
-gives the function neccessary to connect to the ddatabase so that we can perofm crud operations
+gives the function neccessary to connect to the ddatabase so that we can perform crud operations
 
 D29 - revised above content from beginning. 
 continuing the course - webapp.
@@ -443,7 +425,6 @@ D30
 Debugging Nodejs.
 Everyone who is writing software making mistakes, the real goal is to recover 
 them quickly and get back on track so we can work on continue to be productive.
-
 
 1. console.log()
 2. debugger
@@ -457,9 +438,8 @@ Now open chrome browser and type chrome://inspect
 node debugger uses built in v8 debugger tools also chrome uses same debugger v8 tools. other browser
 debugger tools will be different.
 
-
 Remote target: click on inspect, opens new instance.
-if you dont see ur app under remote target. click on configuration and check localhost an ip 
+if you dont see ur app under remote target. click on configuration and check localhost and ip 
 if those two fields are not there then add localhost:9229 and 127..0.1.9229.
 
 Notice that nodejs scripts are wrapped inside a function.
@@ -474,7 +454,7 @@ In the console you can get the values of the variables ex: notes[1] , grabs the 
 
 click on play button it continues all the statements in the script and finishes the execution.
 
-to restart the execution again, type in restart command and go shut down the process by control c.
+to restart the execution again, type in restart command and to shut down the process by control c.
 
 Logic errors -Debugging helps
 When you do typo errors, 
@@ -494,7 +474,7 @@ Next lines gives you, where exactly this method called
 
 console.log('starting')
 
-//Asynchronous func node js provided
+//Asynchronous func which node js provided
 setTimeout() - allows to run some code after specific amount of time passed.
 takes two arguments. first argument is the function and the second is of time in milliseconds
 
@@ -530,7 +510,6 @@ why is it 0 secs timer is printed at last (not printed in second)?
 we have to understand, the internals of node js that are responsible for getting asynchronous programming
 to work.
 
-
 Node js file has the following code
 
 const x = 1
@@ -542,7 +521,7 @@ above code is of synchronous code example, lets see the execution process.
 Call Stack is a data structure provided by js v8 engine. The job of the call stack is to track the 
 execution of our program. It does by tracking all the functions that are currently running.
 
-FIFO - first in first out. (Ex:  tennis ball tin, you add balls in it and when you want to
+FIFO - first in first out. (Ex: tennis ball tin, you add balls in it and when you want to
 remove last ball you will have to remove the first one first.)
 
 will see the above code snippet execution,
@@ -567,14 +546,12 @@ after execution of log method it pops out of the Stack
 
 so the main func is pop-ed out of the call stack.
 
-
 Example 2:
 const listLocations = (locations) => {
     locations.forEach((location)=>{
         console.log(location)
     })
 }
-
 const myLocations = ['philly', 'nyc']
 
 listLocations(myLocations)
@@ -606,17 +583,16 @@ listLocations func.
 
 After listLocations pops out, main func pops out as there are no other functions to execute.
 
-
 Example 3 : Asynchronous code snippet.
 
-The ouptut we saw for the below code is
+The output we saw for the below code is
 1. starting
 2. stopping
 3. 0 sec timer
 4. 2 sec timer
 
-2secs timer is getting excuted after all func is fine because we are putting 2sec delay in execution
-but why is 0 sec timer is getting executed afte stopping? why is it not getting print in second line
+2secs timer is getting executed after all functions is fine because we are putting 2sec delay in execution
+but why is 0 sec timer is getting executed after stopping? why is it not getting print in second line
 
 console.log('starting)
 
@@ -635,16 +611,16 @@ Execution process:
 2. log func is pushed into call stack and executes and prints "starting" message to console.
 removed from call stack after the execution.
 
-3. setTimeout is a func, observe setTimeout() - func call, inside it has another func but it a first a func call
+3. setTimeout is a func, observe setTimeout() - func call, inside it has another func but it is first a func call
 as setTimeout is func call it is pushed into call stack.
 
-setTimeout is not part of Javascript programming language. Not gonna find it JS spec and 
+setTimeout is not part of Javascript programming language. Not gonna find it in JS spec and 
 V8 has no implementation for it.
 
 instead it is node js which creates an implementation of setTimeout using c++ and provides
 to nodejs scripts to use.
 
-when we call setTimeout, it is registering an event with nodejs api's . that is an event call back pair.
+when we call setTimeout, it is registering an event with nodejs api's. that is an event call back pair.
 
 event here is to wait 2 secs
 and callback is the func to run
@@ -653,15 +629,13 @@ callback excutes when the timer of 2secs finishes.
 when you call setTimeout, a event is register with node apis, 
 and will have setTimeout callback waiting for 2secs. the process of 2secs gets started
 
-
 while we are waiting for that 2 secs to finish, we can do other things.
 Javascript is single threaded programming language. You can do one thing at a time and the call stack
 enforces that. first one in call stack gets executed first, no way to execute multiple things at same time
 
-
 it doesnt mean Node js is completely single threaded. code you run is single threaded but nodejs
 uses other threads in C++ behind the scenes to manage events. 
-this allows us to run our app while we are waiting for 2secs . we dont have to wait for complete 2secs
+this allows us to run our app while we are waiting for 2secs. we dont have to wait for complete 2secs
 it is non blocking nature of node. not blocking rest of the app to run. {setTimeout example}
 
 Summary : when you call setTimeout, call stack registers event with node apis and 2secs timer here gets started. 
@@ -679,7 +653,7 @@ job of callback queque is to list all the callbacks
 
 job of event loop is to get the first callback from callback queque and push to call stack when call stack is empty.
 
-here call stack is not empty, main func is there so event loop do not push callbacks from callback queque to call stack
+here call stack is not empty, main func is there so event loop do not push callbacks from callback queque to call stack.
 execution moves to next line
 
 6. console.log('stopping'), log moves to call stack, executes and prints to console.
@@ -695,13 +669,12 @@ next eventloop pushes setTimeout 2secs to call stack , callstack execute it and 
 
 Code execution finishes now.
 
-
-Making HTTP requests.
+****Making HTTP requests.
 make http requests from nodejs application.
 
 1. If you want to get whether data into your app, you gonna have to make http request.
-2. If you want to send email to some one from your app, its gonna another http request
-3. if you want to send some one a text message using twilio , that is also a http request.
+2. If you want to send email to someone from your app, its gonna another http request
+3. if you want to send someone a text message using twilio , that is also a http request.
 
 our app server doing http request to some other company server to get some task done.
 
@@ -725,34 +698,34 @@ npm init
 install request module from npm. 
 npm i request {dependency gets installed under node_modules}
 
-
 const request = require('request')
 
 request({}, ()=>{})
 request takes two argyments
 1. options object, where we pass options here in this case url - api
 2. call back, it executes when we get some respone/data. callback takes two arguments
-    a) error, if something goes wrong from that api {ex: you are not connected to url or wrong api url etc}
+    a) error, if something goes wrong from that api {ex: you are not connected to internet or wrong api url etc}
     b) response obj, if we succesfully hit the api and api returns the data.
 request({url: url}, (error, response)=>{ // if we get correct respone then error value is undefined
     console.log(respone)
 })
 
-data gets in the form of json, convert json to obj using JSON.parse(respone.data)-->body prop has required data
+data gets in the form of json, convert json to obj using JSON.parse(respone.body)-->body prop has required data
 
-** we can parse json in request module itself. pass json: true in request options object
+***we can parse json in request module itself. pass json: true in request options object
 
 install json formatter plugin in chrome and add extension.
 
 ****To add options to the url, we have to url/lat,long?key=value&key=value
 ex:lang=it&units=si ---> response comes in italian and units in si units. 
 
-We have hardcoded the lat and long in darksly api but in our web app user enter 
+We have hardcoded the lat and long in darksky api but in our web app user enter 
 location and gets the forecast. we need another api which takes in location
 and gives the cordinates.
 
 Geocoding - takes location and gives the co ordinates.
-we use mapbox api for Geocoding and pass the coordinates to Darksky api.
+
+we can use Mapbox api for geocoding and pass the coordinates to Darksky api.
 
 D31
 signup - mapbox, gives access token, limit 50000 requests/month.
@@ -765,11 +738,9 @@ reverse geocoding - cordinates -> address.
 required parameters - endpoint and search_text
 endpoint here - mapbox.places , mapbox.places-permananent (commercial/enterprise)
 
-
 query string: ?key=value&key=value
 
 Handling errors:
-
 request({url:url}, (error, response)=>{
     if(error){
         console.log("unable to connect to ----service") //we get error when 1. we do not have internet connection. low level error
@@ -780,7 +751,6 @@ request({url:url}, (error, response)=>{
     }
 })
 
-
 CallBack function: A function passed as argument to another function. Intension to call later
 setTimeout(()=>{
 
@@ -789,7 +759,7 @@ Above example we are using callback in asynchronous way. setTimeout is node prov
 Not every callback func is asynchronous. array methods filter uses call back pattern but are indeed synchronous.
 
 const names = ['andy', 'jes', 'jesp']
-const shortnames = names.filter((name)=>{ //passing a callback func to func intension to call later
+const shortnames = names.filter((name)=>{ //passing a callback func to func, intension to call later
     return name.length <= 3
 })
 we are using callback pattern in above example but there is nothing asynchronous. It is not reacting with native
@@ -826,7 +796,6 @@ this wont happen because event loop pushes callback funcs only when callstack is
 
 here we need to use callback func
 
-
 const geoCode = (address, callback) => {
     setTimeout(()=>{
         const data = {
@@ -842,18 +811,18 @@ geoCode('philly', (geoCodeData)=>{ //when you call geoCode with philly as addres
                                 // we are passing data obj as argument to callback func
                                 //setTimeout callback trigger after the 2secs timer event finishes.
 
-    console.log(geoCode)
+    console.log(geoCodeData)
 })
 
-callback under setTimeout gets called when the timer finsihes and we can access data object 
-in callbackfunc which is passed to geoCode.
+callback under setTimeout gets called when the timer finishes and we can access data object 
+in callbackfunc which is passed to geoCode. //update this para.
 
- why are we using setTimeout under geoCode?? because we need to get the coordinates
-  when we call geocode with location. this is done by doing http request to map box api which is asynchronous
+why are we using setTimeout under geoCode?? because we need to get the coordinates when we call geocode with location. 
+this is done by doing http request to map box api which is asynchronous
 
-  so here the pattern of the example ---> under geocode func we make api request via http request to mapbox which is asynchronous one
-  and use callback to send coordinates. geocode returns cordinates via callback func and we use callback func in geocode func call to use those cordinates
-  and give forecast info to the user for that location
+so here the pattern of the example ---> under geocode func we make api request via http request to mapbox which is asynchronous one
+and use callback to send coordinates. geocode returns cordinates via callback func and we use callback func in geocode func call to use those cordinates
+and give forecast info to the user for that location
 
 we will use callback in geocode func
 
@@ -865,7 +834,7 @@ const geocode = (address, callback) => {
         if(error){
             callback('unable to connect to --service' , undefined) //instead of doing console.log, we are sending
                                                                 // error message to callback func, so that callback func
-                                                                //can do with that error/response --send error msg as email to client etc                                                 
+                                                                //can do anything with that error/response --send error msg as email to client etc                                                 
         } else if(respone.body.features.length === 0){
             callback('unable to search location', undefined) //if there is no response it is automatically set to undefined but it is good approach to send undefined value for respone
         } else {
@@ -949,7 +918,6 @@ const product = {
     stock: 201,
     salesPrice: undefined
 }
-
 Can access obj prop as 
 const label = product.label
 const price = product.price
@@ -958,7 +926,7 @@ but we end up writing many lines of code, using latest syntax (object destructur
 
 const {label, price} = product
 
-creates individual variables lable, price ect from product object.
+creates individual variables label, price etc from product object.
 
 console.log(label) //Note book
 
@@ -987,13 +955,13 @@ const transaction = (type, {label, stock}) => { //we can access product obj prop
 }
 transaction('order',  product).
 
-*****HTTP requests without a library {earlier we acheived http requests using request npm library}
+*****HTTP requests without a library {earlier we achieved http requests using request npm library}
 libraries make process a lot easier.
  Learning what exactly request module is doing --
 
 Navigate to node official documentation - 
 we have two modules - http and https to perform standard and secure http request.
-whereas using request npm library, we dont have to use two modules. request module abstracts all these behing the scenes
+whereas using request npm library, we dont have to use two modules. request module abstracts all these behind the scenes
 
 http and https - we can use these two modules to create server and make request to existing server
 
@@ -1001,18 +969,16 @@ Geocode is a https request. Load in https module in our app.
 it is core module so we dont have to install anything.
 
 const https = require('https')
-
 https.request(url, (response)=> { //request module to fireoff request
                                  //takes two arguments, one url and another argument as callback
                                 //callback takes one argument which is response {this we get when we hit url}
-
 
 //core modules operate at low level, we get data in the form of chunks based on response not complete response at Once
 //Listen to individual chunk to come in.
 
     response.on('data', (chunk)=> { //response.on() is a func that allows us to register a handler
-                                    //we have diff events that we can resgister, here the event is data
-                                    //callback fires when the new data comes in  and can access the data by the argument chunk
+                                    //we have diff events that we can register, here the event is data
+                                    //callback fires when the new data comes in and can access the data by the argument chunk
     })
 
     response.on('end', ()=> { //when we get all the data this 'end' event gets fired
@@ -1022,7 +988,7 @@ https.request(url, (response)=> { //request module to fireoff request
 the data we get in chunk is of buffer data and we get individual chunks based on the response that server is sending
 we need to store in one var and then convert to string and then parse it object
 
---> use event and end events together - get the complete data json, parse it 
+--> use data and end events together - get the complete data json, parse it 
 
 const https = require('https')
 https.request(url, (response)=> { 
@@ -1037,7 +1003,7 @@ https.request(url, (response)=> {
 })
 the above do not work because we need to tell that we are ready to send final request(complete request) 
 this is done by
-request returns request object, stored it in a variable
+request returns request object, store it in a variable
 tell that we are done with request by calling end method
 
 const https = require('https')
@@ -1058,16 +1024,17 @@ request.on('error', (error)=> { //error event
     console.log(error)
 })
 request.end()
+
 This is what it takes to send http and https requests using core modules.
 
 core node modules are supposed to provide with low level implementations. node comes with npm bundle so we can use
 npm modules.
 
 what ever apps we build till now are accessible via CLI (notes app, partial weather app), but we
-need to access them vial url. user can enter url in the browser and can access our application.
+need to access them via url. user can enter url in the browser and can access our application.
 
 webservers: express - npm library
-express makes very easy to Create webservers using node. 
+express makes very easy to create webservers using node. 
 serve up all the assets for webapp - html, css and client side JS
 
 1. visit a url in the browser, to interact with ur app in the browser
@@ -1084,7 +1051,7 @@ or else it would be complex when you have more files when the app is scaled.
 src-->app.js
 
 const express = require('express')
-return function., we call it to create express application.
+return function, we call it to create express application.
 
 const app = express()
 //app.com --> homepage etc
@@ -1109,7 +1076,7 @@ to start the server
 app.listen(3000, ()=>{ // starts the server and listen to specific port. common dev port - 3000, for http default-8080
                         //callback runs when the server is up and running. callback is optional.
 })
-node process is running, thats why cursor is still running not retured to terminal.
+node process is running, thats why cursor is still running not returned to terminal.
 J2
 localhost:3000 
 when we visited that url in the browser, it went off to the server, the express server found the matching route
@@ -1125,7 +1092,7 @@ res.send({         //json can be array of objects - [{},{}]
 })
 express gonna detect that we provided an object, automatically stringify and renders json
 
-We are adding a html inside a string in js file. It would be difficult manage if we add more html elements in res.send
+We are adding a html inside a string in js file. It would be difficult to manage if we add more html elements in res.send
 It would be nice if we add separate files and express server those files
 
 configure express to serve up entire folder that would contain html,css, js and images 
@@ -1146,7 +1113,7 @@ Node provides two variables
 2. __filename -- gives the path of the file
 
 These two values are provided by that wrapper func (debugger - main func created / wrapped all our code inside a func )
-that func various things to our code like require func.
+that func provides various things to our code like require func.
 
 currently __dirname is ponting towards src/index.js we need to point to public folder.
 
@@ -1161,16 +1128,235 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 app.use(express.static(publicDirectoryPath))
 
 app.use() --> way of configure/customize ur express server.
-express.static() --> severs public folder.
+express.static() --> serves public folder.
 
 localhost:3000/index.html also works 
 
 app.get('', ()=>{}) - root route is not needed now as we server up index.html in public folder, so server by default picks up that file
 
-create css folder > css file and link it in all html files. same with js and images.
+create css folder > css file and link it in all html files(use link tag under head tag). 
 
-./ --> relative path
-/ -> absolute path
+<link rel="stylesheet" href="/css/style.css">  //webserver root, here public folder
+same with client js(script tag under head tag...<script src="/js/app.js"></script>) and images-img element <img src="/img/abc.png">.
+
+./ --> relative path ->relative to that file
+/ -> absolute path --> webserver root
+
+J6
+Dynamic pages with templating
+J7
+Dynamic pages with templating
+static - do not change.
+
+Template engine to render dynamic web pages using express
+
+Handle bars:
+1. gonna allow us to render dynamic document
+2. easily create code that can be used across pages ex: header and footer, we can write once and use them in each page
+It would be bad if the header and footer changes for each page and if we use copy paste the code in 
+each page, it would be difficult to go to each page and modify.
+
+npm handlebars
+it is low level library that implements handlebars in js.
+can be used in browser, server, desktop apps using electron 
+
+we use handlebars using express server.
+
+another handlebar plugin npm hbs. hbs uses handlebars behind the scenes. makes easy to intergrate with express
+install hbs in our proj.
+npm i hbs
+
+Now, we need to tell express which template engine we are using.
+
+app.set('view engine', 'hbs') //hbs- name of the module
+spacing and capitilization is important in view engine string.
+
+By default express looks for templates under views directory
+under views folder - create files - index.hbs (extension is hbs)
+
+hbs are same as html with few added features like injecting dynamic values
+
+to server up above file (index.hbs), we need to set up a route
+
+app.get('', (req,res)=> {
+    res.render('index', {title: "weather"})  //res.send() - can be used to send string, html string, obj and also array
+                                //object is converted to json. express takes care of it
+                            //instead of using res.send we used res.render() method, which renders our views and it takes two arguments
+                        //res.render('template file', {object, these values are provided
+                         as dynamic values which are used under index.hbs template file })
+})                      //no need to adding .hbs extension to index, as long as name is equal, it is fine
+
+when requestor comes to the home root. by calling res.render() express goes to views
+and converts hbs to html and give html back to requestor.
+
+the second argument we passed to res.render(), that can be accessible in index.hbs
+To access title in index.hbs we use the syntax {{}}, inside inner bracket write variable/prop name
+ex: {{title}} //title gets printed in browser
+
+customizing views directory:
+if you change the name of the views directory, express will through error as
+"Failed to lookup view "help" in view directory ...points to directory where it expecting views directory to be"
+
+by default express expects the location of views under root, we can customize it 
+we need to tell express where to look
+
+define one path just like we defined for publicDirectoryPath
+const viewsPath = path.join(__dirname, '../templates'). now we need to tell express to use this path
+app.set('views', viewsPath)
+
+app.set(name,value)
+
+resuable partials, that can be used in all documents (header and footer or sidebars)
+partials - allows you to create little template of a bigger page
+
+to work with partials we need to first load in hbs module in app.js
+const hbs = require('hbs')
+now we need to tell handlebar where to look in for partials.
+
+create a folder under template folder - 1. views - move all views(hbs files) to this folder
+2. create partials folder - put header.hbs and footer.hbs files under this folder.
+
+***Change the views path ../templates/views
+
+const partials = path.join(__dirname, '../templates/partials')
+resgisterPartials method is used to tell hbs where to look for partials
+
+hbs.resgisterPartials(partials) //method takes argument of partials files path directory.
+
+header.hbs
+it isnt a complete page, it is part of the page
+we can create h1 tag <h1>Static header.hbs text </h1>
+we can now use this partials-header file in all other views files
+
+To render a partial in other pages:
+
+{{>header}} ---> after greater than symbol put file name.
+
+we get error because we are using nodemon and it restarts only when there is anychange in js files
+we need to tell nodemon to restart server for changes in all hbs files.
+
+customize nodemon command
+nodemon src/app.js -e js,hbs ===>  we need to use -e flag, stands for extension 
+
+now nodemon restarts for changes in js and hbs files.
+
+remove {{title}} from all files and put partial {{>header}} 
+now in header.hbs file we can now grap the title value from all pages, about,help and homepage
+
+<h1>Static header.hbs text </h1> instead of using static value, use
+<h1>{{title}}</h1> in header.hbs and load it in all views pages.
+
+so when we use {{>header}} in about/help/homepage, it goes to header.hbs or loads that file in views pages
+
+title value we are passing from routes to all pages, hence title value will be printed based on its value
+
+we have header in place and we can add navigation bar in header.hbs
+
+create a tag
+<div>
+<a href="/about">About</a> //href to specify where this link should go to
+<a href="">Weather</a>  --home
+<a href="/help">Help</a>
+</div>
+we you click on the link, it goes to appropriate routes and returns the respone.
+
+By using partials we achieved headers and navigation bars by writing once and it is accessible in all pages
+if we have to change anything, we can change in header.hbs file and it is applicable in all pages
+
+create same for footer partial.
+footer.hbs ==> <p>created by{{name}}</p> 
+include it in all views pages ==> {{>footer}}
+
+****404 Pages:
+/me --some random route throws error as cannot GET/me  , error given by express
+we can set 404 page when user provide wrong url 1. we can render html with some message 2. we can provide links to home/about etc
+
+in app.js file define a route with * ---star is a wildcard
+Define route with * at the bottom, above app.listen.
+
+express matches with this route if express did not find any matching route when user navigated to page.
+ex: /about - express matches with /about route and sends respone
+/me - we do not have this route. express checks for this route from beginning of app.js file
+it first checks with publicDirectoryPath did not find, then checks all the routes - did not match
+at last we have * wildcard route, matches it and returns respone.
+
+if we write * at the beginning express matches with it and returns respone though we have /about route in middle of the file
+
+create a route with * wildcard
+
+app.get('*', (req,res)=> {
+    res.render('404page', {
+        errorText: "Page Not found",
+        title: "404 page",
+        name: "srk"
+    })
+})
+In the 404page.hbs add header and footer partials. header is taken from title prop which we sent.
+
+if we have articles, /help/somearticlename, which do not exist, we can create a route /help/* and render help article not found message
+and provide links to get back to other pages. {specific to help page}
+
+v51,55 - comeback after css.
+
+Accessing API from browser
+creating own api endpoint and access them from browser.
+
+we need browser to communicate with server by passing a location and server converts 
+it to forecast and sends that forecast to browser as json respone and browser renders it to screen.
+
+**The Query string::
+?key=value&key=value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
