@@ -1307,6 +1307,8 @@ it to forecast and sends that forecast to browser as json respone and browser re
 **The Query string::
 ?key=value&key=value
 
+final output -- search form where user enter location and click on a button, after few milliseconds
+user gets forecast data for that location.
 
 
 
