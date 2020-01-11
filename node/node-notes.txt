@@ -462,7 +462,7 @@ Stack trace
 Reference error : datajspn is not defined //gives you the info of the error.
 
 next to it, it gives the file name where error occured. 
-at saveNotes (//path of the file: lineno and column number) 
+at saveNotes (//path of the file: line no and column number) 
 Next lines gives you, where exactly this method called
 (here saveNotes called in add Notes and add notes called in handler)
 
@@ -539,7 +539,7 @@ console.log('sum is ' + y)
 
 log is a func and whenever there is a func call it gets added to call stack.
 
-2. log('sum' + y), then is going to execute and get executes and prints value in console
+2. log('sum' + y), then it is going to execute and get executes and prints value in console
 after execution of log method it pops out of the Stack
 
 3. Moves to next line of the program. here there is no code after the console.log('').
@@ -807,7 +807,7 @@ const geoCode = (address, callback) => {
 }
 geoCode('philly', (geoCodeData)=>{ //when you call geoCode with philly as address - one argument and the
                                 //other argument as callback func. it is not going to execute first
-                                //callback func passed as argument is going to execute under setTimeout func
+                                //callback func passed as argument, is going to execute under setTimeout func
                                 // we are passing data obj as argument to callback func
                                 //setTimeout callback trigger after the 2secs timer event finishes.
 
@@ -881,7 +881,7 @@ geocode('philly', (error, data)=> {
 
             forecast(lat,long,(error, forecastdata)=>{
                 if(error){
-                  return  console.log('Error', error)
+                  return console.log('Error', error)
                 }
                 console.log(data.location) //location we get from data object when we execute geoCode
                 console.log(forecastdata) //string text of forecast
@@ -998,7 +998,7 @@ https.request(url, (response)=> {
                                         //storing it var data
     })
     response.on('end', ()=> { 
-        const parsedObj = data.parse(data)
+        const parsedObj = JSON.parse(data)
     })
 })
 the above do not work because we need to tell that we are ready to send final request(complete request) 
@@ -1014,7 +1014,7 @@ const request = https.request(url, (response)=> {
                                         //storing it var data
     })
     response.on('end', ()=> { 
-        const parsedObj = data.parse(data)
+        const parsedObj = JSON.parse(data)
     })
 })
 
@@ -1137,7 +1137,7 @@ app.get('', ()=>{}) - root route is not needed now as we server up index.html in
 create css folder > css file and link it in all html files(use link tag under head tag). 
 
 <link rel="stylesheet" href="/css/style.css">  //webserver root, here public folder
-same with client js(script tag under head tag...<script src="/js/app.js"></script>) and images-img element <img src="/img/abc.png">.
+same with client js(script tag under body tag...<script src="/js/app.js"></script>) and images-img element <img src="/img/abc.png">.
 
 ./ --> relative path ->relative to that file
 / -> absolute path --> webserver root
@@ -1162,7 +1162,7 @@ can be used in browser, server, desktop apps using electron
 
 we use handlebars using express server.
 
-another handlebar plugin npm hbs. hbs uses handlebars behind the scenes. makes easy to intergrate with express
+another handlebar plugin npm hbs. hbs uses handlebars behind the scenes. makes easy to integrate with express
 install hbs in our proj.
 npm i hbs
 
@@ -1241,7 +1241,7 @@ nodemon src/app.js -e js,hbs ===>  we need to use -e flag, stands for extension
 now nodemon restarts for changes in js and hbs files.
 
 remove {{title}} from all files and put partial {{>header}} 
-now in header.hbs file we can now grap the title value from all pages, about,help and homepage
+now in header.hbs file we can now grab the title value from all pages, about,help and homepage
 
 <h1>Static header.hbs text </h1> instead of using static value, use
 <h1>{{title}}</h1> in header.hbs and load it in all views pages.
@@ -1269,7 +1269,9 @@ include it in all views pages ==> {{>footer}}
 
 ****404 Pages:
 /me --some random route throws error as cannot GET/me  , error given by express
-we can set 404 page when user provide wrong url 1. we can render html with some message 2. we can provide links to home/about etc
+we can set 404 page when user provide wrong url 
+1. we can render html with some message 
+2. we can provide links to home/about etc
 
 in app.js file define a route with * ---star is a wildcard
 Define route with * at the bottom, above app.listen.
@@ -1310,123 +1312,368 @@ it to forecast and sends that forecast to browser as json respone and browser re
 final output -- search form where user enter location and click on a button, after few milliseconds
 user gets forecast data for that location.
 
+/weather we are sending static json, the goal is to use geocode and forecast functions inside the /weather and send
+json data to browser and browser will be able render the forecast data 
+
+how browser gonna able to send location/address to /weather route.
+/weather route should know which address it needs to geoCode and fetch forecast for.
+
+for this we use query string. browser gonna send query string as part of url, server then read the query string
+value and get the geoCode/forecast for that location.
+
+url?key=value&key=value.
+
+we create a /products endpoint and that sends back products to be displayed in the browser.
+
+app.get('/products', (req,res)=> {
+    res.send({
+        products: []
+    })
+})
+open the route /products in browser, it renders products json.
+
+we can filter the products based on user search field.
+ex: user can seach games and we should render games products in our ecommerce site.
+
+we pass that search term as part of url - query string
+localhost/products/?search=games
+
+express parses the url and gives us a query object which will have the information about the query strings
+
+app.get('/products', (req,res)=> {
+    console.log(req.query) //query object will have all the query strings
+})
+input: localhost/products/?search=games&rating=5
+o/p: {search: "games", rating: 5}
+
+we can access search value in route as req.query.search
+
+Express do not validate whether we provided value in query strings, we can write simple if statement for that
+
+app.get('/products', (req,res)=> {
+    if(!req.query.search){ //checks whether we provided a value or not in query string
+        return res.send({
+            error: "You must provide location"  //we are using return statement to stop the execution because we    
+                                                //cannot send two responses from a route. server is like one request and one response
+        })                                         //we get an error as "cannot set headers after they are sent to client"
+    }
+    res.send({
+        products: []
+    })
+    console.log(req.query) 
+})
+
+follow same procedure for /weather route
+
+wire up geocode and forecast to /weather route
+1.
+const geocode = (address, callback) => {
+    const url = "url/+address+" //we can send diff address as we are using dynamic address
+
+    request({url:url, json:true}, (error, response)=> {
+        if(error){
+            callback('unable to connect to --service' , undefined)                                 
+        } else if(respone.body.features.length === 0){
+            callback('unable to search location', undefined)
+        } else {
+            callback(undefined, {
+                latitude: respone.body.features[0].center[1]
+                longitude: respone.body.features[0].center[2]
+                location: respone.body.features[0].place_name
+            })
+        }
+    })
+}
+2.
+geocode('philly', (error, data)=> { 
+        if(error) {
+            ***return console.log('Error', error)
+        } else {
+            //console.log('Data' , data)
+            const lat = data.lat
+            const long = data.long
+
+            forecast(lat,long,(error, forecastdata)=>{
+                if(error){
+                  return console.log('Error', error)
+                }
+                console.log(data.location) //location we get from data object when we execute geoCode
+                console.log(forecastdata) //string text of forecast
+            })
+        }
+})
+
+Final JSON endpoint:
+3.
+app.get('/weather', (req,res)=> {
+        if(req.query.address){
+            return res.send({
+                error: "you must provide location"
+            })
+        }
+    geocode(req.query.address, (error, {latitude,longitude,location})=> {  //lat,long nd location are returned by callback function so instead of "data" object 
+                                                            //we are destructuring and grabbing lat,long and location prop from data object
+        if(error) {
+            return res.send({ error })  //instead of console.log we are rendering json response with error which is destructured.
+    
+        }
+          forecast(latitude,longitude,(error, forecastdata)=>{ //passing lat,long from geocode to forecast
+                                                                //forecastdata has forecast string
+                if(error){
+                  return res.send({error})
+                }
+                res.send({ //if geocode and forecast goes well, we are sending final json
+                    location ,
+                    forecast: forecastdata,
+                    address: req.query.address
+                })
+            })
+        }
+    })
+})
+
+sumry: 
+1. geocode function takes the address and callback 
+a. address is used to get the cordinates for that address/location. we concat it to url and pass it to request module
+    requestmodule is used to perform http/https request to servers, we are doing https request to geocode server/service
+    geocode returns the json response
+b. callback is used because, we cannot send data from asynchronous function here it is request module so we are sending
+    response which we get from mapbox api {geocode}. we are sending i) error ii) object with latitude, long and location
+    as arguments to callback func.
+
+approach is same for forecast.
+
+2. we called geocode with a) location, b) callback - callback will have error and object (data). {{geocode expects those two}}
+
+if callback func returns error then we print error or else we send lat,long and location to forecast.
+
+forecast is also same it returns forecastdata{forecast string}
+
+3. instead of console.log we are sending json response. {JSON endpoint - /weather returns location, address-what user typed and forecast}
+
+simple terms - for request module pass url with address and it either gives error or response. pass it to callback func
+display error or use response prop and pass it to another func(forecast)
+forecast also do the same, pass response(data object - lat,long,location) from first func to request module
+request module either returns error ot response
+display error or response from forecast (address,location and forecast)
+
+J11
+default func parameters:
+
+const greeter = (name) => {   //name - parameter
+    console.log('Hello' + name)
+}
+
+greeter('srk') //Hello srk
+greeter() //Hello undefined. so if user doesnt provide argument we get undefined (default value)
+
+To solve the above issue we can use if statement but we also have a option to put default values to parameters.
+
+const greeter = (name = 'srk') => {   //name - parameter
+    console.log('Hello' + name)
+}
+
+greeter('bob') //Hello bob
+greeter() //Hello srk because if picked the default value.
+
+Issue with destructuring: what if we do not provide value to destructured prop?
+we get undefined.
+
+const product = {
+    name: laptops,
+    value: x dollars,
+    available: true
+}
+
+we can destructure above object as const {name, value} = product
+and in func
+const availableProd = ({name, available}) => {
+    console.log(name)
+}
+
+availableProd(product) //this works fine and we get name prop value - laptops
+but what if we do not provide product as argument to func call? what will be the output for the destructured prop?
+we will get an error as "Cannot destructure property "name" of undefined or null"
+
+so we can fix it by adding empty obj to that destructured obj, we will get undefined value for the variable
+but it solving cannot destructure error which did not allowed to enter into the func. it failed on func first line
+
+const availableProd = ({name, available} = {}) => {
+    console.log(name) //undefined
+}
+availableProd() // we will get undefined and by passing empty obj to destructured prop, we fixed cannot destructure error on line 1
+
+const availableProd = ({name="srk", available} = {}) => {
+    console.log(name) //srk
+    console.log(available) //undefined 
+}
+availableProd() // we will get srk because we used default param's. 
+
+**passing {} to destructured obj {lat,long,location} in our script. (all scripts where ever we destructured obj)
+why are we destructuring with empty object?
+
+because if we provide wrong location like address=!, our server gets crash this is because when we put wrong
+location we get error not response. in our code we are destructuring response {lat,long,location} but here
+the respone is undefined and when we do destructuring on undefined we get cannot destructure error {code terminates on destructured line}
+
+to fix this we are passing empty obj {} to destructured obj. if we pass obj (response), destructuring can be done and if 
+we dont pass obj, empty obj will be set, there by moving code to next line whether we send or do not send response.
+
+app.get('/weather', (req,res)=> {
+        if(req.query.address){
+            return res.send({
+                error: "you must provide location"
+            })
+        }
+    geocode(req.query.address, (error, {latitude,longitude,location} = {})=> {  //if we do not send response, we get error and in next line we are printing/sending error 
+                                                                                //{yes lat, long values will be undefined but our error code gets executed no so no worries}                
+        if(error) {
+            return res.send({ error })  
+        }
+          forecast(latitude,longitude,(error, forecastdata)=>
+                if(error){
+                  return res.send({error})
+                }
+                res.send({ 
+                    location ,
+                    forecast: forecastdata,
+                    address: req.query.address
+
+                })
+            })
+        }
+    })
+})
+
+Now we have JSON endpoint (backend) which sends json. we need to wireup with frontend.{user can enter text in search form
+and click on search button from UI, request should come to server and server should send response for that location and browser should render the forecast }
+wireup frontend and backend.
+
+Browser http request with fetch:
+homepage - index.hbs view
+we linked in app.js client side js to that view. for rest of the files we did not. index.hbs is the only
+file that needs to fetch forecast, that we write it in client side js app.js file using fetch api
+
+client side js runs in browser.
+making http request from client side js we will use fetch api. Fetch is not part of JS, it is browser based api
+can use in all modern browsers
+not accessible in nodejs so we cannot write in backend scripts.
+
+fetch('url').then(()=>{}) --> takes url as argument, it is similar as request api. request api takes second argument
+as callback func where as fetch do not take second argument, it uses promises then method
+so if we get data then method will be executed.
+
+fetch('url') calls asynchronous IO operation like request api. we will not get data right away, we provide a func that runs
+when the data is available.
+
+url = we use json end point that we created. returns json with forecast, location etc else error
+
+fetch('url').then((response)=>{ //if we get response, then "then" method will be executed, and has the access to response
+    response.json().then((data)=>{ //on response we use .json() method to parse the response. (response will be in the form of json, the end point we created returns json)
+                                //once the response is parsed, it will be accessible in then method.
+                                //data is object , on that object we have error prop if it returns error else forecast and location.
+                             //access those prop as data.error for error and data.location and data.forecast for valid response
+               if(data.error) {
+                   console.log(error) //this console displays on browser.
+
+               } else{
+                   console.log(data.location)
+                   console.log(data.forecast)
+               }           
+                }) 
+        })
+url we are using - http://localhost:3000?address=boston.
+we are hardcoding address value, we need user to type in address in browser
+Create a search form: 
+in index.hbs file create a form 
+<form>
+<input placeholder="Location">
+<button>Search</button
+</form>
+
+select the form element in app.js file using querySelector. when you are linking app.js to index.hbs
+put script tag under body tag, this ensures html loads first than js file.
+
+const weatherForm = document.querySelector('form') //returns element store it in a variable and form in querySelector is a tag name.
+
+we now need to write some code which executes when user interacts with that form by submitting location.
+we use event listner on that element.
+
+weatherForm.addEventListner('submit', (e)=>{ //submit is the event name. once that event is occured we can access that event in cb.
+    e.preventDefault() //browser default behaviour is to refresh the page after submit. so we are stopping it using preventDefault method
+})
+
+we need to access the value that user enetered. same use querySelector to select that element
+const search = document.querySelector('input') //input is the tag name which we need and where user enter the location
+
+weatherForm.addEventListner('submit', (e)=>{ 
+    e.preventDefault()
+    const location = search.value  //search has input element and value of input element is accessed by .value
+fetch('https://localhost:3000/weather?address='+ location).then((response)=>{     //use fetch api to get the forecast by passing user enetered location
+    response.json().then((data)=>{ 
+               if(data.error) {
+                   console.log(error) //this console displays on browser.
+               } else{
+                   console.log(data.location)
+                   console.log(data.forecast)
+               }           
+                }) 
+        })
+})
+instead of console.log, we can create two paragraphs and render the forecast in UI.
+
+below the form create two paragraphs, to identify uniquely put id attributes. 
+querySelector('p'), querySelector matches the first element matched we need to identify uniquely
+<p id="message-1"> </p> //error or location
+<p id="message-2"> </p> //forecast
+now we can target these paragraphs and render data
+
+const messageOne = document.querySelector('#message-1") //if it is id use # and for className use dotClassname 
+const messageTwo = document.querySelector('#message-2")
+
+textContent is used to set the content. goal is when user click on submit we display 'loading' text, once
+we get response we display location in para1 and forecast in para2.
+so we Overwrite 'loading' text to location text. same with error
+
+weatherForm.addEventListner('submit', (e)=>{ 
+    e.preventDefault()
+    const location = search.value 
+    messageOne.textContent = 'loading...' //so addEventListner only executes when user click on submit
+                                        //we are displaying 'loading' for para1 and there is no value set to para2 so it wont display
+
+    fetch('https://localhost:3000/weather?address='+ location).then((response)=>{
+        response.json().then((data)=>{ 
+               if(data.error) {
+                   messageOne.textContent = data.error // we are Overwriting loading text from para1 to error that we get as response
+               } else{
+                   messageOne.textContent = data.location //Overwriting loading to location response
+                   messageTwo.textContent = data.forecast //putting para2 value as forecast response.
+               }           
+                }) 
+        })
+})
+
+styling part : input and button, using element names for styling because all the input boxes and buttons will have same consistent styling
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-------------==============-----------------=================
 Application deployment::
+till now our application is running locally in ur machine and we need a url where user can access in browser and search for forecast for any location of his choice.
+
 git, github and heroku.
 git: allows us to put our app under version control. allows us to track our changes over time.
 github: allows to back up our source code and collabrate with others
 heroku - deploy our app to production server. Everyone can access.
 
-
 signup github - a development platform. allows us to manage our project. track changes over time. collabrate with team
 track bugs/issues and feature requests. host public or private projects. most of the npm modules are hosted on github
 
-signup - heroku
-heroku cli - article devcenter heroku - install in ur machine
+signup - heroku - application deployment platform, gives us tools and 
+infrastructure neccessary to take our nodejs application and deploy it into their prod servers.
+
+install heroku command line tools - these gonna give us access to various commands we can use from the terminal to deploy
+our latest code changes to prod servers allowing users to see changes in our app.
+
+heroku cli - article devcenter heroku - install in ur machine based on ur OS.
+after succesful installation, restart the terminal
 
 type in console
 heroku -v -- to get the heroku version.
@@ -1434,116 +1681,86 @@ heroku -v -- to get the heroku version.
 heroku login
 links the commands we run from the terminal to our heroku account {allows us to manage our project from vs code}
 
-press q space and login to heroku account in browser {close that tab}
+press any key , opens new tab in browser and login to heroku account in browser {close that tab}
 
 in console it display - logged in as xxxxxxx
+Git version control:
 
+version control allows you manage the versions of your app over time.
+add feature
+save points 
 
+changes > deploy > revert > rework > deploy 
+without version control its hard to get the previous version/state.
 
+if anything goes wrong, manually verify where and what went wrong. with vc we can track in which version the wrong happened
 
+we are using git version control
 
+install git 
+git-scm.com website
+installer for ur OS, download.
 
+check the option git bash, if os is windows. while installing git using git installer
 
+restart terminal
 
+git --v
+print version
 
+put our proj in version control to track of its changes over the time. 
+then take those changesto send off to github/heroku servers by running commands from the terminal.
 
+version control with git
+untracked files     unstaged changes    staged changes      commits
 
+we have new nodejs proj
+1. run a command to initialize git in that proj
+2. files to proj
+    untracked files - by default git doesnt track your files, you have to run commands telling git to track specific files
+            all new files of your project are untracked files
+                src/app.js
+                readme.md - markdown file
+    
+    **** when something is committed to the git , git starts tracking that file. it is a two step process
+            a) git add . -->  staged changes b) git commit ----> commits
 
+3. use command git add filename or git add space dot (git add .) to add one or more files to staged changes
+    src/app.js - is now in staged changes   {staged changes -- about to be commited}
+4. Now commit the file using the command git commit -m "message"
 
+now git creates a commit with id 1aed4...
 
+5. add new file src/utils/geocode.js this will first under untracked files
+6. modified app.js because of geocode.js file. As we committed app.js earlier, git is tracking this file.
+    when you modify app.js, it comes under unstaged changes
 
+7. Now use git commit command, geocode.js and app.js will be commited and git generated id 1sada44fsdf....
 
+now we have two commits, we can revert back to previous versions if needed 
 
+integrating git:
 
 
 
 
+commands:
+git init   ///in root proj folder
+initialized empty Git respository in /users/srk/proj-path///.git
 
+.git - created by git. git stores commits in datastructures inside .git.
+respository - place where things related to git are stored. currently we have local respository.
+when you integrate with github/heroku we will have remote respositories
 
+.gitignore file ---> node_modules, ignores folders/files mentioned in this file
 
+git add src/  --> adds src folder to staging area
+or 
+git add .  --> adds everything to staged area
 
+git commit -m "init commit" --> -m message ""
 
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SSH keys:
 
 
 
