@@ -1364,7 +1364,6 @@ app.get('/products', (req,res)=> {
 })
 
 follow same procedure for /weather route
-
 wire up geocode and forecast to /weather route
 1.
 const geocode = (address, callback) => {
@@ -1740,10 +1739,6 @@ now git creates a commit with id 1aed4...
 now we have two commits, we can revert back to previous versions if needed 
 
 integrating git:
-
-
-
-
 commands:
 git init   ///in root proj folder
 initialized empty Git respository in /users/srk/proj-path///.git
@@ -1762,21 +1757,201 @@ git commit -m "init commit" --> -m message ""
 
 SSH keys:
 
+we added few commits, now take those commits and send them to 3rd party services like github and heroku.
+the question is, how do we transfer data from our machine to other machine servers in a secure way? ans is ssh
 
+ssh - secure shell - securely communicating with other machine. 
+set up ssh key pair, these two files used to facilitate this secure communication
 
+for windows - install git bash
 
+check if you already have ssh keys
+ls -a -l ~/.ssh 
+--->a flag is used to list all the hidden files , -l tag is to display output neatly one by one 
+tilda ~ is used to retrive user directory and then ./ssh - search for this folder/file
 
+if you get error, you do not have that folder.
+create ssh keys: 
+ssh key gen -t rsa -b 4096 -C "srk@gmail.com"
 
+ssh key gen  -- command is used to generate ssh keys 
+-t type rsa protocal, rsa - last name of 3 creators who created algorithm
+-b -- bits 
+4096 bits for the key
+C -- comment /label for the key use email
 
+It will ask you questions
 
+Enter file in which to save the key : (/users/anddd/.ssh/id_rsa):    
+by default it is storing under .ssh folder under user directory
+hit enter to use default
 
+enter a pass phrase -> use default, hit enter
 
+Now enter same ls command : ls -a -l ~/.ssh 
+you will see two files id_rsa, id_rsa.pub -- pub is public
 
+id_rsa -secret file, keep in our machine, we are not gonna share this key with anyone
+id_rsa.pub - public file, we share this with github and heroku to communicate with our machine with their servers
 
+to start the program
+eval "$(ssh-agent -s)" --> {-s flag start}start up ssh agent, if it is already running it returns process id
+o/p : Agent pid 8743
 
+register the file
+ssh-add ~/.ssh/id_rsa {provide the path file}
 
+pushing code to github
+create a github respository
 
+push an existing repo from cli
+git remote add origin git@github.com:user/repo.git
 
+remote - version of ur proj hosted on somewhere else ex: version of our proj in github servers or in heroku servers
+add   - how are we gonna work with remotes - remove or add remote
+origin - name of the remote, name can be anything but origin is the convention.
+url : username and name of the repo
 
+running above command sets up the channel of communication between ur machine and github servers
 
+ex: adding a contact in ur mobile {remote is contact name, url is phonenumber :) }
 
+type it in terminal.
+
+push our commits to github
+git push -u origin master
+
+push - allows us to push our commits to given remote
+-u  - set the default, here it is origin
+origin - remote name
+master - default name of a branch.
+
+now we can use git push command to push our commits.
+
+git push -u origin master, command fails now because github do not know who is sending
+take public key and give it to github.com so it can create secure connection.
+
+github>settings>ssh and gpg keys> new ssh key> title = work laptop & key = contents of public file id_rsa.pub
+
+in terminal type in cat ~/.ssh/id_rsa.pub
+cat command is used to concatenate the contents retrived from the given file to terminal
+copy the content - till username and paste it in key: github page.
+
+set up of key is done but never used, to test the connection
+
+in console type in ssh -T git@github.com ---> tests the ssh connection to github servers
+type yes
+hi username, authenticated msg.
+
+git push -u origin master ---push the code.
+
+code pushed to heroku:
+deploy nodejs apps to prod
+setup remote and push 
+
+with heroku, we can manage our apps from the terminal. do not need to touch heroku webapp
+install cli tools, use those to create, manage and push new vrsions up to the prod env
+
+setup ssh public key file to heroku
+
+for github we copied contents from public ssh key file and pasted it in under github settings page.
+in heroku we can run a single command heroku keys:add
+look through our ssh dir ask us which keys to uplaod 
+it finds /users/aaaa/.ssh/id_rsa.pub
+would you like to upload it to heroku? - yes
+
+channel established - our ssh key is associated with heroku account. able to send code securly back and forth
+
+create heroku app : heroku create nameoftheproj (uniquely through out entire heroku accounts)
+it does the following things
+1. creates new heroku app on heroku servers
+2. https://appname.herokuapp.com  --live url of the app
+3. git url https://git.heroku.com/appname.git - 
+    a) git remote url 
+    b) setup remote for us  (for github we added git remote add origin, this is not needed heroku itself created remote for us)
+git repo where we push our code changes. this remote is created when you run create heroku appname command
+
+we need to make some changes to our app - in order to deploy to heroku
+
+1. we are starting the server from terminal via node src/app.js
+we can add a start command under script in package.json file
+scripts: {
+    "start" : "node src/app.js"
+}
+now in terminal we can use npm run start. npm expects a script to run, here start is the command we mentioned in pkg.json file to run default file
+heroku also uses this command
+
+2. we are using hardcoded port value 3000 in app.js. heroku provide port when running on heroku and 
+it is dynamic and it is provided to our app via environment variable.environment variables are key value pairs set on OS level
+so change the port as
+const port = process.env.PORT || 3000  ---env is a object,which has access to env variables
+when running in local it can pick 3000 and on running on heroku servers, port can be picked from heroku given port
+
+3. in index.hbs file we added url as fetch('localhost:3000/api') , heroku try to access localhost which doesnt exist
+so remove localhost and keep only the end point /api
+in other files we used href = /about, href=/help, where we did not mentioned any localhost etc so here also same case
+env and port can be picked 
+
+Now make a commit and push to heroku
+git add .
+ git commit -m "setup app for heroku"
+ git push ---> pushes code to github - orgin/remote
+ git remote --view all the remotes configured
+ shows the remotes that we have
+        github
+        heroku
+To deploy use:
+git push heroku master --- push our latest commits to heroku git remote
+when heroku new commits have been pushed its gonna deploy our app again
+
+it install dependencies and do all processes.
+
+url-open in browser and see the app (yes)
+
+new feature deployment and workflow
+add a feature > test it in local> git add . > git commit -m "aa" > git push - push code to github
+> git push heroku master - pushes code to heroku remote and re deploy's our changes
+
+Avoiding global modules
+nodemon src/app.js -e js,hbs
+we can set up above command under script tag in pkg.json,
+script: {
+    "dev": "nodemon src/app.js -e js,hbs"
+} 
+ppl understand it is local dev server and run script under dev.
+
+>>npm run dev
+
+we installed nodemon as global module and when you share ur code with someone they setup our proj and install dependencies
+by npm install - installs all the dependencies but they error if they use npm run dev 
+because nodemon is not a local dependency and they do not know the version that we used, if they install wrong version of nodemon
+it may give them error.
+
+uninstall nodemon globally and install it as local dependency
+npm uninstall -g nodemon   -- -g global
+
+npm install nodemon@1.2.0 --save-dev
+when you install something using --save-dev, it lists it as dev dependency
+dev-dependencies: {
+    "nodemon": 1.2.0
+}
+
+you only need them on local. these dev-dependencies are not installed in prod (here heroku n hence saving some time
+in not installing something which heroku does not use)
+
+all the dependencies can be seen under dependencies prop under pkg.json.
+ when we run npm install, npm looks into pkg.json and pkglock.json and downloads all the dependencies into our proj and can be seen under node_modules folder
+dependencies : {
+    express
+    hbs
+    request
+}
+
+now, when you run nodemon src/app.js its gonna fail, as nodemon is not globally installed.
+
+scripts can use commands from locally installed modules.
+scripts : {
+    "dev": "nodemon src/app.js -e js,hbs"
+}
+
+------------------------------------------------------------------

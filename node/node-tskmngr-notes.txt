@@ -1,0 +1,35 @@
+Databases and mongodb
+
+connect to database
+user authentication
+data storage in db of user
+file uploads for user profile pic 
+email n notification
+
+Database - we are using mongodb to store user data etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
