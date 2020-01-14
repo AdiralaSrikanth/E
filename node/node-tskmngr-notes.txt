@@ -4,9 +4,233 @@ connect to database
 user authentication
 data storage in db of user
 file uploads for user profile pic 
-email n notification
+email notifications
+CRUD
+Database - we are using mongodb to store user data.
+J14
+mongodb.com --- open source and available for all operating systems
 
-Database - we are using mongodb to store user data etc
+No sql - not only structured query language
+
+mongodb provides npm module that can be used to read and write to database
+
+sql vs nosql
+database > table(s) > individual items - row or record > column
+database > collection(s) > document(s) - looks like json  > fields
+A collection is a list of entries those entries are reffered as documents and documents have many fields.
+
+installing mongodb
+start up mongodb server and connect with node js
+
+download server - community - based on OS
+for linux - version - 4.0.X OS - ubuntu, pkg T0Z - download
+
+Navigate to download folder - extract files > bin dir - contains executables to perform various tasks
+main one is > mongod executable- used to startup the mongodb server
+
+move this folder to user directory (permanent location)
+
+Now, create a place for our data to get store. by default mongodb expects you to create a data directory at the root of your harddrive
+in that place it expects db directory. will have permissions issue so create a folder in user directory
+create folder "mongodb-data" in user which has mongodb {executables}
+
+Terminal:
+cd ~  --Navigates to user directory
+pwd - print working directory
+return path /users/aaaa
+to start mongodb server - path to the executable -> /users/aaa/mongodb/bin/mongod --dbpath=/users/aaa/mongodb-data
+<path to mongod executable> --dbpath=<path to data folder>
+
+initialize database and gets the db up and running. 
+now go to mongodb-data and observe data is generated. 
+
+installing database GUI viewer: robo3t (earlier robomongo) - mongodb admin tool - open source
+download and install mongo 3t
+
+opens mongodb connections panel > create connection > name-local mongodb > address - localhost and port - 27017
+
+open shell > db.version() - method on db object - it is js
+
+connecting to mongodb database from nodejs and inserting document :
+we use monogdb native driver - npm module > allows us to interact with our database using nodejs.
+
+docs.mongodb.com > docs > drivers > drivers are libraries that allow you to interact with the mongodb database from wide range of programming language
+
+c,java,node,php,python --> click on nodejs > see/find the native driver for the platform
+
+release and API section - click on API --> returns to documentation
+
+google - mongodb npm module -- official native driver released by mongodb.
+1. leave the current terminal, database server needs to be up and running in order us to connect to it. do not shut it down.
+2. Open up new terminal
+
+create a proj and open in vsc
+npm init -y --> pkg.json
+npm install mongodb@3.1.0
+Now we can use driver and connect to our database and insert some data
+
+file > mongodb.js
+learning CRUD operations
+
+const mongodb = require('mongodb') //returns object
+to initialize connection
+const MongoClient = mongodb.MongoClient
+MongoClient give us access to the function neccessary to connect to our db so we can perform CRUD operations
+
+we need to define connection url and db we are trying to connect to.
+
+const connectionUrl = 'mongodb://127.0.0.1:27017' ---->connect to localhost url which is up and running. 
+mongodb:// --> following their protocol, 
+instead of localhost we are using ip address sometimes localhost has strange issues 
+
+const databaseName = 'task-manager'
+connect to our database/server
+ 
+MongoClient.connect() -- connect method, takes 3 arguments 1. connectionurl 2. options object {useNewUrlParser : true -->parses url}
+3. callback function- takes two arguments error and client, if we fail to connect to db, gives error and if we succeed, gets client
+
+Connecting to a database is asynchronous operation. takes time for connection. callback will run when the connection is complete
+
+MongoClient.connect(connectionurl, {useNewUrlParser : true -->parses url}, (error, client)=>{
+        if(error) {
+            return console.log('Unable to connect to database')
+        }
+        console.log('connected successfully')
+    })
+in other terminal where mongodb server running, we can see the connections with ip and port
+
+in second terminal where we are running node app, it is still hanging and hasnt brought to normal command.
+
+once the connection is opened, node process is up and running as long as connection active. can shut down.
+
+insert doc:
+
+MongoClient.connect(connectionurl, {useNewUrlParser : true -->parses url}, (error, client)=>{
+        if(error) {
+            return console.log('Unable to connect to database')
+        }
+       const db =  client.db('databaseName') //we store database name in databaseName variable, you dont have to mention, mongodb will create db if you dont mention
+                        //db method takes database name and return database reference. can be used to manipulate data
+
+//collection is a function and expects name of the collection
+        db.collection('users').insertOne({
+            name: 'srk',
+            age: 26
+        })
+    //call a method on collection reference - insertOne() expects object as argument
+    //inserting a document into users collection.
+     })
+save the file and run node mongodb.js
+open robo3t --> right click the connection and refresh the shell > 
+newly created database will be visible > collections
+> users {we created} >right click collection > view documents
+
+_id     //stores unique identifier for that particular doc. mongodb generates it //similiar to sql which generates increment id.
+name
+age
+when you insert a document, it will have unique id automatically generated for us.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
