@@ -385,27 +385,239 @@ const updateprof = db.collection('users').deleteMany({
 
 result -- deletedCount:2
 
+Restapi and mongoose
+express based rest api.
+allow user to perform operations such as
+signup
+add task
+fetch all tasks
+
+mongoose -popular library when working with node & mongodb - easy system for modelling our data - for modelling things like a user or task
+fields and datatypes and data validation.
+
+setting up mongoose:
+npm module mongoose - mongoose directly related to mongodb
+allows us to do some of the things that we do not know how to do so far.
+we know how to do CRUD operations, but what about the things
+1. how do I set up validation for my documents defining which fields are required and which are optional
+2. what types of data to expect for the fields ex: completed:true, it should be boolean not a string or number.
+3. If user1 creates a task and I dont want user 32 to view that task - add authentication 
+4. also allows us to do basic crud operations on mongodb database.
+
+mongoosejs.com ->
+ex given in that website. mongoose performing tasks
+1. connect to db
+2. create cat model
+3. create new instance iof cat model new Cat()
+4. save to db.
+
+2. model:
+allows us to model something in real world that we gonna able to store it in database
+ex: user /cat/furnitures /task
+create models for collections that we want and use model to describe the data.{fields}
+
+ODM - objetc doc mapper - map ur obj in ur code over to doc inside mogndb db.
+
+npm i mongoose@3.1.16
+
+folder strucure: appname>src folder- app source code will live>db folder > mongoose.js file
+const mongoose = require('mongoose')
+mongoose.connect() // we use it to connect to database. 
+takes two arguments 1.connectionurl ---> <mongodb://ip&port<databaseName>>, 2. options object
+
+mongoose uses mongodb behind the scenes
+connect to db:
+mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api', {
+    useNewUrlParser: true,
+    useCreateIndex: true      //when mongoose work with mongodb, indexe's are created allowing qucikly access the data.
+})
+
+defining the model:
+const User = mongoose.model('User', {       //accepts two arguments 1. model string name 2. definiton where we define the fields that we want
+                        //set up all the fields as prop's on this obj.
+    name: {             //field and whose value is a object
+        type: String   //type of the field to accept string/number.
+    },
+    age: {
+        type: Number
+    }   
+})
+               
+creating instance of the model to add documents to the database
+
+const me = new User({   //use new keyword and constructor func for that model.
+    name: 'srk',        //data, should match with the type we defined.
+    age:26
+})
+not saving to database yet, we need to use methods available on the instance (here me)
+
+in order to save model instance
+me.save().then((me)=>{            //save method does not take arguments, it saves data in db. it returns promise
+        c.l(me)                    //wait for saving process to finish, then it either resolve or reject.
+                                //when things go, we get access to our instance model
+}).catch((error)=>{
+    c.l(error)
+})    
+.then or .catch -> register a handler when the promise is fulfilled/rejected
+
+***Data validation and sanitization:
+
+Data validation: data confronts to some rules 
+ex: user age >=18
+Sanitization: Alter the data before saving it
+ex: removing empty spaces around user name - trim.
+
+mongoosejs.com docs
+validation
+1. setup some of our fields required {required: true}
+
+inside model:
+name: {
+    type: String,
+    required: true //you have to provide name field while creating a user. field with required are optional we can add to db without them
+
+}
+mongoose documentation
+Builtin validator : there are less validators
+1. All schematypes have the built in validator. 
+2. Numbers have min and max validator. String have enum,match, minlength and maxlength.
+To validate valid email or social cvv number or validate user age >10 etc, mongoose does not provide many validators
+
+allows us to setup custom validation , allowing to validate anything
+we can customize our own validator, using validate function,
+
+age: {
+    type: Number,
+    required: true
+    validate(value) {    //es6 func. takes one argument on that field. based on type "value" will be there number/string etc.
+        if(age<0) { //ppl should not error negative age if yes throw error
+            throw new Error('User age should be positive') //using js Error method to return error
+        }
+    }
+}
+we can also use Validator npm library to verify more complex things like valid email, social cvv number etc. instead of
+we spending time on writing validation code we can use libraries to save time n effort.
+
+npm validator
+npm i validator@10.9.0
+load library in our app.
+const validator = require('validator)
+
+email: {
+    type: String,
+    required: true
+    validate(value) {    //es6 func. takes one argument on that field. 
+        if(!validator.isEmail(value)) { //validator module has isEmail() func takes in string and returns true or false
+                                    //if you provide wrong email it returns false and we flip it to true to print error
+            throw new Error('Please enter valid email') //using js Error method to return error
+        }
+    }
+}
+error obj -if something is wrong. comes under .catch() of save() promise. our error we will under message.
+
+mongoose has other validators under schematypes {string,number,date,boolean,array etc}
+list of options available for each schematype:
+default  --can set default value - age:0 or name: anynoymous
+trim
+toLowerCase()
+email: {
+    type: String,
+    required: true
+    trim: true  //trims extra spaces.
+    lowerCase: true //coverts to LowerCase
+    validate(value) {    
+        if(!validator.isEmail(value)) {
+            throw new Error('Please enter valid email')
+        }
+    }
+}
+**Using all above prop's, will have more control over the data that we are allowing to database
+
+Structuring a Rest api:
+Till now we defined models and we know how to create instances using those models and storing data in database
+
+http endpoints for tasks app:
 
 
+Restful api:
+api - gives set of tools to build software app.
+
+node provides apis like fs
+express provides apis - provides set of tools that allow us to build soft app.
+
+restapi we are creating also provides tools that allows others to build software.
+
+REST - allows clients-webapps to access and manipulate resources using set of predefined operations
+resource - user or task. 
+predefined operations - create a new task or mark a task as complete
+upload prof pic.
+
+These predefined operations allow the client/webapps to go through the process of creating a front end for task manager
+
+Representational - with a rest api we are getting and working with representation of our data. 
+data is stored in database but using restapi
+I can fetch data and manipulate data - CRUD operation
+we are working with represention of our users and tasks
+
+state transfer: a rest api the server is stateless the state has been transfered from server to client
+each request from client such as a req from a webapp app contains everything needed for the server to process that request
+includes the operation they are trying to perform {GET}
+all of the data the operation needs in order to work
+authentication making sure that the user who is performing the operation is authenticated
 
 
+requests are made via http requests
+client webapp able to perfomr predefined operation
 
+client >>need task data to show >> make a http request to a specific url on the server >> GET /tasks/a7eee>>server> server finds the data in db
+>>server>>send back as part of http response>>>200 status code - JSON response>>client render the data.
 
+POST  re- status code 201 - resource created.
 
+client>srk - authenticating>>request> POST /tasks - JSON request {sending along json with req ex:desc and completed status}>>>
+server authenticate the user>>>create that task/todo associated with us>> sends response -- 201 hhtp status code - resource created>> 201-JSON response>>client >render data 
 
+Predfined operations for our resources:
+we need to expose our predefined operations ex: CRUD operations
+                        create  POST /tasks      // every single rest api defined with two pieces of data 1.http method 2. path
+TASK RESOURCE           read    GET /tasks          //path is same
+                        read    GET /tasks/:id   //id is placeholder and is dynamic
 
+                        update PATCH /tasks/:id
+                        delete DELETE /tasks/:id
 
+/tasks is a pluralized resource.
 
+we gonna send 100s of http request b/w client and server. what we gonna send in request? we send text
+Request:
+POST /tasks HTTP/1.1     ---> request line --contains http method, the path and http protocol
+Accept: application/json        //expecting json data back
+Connection: keep alive           //3 request headers, allows you to attach meta data to req
+Authorization: Bearer eysfsdfdsfdfsds      //setup authentication.
 
+{description: "order new books"}    //request body. post data and provided as json.
 
+Response:
+Http/1.1 201 created        //status line protocol, status code, text represention of status code
+Date: sun 28 jul 2019 15.30 
+Server - Express                //response headers
+content-type: application/json
 
+{"_id": "5cdddd", "des..":"ordd..", "completed": "false"}  //response body.
 
+installing postman - allowing us to verify our rest api working as expected without the UI/client.
+getpostman.com. - download the app.
+create request.
+collection - store related requests
 
+homepage -
+httpmethod - GET/POST
+url that we are trying to make request to.
+GET url/weather?address=hyd {can add address in params sec as key value pair} /weather - endpint 
+hit send button.
 
-
-
-
-
+communicate with the server and gets response. body >pretty/raw
+can see status code and time took and size of http response.
 
 
 
