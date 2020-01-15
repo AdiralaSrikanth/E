@@ -130,56 +130,260 @@ name
 age
 when you insert a document, it will have unique id automatically generated for us.
 
+insertOne is asynchronous. we did not use callback above. it is not neccessary now but with prod app it is neccessary
+if we want to handle errors or want to know that our operation performed as expected
 
+ db.collection('users').insertOne({
+            name: 'srk',
+            age: 26
+        }, (error, result)=> {   //second argument to insertOne, a callback which gets called when the operation is complete
+                                //error or result - if things went well //result has operation result -which has data as well as the unique id  
+            if(error) {
+                return console.log('Unable to insert user')
+            }
+            console.log(result.ops) //on result we use one property called 'ops' - contains all of the documents (array of documents) that were inserted
+        })
+     })
+save the file and run node mongodb.js command in terminal
+returns inserted doc.
 
+how will I know about 'ops' on result?? go to nodejs driver doc  > MongoClient > on MongoClient we have a method - connect > doc on that connect method
 
+check the same for insertOne. collection>methods>insertOne>documentation.
+insertOne - inserts one doc.
+insertMany - inserts many doc
 
+db.collection('users').insertMany([{
+            name: 'srk',
+            age: 26
+        }, {
+            name:'bob',
+            age: 26
+        }
+        ], (error, result)=>{
+            if(error){return console.log('unable to insert docs')}
+            console.log(result.ops)
+        })
+     })
+save the file and run node mongodb.js command in terminal
+open robo3t and verify the inserted docs. 
+J15
+The objectID:
+automatically created by mongodb and stores unique identifier for each document you insert into database.
 
+GU ids - globally unique identifier. ability to scale up in a distributed system. 
+multiple database servers running instead of one, allowing us to handle heavy traffic, multiple queries coming in
+there is no chance of ids collision across all database servers. with increment id approach of sql, there may be a chance
+of ids collision. a user will have a increment id (id=2)in one database server
+and the other user will have same increment id (id=2) in other database server - id conflict
 
+we can generate ids for our document before inserting them to our database.
+instead of mongodb server generating ids, we can use mongodb library to generate our own objectID.
 
+const {MongoClient, ObjectID} = require('mongodb') //returns obj and we need the prop of that object hence destructured.
 
+const id = new ObjectID() //constructor function thats y new keyword and takes no arguments. generates id 
+console.log(id) //5c1110c5c6cdac04f740575b - count 24
+lets talk about id value. 5c1110c5c6cdac04f740575b
+google - mongodb ObjectID > reference doc not api doc.
 
+The 12byte ObjectID value consists of, 
+1. a <4byte timestamp> representing the seconds since the unix epoach (point of units - midnight jan 1970)
+2. <5 byte random no.>
+3. <3byte counter. starting with a random value.>
+combination of all these generates robust id. no need of server telling increment the id
 
+open ObjectID node js doc. see the available methods
+we use getTimeStamp() method - which returns generation date. returns the generation date(accurate upto the second) that this id was generated.
 
+const id = new ObjectID()
+console.log(id) //id that we generated.
+console.log(id.getTimeStamp()) //prints the timestamp
 
+db.collection('users').insertMany([{
+            _id: id,     //for _id value we are using the id we generated. check the id of this doc and the id we generated -will be same
+            name: 'srk',
+            age: 26
+        }, {
+            name:'bob',
+            age: 26
+        }
+        ], (error, result)=>{
+            if(error){return console.log('unable to insert docs')}
+            console.log(result.ops)
+        })
+     })
+Above example is of - we can provide our own ids to the documents if we want to. we dont use it as it is extra work, mongodb will automatically generates it
 
+How object ids are stored: 
+ObjectID("5c1110c5c6cdac04f740575b") -- function call and a string is provided as a argument.
+The above statement is for visualization purpose to see what's the id value. ids are binary data.
+by storing binary data instead of string cuts half of the memory (size)
 
+const id = new ObjectID()
+console.log(id.id.length) //id has a prop of id - contains raw binary data
+<buffer 5c 11 ... >
+and can see the length - 12 (same as 12bytes we saw in documentation)
+console.log(id.toHexString().length) //string representation, gives the length of 24 (double of original value)
+ObjectID("5c1110c5c6cdac04f740575b")
+so for visualization they put string and is a argument to a ObjectID function call, it then converts to binary data n store 
+abstracts all from user.
 
+Querying documents:
+Read documents from database
+1. find({}) -- fetch multiple documents out of the database. doesnt takes callback, returns cursor.
+2. findOne({},cb)
 
+db.collection('users').findOne({name: 'bob}, (error, user)=> {
+    if(error) {return console.log('Unable to fetch user')}
+    console.log(user) //if user found, returns user document object
+})
 
+//findOne accepts two arguments 1.obj 2. function
+1.obj - specifiy search criteria ex: name
+2. callback gets called when the operation is complete. either we get error or the document
 
+db.collection('users').findOne({name: 'bob, age:1 }, (error, user)=> {
+    if(error) {return console.log('Unable to fetch user')}
+    console.log(user) 
+})
+There is no user with age 1, it did not through error, output is null.
+searching for a document and not finding it is not a error.
 
+**if there are two users with name bob, findOne return the first match document. 
+use ObjectID to uniquely idenityfy that doc
 
+db.collection('users').findOne({_id: new ObjectID("objectid..") }, (error, user)=> {})
+I think we can omit new keyword, mongodb do defensive programming. check
+will learn to avoid new keyword, it is standard way of doing when using mongodb native driver.
 
+2. find({}) - doesnt makes sense if we use objectID as its gonna return one doc. find is used to return multiple documents
 
+db.collection('users').find({age: 27}) it doesot take cb as second argument. return value is a cursor
+cursor is a pointer to that data in the database. 
+mongodb assume, everytime you use find, you always want to get back an array of all those documents.
+other things you might want to do - get the first five documents (limit) or get the count (count) of matching documents. just the count not the documents
 
+nodejs monodb driver api documentation > cursor
 
+find return cursor > cursor has methods> limit or count or toArray methods etc
+1.
+db.collection('users').find({age: 27}).toArray((error, users)=>{ //toArray takes cb, either error or documents here users
+    console.log(users) //lists users(documents) with age as 27 as a array
+})
+2. db.collection('users').find({age: 27}).toArray((error, count)=>{ 
+    console.log(count) //returns count - simple integer count as 3 not the entire matching documents sending through wire 
+})
+Cursor advantage: sometimes I want to get the data (Ex:1) and sometimes I just want to get the matching documents count (ex:2)
 
+***** Call backs explanation:
+We need them because a lot of operations in JavaScript are asynchronous, or put a bit more simply they don't actually stop
+the program from continuing until they are done like you are probably used to. But instead just run in the background 
+while the rest of the code continues executing.
 
+If you wanted to fetch some data from a server for instance (which could takes an unknown amount of time) 
+it would be incredibly inefficient for your program to just freeze completely while it waited for that data to be fetched. 
+So instead of doing that it's common to just run the fetching task in the background.
 
+This means that if you have two functions in a row with function A being asynchronous then function B will be executed 
+while function A is still running. In that case if function B depends on data that function A is fetching you will 
+run into problems.
 
+This problem is solved with callbacks. With a callback you can guarantee that function B is only called after 
+function A is finished with its thing because function A is actually the one responsible for calling function B.
 
+Asynchronous functions also aren't the only use of callbacks, but they are the most common and useful use of them 
+that I can think of at the top of my head.
+---------------------------------------------------------------------------------------------------
 
+Promises:
+make it easy to manage asyn code 
+solve callbck problems
+build on cb pattern. enhancement for cb's.
 
+callback func:
+---------------
+const doWorkCallBack = (callback) =>{ //callback parameter
+         setTimeout(()=>{                                           //simulating asyn process
+              callback('This is my error', undefined)               //asyn task is complete (post 2secs) we need to signal the caller that we either got error or result
+         },2000)                                                    //call back runs after 2secs                           
+}
 
+doWorkCallBack((error, result)=>{   //call back runs when I have either error or result.
+       if(error) {return console.log(error)}                             //write logic here
+    console.log(result)
+})
+whole point of using callback pattern is a way to allow the caller of doworkcallback to get the results
+callback(undefined, result) - for result
+callback('This is my error', undefined)-for error :::: o/p: This is my error.
 
+Promises func:
+--------------
+to create a promise we use new keyword with Promise constructor function. takes 1 argument - callback func. -->takes two arguments resolve and reject functions as arguments
+As nodejs developers, we are not going to create promises, typically they are created by the libraries we use
+const doWorkPromise = new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+            resolve([1,2,3])  //after 2secs we are ready to signify that we completed the asynchronous process
+                                        //instead of using cb's we can use resolve - if we get the results that we expect or reject methods -error
+                                        //callback('This is my error', undefined) - order is imp in cb whereas in promises func names signifies the success and error
+            //reject('this is error')
+        },2000)
+})
 
+promise is a obj and has methods like then and catch. doWorkPromise return a promise
 
+doWorkPromise.then((result)=>{    //when everything goes well, it comes under .then block and has result as argument.
+    console.log(result)     //[1,2,3]
+}).catch((error)=>{            //query the db - network connection drops -cannot access db server then you can call reject, it comes to .catch
+    console.log(error)
+})
 
+advantages:
+clear semantics, easier to understand the intension of the code. resolve-reject
+cb's - we to find all callbacks nd we need to figure out which are the arguments that are provided - error prone.
+we have one cb func nd we need to idenify error or result using if, whereas in promises you haveaccess to 2 func. resolve nd reject
 
+in promises, we cannot call both resolve nd reject or two resolve/reject. once we call resolve/reject, then promise isdone.
+we cannot change the state. failure to success
+in cb's - we can use multiple callbacks pass/fail - no preventive measures can easily mess up.
 
+                        fulfilled (resolved)
+                     /
+promise ------>pending   
+        {asyn task}   \
+                     rejected (reject)
 
+Updating documents: updateOne, updateMany
+update is depreciated.
 
+if you do not use callback, updateOne returns promise
+const updateprof = db.collection('users').updateOne({      //filter, update and callback or can use promise
+    _id: new ObjectID("object id")      //targeting doc with id.
+    },{
+    $set: {                 //$set command is used to update the field , not part of api doc,{search google - update operators mongodb - reference doc}
+        name: 'mich'        //updating name field. age field remains same.
+          }
+    })
+updateprof.then((result)=>{  //we can remove updateprof variable and chain .then together - this runs for success case.
+        console.log(result) //result have lot of stuff, useful - modified count - updateone so 1 or 0.
+    }).catch((error)=>{
+        console.log(error)
+    })
 
+$inc -- increment by
+Sinc: {
+    age:1   //increment age by 1.
+    } 
+//check robo3t for updates of documents.
 
+Delete documents: deleteOne and deleteMany
+deleteOne(filter,options,callback) return (promise)
 
+const updateprof = db.collection('users').deleteMany({
+        age: 27
+}).then((result)).catch()
 
-
-
-
-
-
-
+result -- deletedCount:2
 
 
 
