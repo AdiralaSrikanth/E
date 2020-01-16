@@ -32,14 +32,15 @@ move this folder to user directory (permanent location)
 
 Now, create a place for our data to get store. by default mongodb expects you to create a data directory at the root of your harddrive
 in that place it expects db directory. will have permissions issue so create a folder in user directory
-create folder "mongodb-data" in user which has mongodb {executables}
+create folder "mongodb-data" in user directory which has mongodb {executables}
 
 Terminal:
 cd ~  --Navigates to user directory
 pwd - print working directory
 return path /users/aaaa
-to start mongodb server - path to the executable -> /users/aaa/mongodb/bin/mongod --dbpath=/users/aaa/mongodb-data
+to start mongodb server - 
 <path to mongod executable> --dbpath=<path to data folder>
+/users/aaa/mongodb/bin/mongod --dbpath=/users/aaa/mongodb-data
 
 initialize database and gets the db up and running. 
 now go to mongodb-data and observe data is generated. 
@@ -54,7 +55,8 @@ open shell > db.version() - method on db object - it is js
 connecting to mongodb database from nodejs and inserting document :
 we use monogdb native driver - npm module > allows us to interact with our database using nodejs.
 
-docs.mongodb.com > docs > drivers > drivers are libraries that allow you to interact with the mongodb database from wide range of programming language
+docs.mongodb.com > docs > drivers > drivers are libraries that allow you to interact 
+with the mongodb database from wide range of programming language
 
 c,java,node,php,python --> click on nodejs > see/find the native driver for the platform
 
@@ -247,14 +249,13 @@ db.collection('users').findOne({name: 'bob, age:1 }, (error, user)=> {
     if(error) {return console.log('Unable to fetch user')}
     console.log(user) 
 })
-There is no user with age 1, it did not through error, output is null.
+There is no user with age 1, it did not throw error, output is null.
 searching for a document and not finding it is not a error.
 
 **if there are two users with name bob, findOne return the first match document. 
-use ObjectID to uniquely idenityfy that doc
+use ObjectID to uniquely identify that doc
 
 db.collection('users').findOne({_id: new ObjectID("objectid..") }, (error, user)=> {})
-I think we can omit new keyword, mongodb do defensive programming. check
 will learn to avoid new keyword, it is standard way of doing when using mongodb native driver.
 
 2. find({}) - doesnt makes sense if we use objectID as its gonna return one doc. find is used to return multiple documents
@@ -264,14 +265,14 @@ cursor is a pointer to that data in the database.
 mongodb assume, everytime you use find, you always want to get back an array of all those documents.
 other things you might want to do - get the first five documents (limit) or get the count (count) of matching documents. just the count not the documents
 
-nodejs monodb driver api documentation > cursor
+nodejs mongodb driver api documentation > cursor
 
 find return cursor > cursor has methods> limit or count or toArray methods etc
 1.
 db.collection('users').find({age: 27}).toArray((error, users)=>{ //toArray takes cb, either error or documents here users
     console.log(users) //lists users(documents) with age as 27 as a array
 })
-2. db.collection('users').find({age: 27}).toArray((error, count)=>{ 
+2. db.collection('users').find({age: 27}).count((error, count)=>{ 
     console.log(count) //returns count - simple integer count as 3 not the entire matching documents sending through wire 
 })
 Cursor advantage: sometimes I want to get the data (Ex:1) and sometimes I just want to get the matching documents count (ex:2)
@@ -340,7 +341,7 @@ doWorkPromise.then((result)=>{    //when everything goes well, it comes under .t
 
 advantages:
 clear semantics, easier to understand the intension of the code. resolve-reject
-cb's - we to find all callbacks nd we need to figure out which are the arguments that are provided - error prone.
+cb's - we have to find all callbacks nd we need to figure out which are the arguments that are provided - error prone.
 we have one cb func nd we need to idenify error or result using if, whereas in promises you haveaccess to 2 func. resolve nd reject
 
 in promises, we cannot call both resolve nd reject or two resolve/reject. once we call resolve/reject, then promise isdone.
@@ -408,7 +409,7 @@ mongoosejs.com ->
 ex given in that website. mongoose performing tasks
 1. connect to db
 2. create cat model
-3. create new instance iof cat model new Cat()
+3. create new instance of cat model new Cat()
 4. save to db.
 
 2. model:
@@ -416,7 +417,7 @@ allows us to model something in real world that we gonna able to store it in dat
 ex: user /cat/furnitures /task
 create models for collections that we want and use model to describe the data.{fields}
 
-ODM - objetc doc mapper - map ur obj in ur code over to doc inside mogndb db.
+ODM - object doc mapper - map ur obj in ur code over to doc inside mogndb db.
 
 npm i mongoose@3.1.16
 
@@ -454,7 +455,7 @@ not saving to database yet, we need to use methods available on the instance (he
 in order to save model instance
 me.save().then((me)=>{            //save method does not take arguments, it saves data in db. it returns promise
         c.l(me)                    //wait for saving process to finish, then it either resolve or reject.
-                                //when things go, we get access to our instance model
+                                //when things go well, we get access to our instance model
 }).catch((error)=>{
     c.l(error)
 })    
@@ -474,8 +475,7 @@ validation
 inside model:
 name: {
     type: String,
-    required: true //you have to provide name field while creating a user. field with required are optional we can add to db without them
-
+    required: true //you have to provide name field while creating a user. field without required are optional we can add to db without them
 }
 mongoose documentation
 Builtin validator : there are less validators
@@ -483,14 +483,14 @@ Builtin validator : there are less validators
 2. Numbers have min and max validator. String have enum,match, minlength and maxlength.
 To validate valid email or social cvv number or validate user age >10 etc, mongoose does not provide many validators
 
-allows us to setup custom validation , allowing to validate anything
+mongoose allows us to setup custom validation , allowing to validate anything
 we can customize our own validator, using validate function,
 
 age: {
     type: Number,
     required: true
     validate(value) {    //es6 func. takes one argument on that field. based on type "value" will be there number/string etc.
-        if(age<0) { //ppl should not error negative age if yes throw error
+        if(value<0) { //ppl should not enter negative age if yes throw error
             throw new Error('User age should be positive') //using js Error method to return error
         }
     }
@@ -517,14 +517,14 @@ error obj -if something is wrong. comes under .catch() of save() promise. our er
 
 mongoose has other validators under schematypes {string,number,date,boolean,array etc}
 list of options available for each schematype:
-default  --can set default value - age:0 or name: anynoymous
+default  --can set default value - age:0 or name: anonymous
 trim
-toLowerCase()
+lowercase
 email: {
     type: String,
     required: true
     trim: true  //trims extra spaces.
-    lowerCase: true //coverts to LowerCase
+    lowercase: true //coverts to LowerCase
     validate(value) {    
         if(!validator.isEmail(value)) {
             throw new Error('Please enter valid email')
@@ -536,8 +536,7 @@ email: {
 Structuring a Rest api:
 Till now we defined models and we know how to create instances using those models and storing data in database
 
-http endpoints for tasks app:
-
+{http endpoints for tasks app:}
 
 Restful api:
 api - gives set of tools to build software app.
@@ -559,20 +558,19 @@ data is stored in database but using restapi
 I can fetch data and manipulate data - CRUD operation
 we are working with represention of our users and tasks
 
-state transfer: a rest api the server is stateless the state has been transfered from server to client
+state transfer: a rest api, the server is stateless the state has been transfered from server to client
 each request from client such as a req from a webapp app contains everything needed for the server to process that request
 includes the operation they are trying to perform {GET}
 all of the data the operation needs in order to work
 authentication making sure that the user who is performing the operation is authenticated
 
-
 requests are made via http requests
-client webapp able to perfomr predefined operation
+client/webapp able to perform predefined operation
 
 client >>need task data to show >> make a http request to a specific url on the server >> GET /tasks/a7eee>>server> server finds the data in db
 >>server>>send back as part of http response>>>200 status code - JSON response>>client render the data.
 
-POST  re- status code 201 - resource created.
+POST  req- status code 201 - resource created.
 
 client>srk - authenticating>>request> POST /tasks - JSON request {sending along json with req ex:desc and completed status}>>>
 server authenticate the user>>>create that task/todo associated with us>> sends response -- 201 hhtp status code - resource created>> 201-JSON response>>client >render data 
@@ -619,28 +617,130 @@ hit send button.
 communicate with the server and gets response. body >pretty/raw
 can see status code and time took and size of http response.
 
+Resource creation endpoints:
+endpoints involve resource creation
 
+install nodemon as dev dependency -- npn i nodemon@v --save-dev --> to save nodemon as dev dependency
+npm i express
 
+scripts: {
+    "start": "node src/index.js"
+    "dev": "nodemon src/index.js"
+}
 
+create index.js file under src folder
+const express = require('express')
+const app = express() //create express app.
+const port = process.env.PORT || 3000 //as we deploy to heroku so using port from env variable
+const user = require('./')
 
+app.post('/users', (req,res)=>{ 
+    res.send('testing')
+})
 
+app.listen(port, ()=>{console.log('listening at port'+ port)})
 
+postman>createcollection>request>users
+post localhost:3000/users    send //gets the response
 
+data from client to server -- json data via req body
+body tab>raw>json
 
+{
+    "name":"srk",
+    "email":"test@test.com"
+    "password": "res123"
+}
+hit send , status code 200
 
+in the route how can we access the data sent?
+two step process
+1. json is sent so we need to configure express app.use(express.json()) -->converts json to object {{parses incoming json}}
+2. we can use obj in route and is accesible under req. req.body
 
+now we can create a new user. --> mongoose connects to database and we need access to model in this file
 
+refactor folders --> 
+src>models>user.js>>> put all models into individual files under models folder. ex: user model in user.js file etc
+check the modules and require them in files
 
+module.exports = User
+exporting User model
 
+index.js file
+require('./db/mongoose.js')//returns nothing we just need mongoosejs file gets called results in connecting to database server
+const user = require('./models/user')
 
+app.post('/users', (req,res)=>{ 
+    const user = new User({ req.body})//constructor func. requires us to pass obj with all the attributes. we have all those in req.body
+ 
+    user.save().then(()=>{  //save to db. .then handles success
+        res.status(201).send(user)       //in the example, did not put user in then cb func. recheck
+    }).catch((error)=>{
+        res.status(400).send(error)     //we need to send status code as well, currently for error it is sending status code as 200, change it 400
+    })                  
 
+})
+senddata to server via http req using predefined operation we are able to perform some manipulation on database
 
+httpstatuses.com
 
+J16
+Resource reading endpoints:
+list of multiple items 
+one item.
 
+app.get('/users', (req,res)=>{
+          //fetch users from db using mongoose                   
+})
 
+//we use mongoose to fetch all the users from database.
+mongoose provides series of methods similar as mongodb native driver.
 
+mongoosejs>doc>queries> list of methods available directly on model
+ex: Model.deleteMany()
+Model.updateOne(), Model.findOne() etc
 
+app.get('/users', (req,res)=>{
+    User.find({}).then((result)=>{    //on user model we use find method which returns promise n find takes object -find({}), define search criteria inside. finds all
+        res.status(200).send(result) //if we find users we send users as result and status code of 200
+    }).catch((error)=>{res.status(500).send()}) //sending internal server error
+})
 
+postman>new req in collection > read users >
+GET localhost:3000/users send //returns array of users
+
+/:id dynamic - capture the value and access that in route handler 
+to do that express gives us route parameters, parts of url that are used to capture dynamic value
+
+app.get('/users/:id', ()=>{ get request with /users/something,
+    //req.params -->contains all of the route parameters that we are provided. here obj with single prop i.e id and its dynamic value
+    console.log(req.params)  //new req> read user> GET localhost:3000/users/6737737373 -->as we are not sending anything postman loading screen appear
+           //o/p in vsc : {id: "6737737373"} --id we are sending as route parameter and can see the value provided
+})
+
+Now we know how to access the value passed as route parameter, now we will find that user in db and return that user if any
+
+app.get('/users/:id', (req,res)=>{ 
+    const _id = req.params.id
+    User.findById(_id).then((user)=>{ //findOne or findById query method - findById() does not take obj {}, just takes id 
+        if(!user) {
+            return res.status(404).send() //user not found. ////mongodb query - you man not find user but treats as success, it searched and returned nothing - null - success {we might not get the user}
+        }
+        res.send(user) //status will be 200, you will user object.
+                     
+    }).catch((e)=>{
+        res.status(500).send()
+    })
+ })
+const _id = req.params.id
+User.findById(_id)
+
+when we are using mongodb native driver we used to write new ObjectID("objectID") ex: findOne({_id: new ObjectID("string objectid..")
+ here we are not doing it, mongoose converts string ids (5cedfge..)to object ids
+
+/users/:id ==== req.params.id
+post /users json body {} === req.body ===> update in users model ==> const user = new User({req.body}) then user.save(){save to db}.then().catch
 
 
 
