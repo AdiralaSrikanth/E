@@ -1120,15 +1120,41 @@ app.get('/users/:id', (req,res)=>{
     }
 })
 
+separate route files:
+refactor
+currently index.js file has every single route tasks and users routes {break it in small files}. separate users and tasks routes
 
+setting up multiple express routes will be combining together to create complete application
 
+4steps process:
 
+const router = new express.Router() //creating a new router
+app.use(router) //registering with existing express app
+router.get('/users', (req,res)=>{res.send('test')}) //setup the routes
+module.exports = router //can be used in diff files.
 
+create folder routers - user.js {user router}
 
+const express = require('express')
+const router = new express.Router()
 
+router.get('/test',(req,res)=>{res.send('from other file')})
+module.exports = router
 
+index.js is the main file so import user router in index.js
+const userRouter = require('/routers/user')
 
+app.use(userRouter). register with our existing app
+change all app.get to router.get()...
 
+1big file>split to 3> index.js creates express app > what this express app does in defined in other files {router}
+
+Authentication and security:
+all of the api endpoints are publicly accessible. anyone can come along and do something - delete data etc
+user need to sign up or login before they gonna do be able to do something. create a task or delete a task
+by forcing user to login, we are creating a relationship b/w user and task. this makes sure user 1 cannot see user 32 task
+
+Passwords
 
 
 
