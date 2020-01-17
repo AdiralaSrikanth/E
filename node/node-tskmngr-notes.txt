@@ -742,9 +742,383 @@ when we are using mongodb native driver we used to write new ObjectID("objectID"
 /users/:id ==== req.params.id
 post /users json body {} === req.body ===> update in users model ==> const user = new User({req.body}) then user.save(){save to db}.then().catch
 
+J17
+Promise chaining
+Till now every time we used promise we did only one asynchronous thing. ex: findById
+what if we want to use one thing and then something else? ex: mark a task as complete and get the records of incompleted tasks
+two asynchronous things. one needs to happen and then another.
+
+lets see how we write without promise chaining
+
+const add = (a, b)=> {  //parameters
+    return new Promise((resolve, reject)=>{
+            setTimeout(()=>{
+                resolve(a + b)          //when add func called, we are returning a promises after waiting for 2 seconds
+            }, 2000)
+    })
+}
+
+add(1, 2).then((sum)=>{
+    console.log(sum)
+    //what if I want to do add one more async task ex: I want to add one more value to returned sum value.
+    add(sum, 3).then((sum2)=>{      //second async call. one promise nested inside another
+        console.log(sum2)
+    }).catch((e)=>{
+        console.log(e)
+    })
+}).catch((e)=>{
+    console.log(e)
+})
+Issue with above code
+1. when we want to perform another asyn task we are calling add func which returns promise and adding .then and .catch
+    basically "Nesting"  what if we have around 20 asyn calls then will be nested too long {complex}
+2. we are duplicating the code, writing .catch for all promises
+
+solution: we can do promises chaining this is achieved by returning a promise from first asyc task
+    and on that promise we can do .then {as it is promise we will have resolve and reject } and for all promises we can write one .catch.
+
+add(1, 2).then((sum)=>{ //.then executes when add(1,2) fulfills
+    console.log(sum)
+    return add(sum, 3)  //returning a promise
+}).then((sum2)=>{           //.then executes when add(sum,3) fulfills.
+        console.log(sum2)   
+    })
+}).catch((e)=>{            //.catch executes for reject - this is for two promises
+    console.log(e)
+
+will see the same ex with findAndUpdate and getting the count
+
+mongoose promises and chaining syntax
+require mongoose file to connect to db and require User model
+ex that we are working - find a user by id and update age = 1 and find all the users with that age
+mongoosejs.com>queries> Model.findAndUpdate
+we have updateOne and updateMany also  //do not return document
+findOneAndUpdate and findByIdAndUpdate() //return document {promise}
+grab the id of a user from robo 3t
+
+User.findByIdAndUpdate('5c1ef..', {age: 1}).then((user)=>{        //return promise and here the document - updated or individual user that is going to update recheck.
+    console.log(user)
+    //check doc mongoosejs.com>api --Model.countDocuments() -- gives the doc count .//Model.count() - depreciated
+    return User.countDocuments({age: 1})
+}).then((count)=>{
+    c.l(count)
+}).catch((e)=>{
+    c.l(e)
+})
+
+findByIdAndUpdate('',{}) takes two arguments  1. find by id -string simple string id no need of new ObjectID('5c20ee00')
+mongoose does it for us 2. what are the updates - {age:1} updating age field value to 1. no need to use $set
+ mongoose does it for us as it uses mongodb native driver behind the scenes
+after updating the document returns promise
+
+return promise from findByIdAndUpdate to do promise chaining.
+
+deprecation warning: given by mongodb native driver
+findByIdAndDelete - find doc with the specified id and deletes that doc.
+
+async-await:
+one more topic related to asynchronous programming.
+async-await - makes it so easy to work with our asynchronous promise based code.
+ writing code that looks more synchronous than asynchronous
+
+asynn-await is merely small set of tools makes it easy to work with promises. still gonna using same old promise methods
+ the only thing that gonna change is how we gonna manage our asynchronous code
+
+will be using async-await in all our routes
+
+const dowork = ()=>{
+}
+console.log(dowork()) //o/p undefined
+we know that JS gonna return undefined when we do not return anything from a func which is called.
+
+async key word , allows us to create async func in that func we are going to use await feature
+mark a func as async func which is done by adding async keyword infront of the func declartion.
+const dowork = async()=>{
+}
+console.log(dowork())
+o/p: Promise {undefined}
+when we call a async func it returns a promise and fulfilled with undefined as a value
+
+async func always returns a promise. that promise is fulfilled with the value you as a developer choose to return from a func
+
+const dowork = async()=>{
+    return 'srk'            /asyn func always returns promise, here it is not just string as we are returning a string from our func 
+                            //as it is asyn func then it returns promise which is fulfilled by value returned here string
+}
+console.log(dowork())
+o/p: Promise {srk} 
+when we call a async func which is returning a string, it returns a promise which is fulfilled with the string here 'srk' as a value
+
+As dowork() is returning promise we can do .then and .catch instead of logging into console
+
+const dowork = async()=>{
+    throw new Error('Something went wrong')     //error-rejecting the promise with that error - .catch block
+    return 'srk'            //returning a value, fulfilling the value of the promise.
+}
+dowork().then((result)=>{
+    console.log(result)   //output - srk
+}).catch((e)=>{
+    console.log(e)
+})
+await operator feature:
+how is it going to make our asynchronous tasks with ease 
+
+Take our previous promise ex
+const add = (a, b)=> {  
+    return new Promise((resolve, reject)=>{
+            setTimeout(()=>{
+                resolve(a + b)   
+            }, 2000)
+    })
+}
+with promise chaining
+add(1,2).then((sum)=>{
+    console.log(sum)
+    return add(sum,2)
+}).then((sum2)=>{
+    c.l(sum2)
+}).catch((e)=>{
+    c.l(e)
+})
+
+with asyn await:
+const add = (a, b)=> {  
+    return new Promise((resolve, reject)=>{
+            setTimeout(()=>{
+                resolve(a + b)   
+            }, 2000)
+    })
+}
+copy paste add func without changing single thing about it. this is done intentionally. when working with async await
+you dont have to change how ur promise functions internally. all you do is change how you work with them
+for us, mongoose does not need to write library in order us to use async await. mongoose supports Promises
+so as a consumer of those promises we can use async await if we want to. 
+
+const dowork = async ()=>{
+    //await operator is used with a promise. await add(1,2) where do I get access to the data? if we are not using async-await
+    //we use .then call and data can be accessed in that callback func {.then(()=>)}
+
+     const sum =  await add(1,2) //add() looks like standard synchronous func. we can create a var to get access to the value that the promise is fulfilled.
+                                //we have to wait 2secs. the adv is syntactical. we can return sum or call as many as add func calls - asynchronous
+                                //fulfills promise and .then func will execute when we call dowork()
+    //able to use code that looks like synchronous perform asynchronous task
+     const sum1 = await add(sum, 2) //code is much simpler than promise changing. 
+     const sum2 = await add(sum2, 2)
+     return sum2                        //return promise after 6 seconds
+    }
+
+dowork().then((result)=>{       //promise fulfills so .then executes
+    console.log(result)   
+}).catch((e)=>{
+    console.log(e)
+})
+
+advantage:
+1. code is much simpler than promise chaining. not using many functions and return func values. leds some confusion situations
+2. scope - when we use two .then - you cannot access first .then var in second so the scope is limited
+we need to create one variable in parent scope and do all the stuff but in
+asyn func everything come under one scope as defined in above ex: sum, sum1. sum2
+
+Handling error
+const add = (a, b)=> {  
+    return new Promise((resolve, reject)=>{
+            setTimeout(()=>{
+                if(a < 0 || b<0) {
+                    return reject('values must be positive ')
+                }
+                resolve(a + b)   
+            }, 2000)
+    })
+}
+const dowork = async()=>{
+     const sum =  await add(1,2) return promise
+     const sum1 = await add(sum, 2)
+     const sum2 = await add(sum2, -1)   //after 6 secs fails and goes to .catch block.
+     return sum2                    
+    }
+
+dowork().then((result)=>{       //promise fulfills so .then executes
+    console.log(result)   
+}).catch((e)=>{
+    console.log(e)
+})
+
+The await operator is used with promises in asynchronous functions. The await operator allows you to work with promises in a way
+that looks like synchronous code. If the promise is fulfilled, the fulfilled value can be
+accessed as the return value from the function.
+
+It’s important to note that async and await are syntax enhancements for working with
+promises. Promises are still at the core of asynchronous code that uses async and await.
 
 
+User.findByIdAndUpdate('5c1ef..', {age: 1}).then((user)=>{
+    console.log(user)
+    return User.countDocuments({age: 1})
+}).then((count)=>{
+    c.l(count)
+}).catch((e)=>{
+    c.l(e)
+})
 
+ will work on above function using async-await
+
+const updateUserAgeAndGetCount = async (id, age) => {
+    const user = await User.findByIdAndUpdate(id, {age})          //destructured age . findByIdAndUpdate returns promise
+    const usersCount = await User.countDocuments({age}) //awaits for the promise
+    return usersCount
+}
+
+updateUserAgeAndGetCount('5c1ef..', {age: 1}).then((usersCount)=>{c.l(usersCount)}).catch((e)=>{c.l(e)})
+
+Integrating async-await in routes:
+index.js file
+
+app.post('/users', (req,res)=>{ 
+    const user = new User({ req.body})
+    user.save().then(()=>{  
+        res.status(201).send(user)   
+    }).catch((error)=>{
+        res.status(400).send(error) 
+    })                  
+
+})
+making above route to use async-await
+
+//when you add async it changes the behavior of the func. func goes from returing whatever value you return to always returning a promise
+//goodnews is that express doesnot use the return value from the func . express doesnot care what we return 
+//instead we use request and response to tell express what we want to do. in this case we added the async functionality
+//without changing the behavior at all
+
+app.post('/users', async (req,res)=>{ //take this func which we pass to express and mark it async func
+
+    const user = new User({ req.body})  //we send json via request body from postman.
+    
+     //   await user.save()       //await the promise that is coming from .save(). At this point we have saved the user, 
+                                //everything that comes after this line is only going to run once the was saved. either success or unsuccessfully
+        //next statement only runs if the promise above fulfills. if it is rejected rest of the function gets stop. eevrything next to it never ran.
+//so we use try catch
+
+        try {
+            await user.save() //if this promise fullfills, goes to next step else goes to catch block
+            res.status(201).send(user)
+        } catch(e) {
+            res.status(400).send(e)
+        }
+})
+//eleminating .then calls
+headover postman send good data {json body - required fields for user model} - 201 and bad data - 400
+
+ex2:
+app.get('/users', async (req,res)=>{
+    try {
+        const users = await User.find({})
+        res.send(users)
+    } catch (e) {
+        res.status(500).send()
+    }
+
+})
+ex3:
+app.get('/users/:id', (req,res)=>{
+    const _id = req.params.id
+    try {
+        const user = await User.find({_id})
+        if(!user) {
+            return res.status(404).send()
+        }
+        res.send(user)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+Http endpoint for updating resources: express provides delete method
+we use Patch http method and task is to update single user
+
+app.patch('/users/:id', async (req,res)=>{
+
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ["name","email","password","age"]
+
+    const validOperation = updates.every((update)=>{
+                return allowedUpdates.includes(update)
+            })  
+
+    if(!validOperation) {
+        return res.status(400).send({"error":"Invalid updates!"})
+    }
+ 
+    try {
+       const user = await User.findByIdAndUpdate(req.params.id, {req.body}, {new: true, runValidators: true})
+        //findByIdAndUpdate mongoose method & $set is not req. mongoose handles it
+
+       if(!user) {
+          return res.status(404).send()
+       }
+       
+       res.send(user)
+
+    } catch (e) {
+        res.status(400).send(e) //two things 1.network error - unable to connect to db - send 500
+                                //2. validation issues ex: for name instead of string value user provided empty string. 
+                                //so sending 500 is wrong for both cases. use 400
+    }
+})
+
+1. we are accepting fields to update via req json body. so if user provide a field which does not exist in user model/document
+express is sending 200 status nd ignores the field ex:height . to do defensive programming we are checking the fields which user want to update
+
+
+    const updates = Object.keys(req.body)
+    Object.keys(req.body) -- object.keys creates/returns a array of strings here keys provided by user in req json body
+
+    const allowedUpdates = ["name","email","password","age"] //not providing _id
+
+    const validOperation = updates.every((update)=>{
+                return allowedUpdates.includes(update)
+            }) 
+
+    every is js array method. it returns true if all the array elements are true ex: if there are 10 elements , it returns true only
+    if 10 elements/conditions are true else false
+
+    we are checking the fields provided by user if that field doesnot exist we send 400 response
+2. 
+try {
+       const user = await User.findByIdAndUpdate(req.params.id, {req.body}, {new: true, runValidators: true})
+
+      1.  we are getting id from req params so req.params.id --sending via url in postman
+      2. instead of hardcoding we are getting fields to update from user via req.body json
+      3. third argument is options object - new:true is when findByIdAndUpdate operation performed
+        by using new:true it sends the updated user with updated fields else it sends the user when it finds
+
+        run validator - required fields, types
+
+        next steps only run when the promise fulfills else goes to catch block
+       if(!user) {
+           res.status(404).send()
+       }
+       
+       //if there is no user found by he query findByIdAndUpdate we send 404 
+
+       res.send(user)
+
+    } catch (e) {
+        res.status(400).send()
+    }
+
+Delete:
+app.get('/users/:id', (req,res)=>{
+
+    try{
+        const user = await User.findByIdAndDelete(req.params.id)
+        if(!user) {
+            return res.status(404).send()
+        }
+        res.send(user) //deleted user
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 
 
