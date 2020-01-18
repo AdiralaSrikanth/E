@@ -1153,8 +1153,220 @@ Authentication and security:
 all of the api endpoints are publicly accessible. anyone can come along and do something - delete data etc
 user need to sign up or login before they gonna do be able to do something. create a task or delete a task
 by forcing user to login, we are creating a relationship b/w user and task. this makes sure user 1 cannot see user 32 task
-
+J18
 Passwords
+currently we are storing passwords in plain text - security issue
+we use bcrypt to hash the password.
+hashed password - we cannot bring back to original value
+encrypt algorithm - password - we can bring back original password
+
+npm i bcryptjs
+const bcrypt = require('bcryptjs')
+
+const passwordHashing = async ()=> {
+        const password = 'Black12345!'
+        const hashedPassword = await bcrypt.hash(password, 8) //hash method of bycrypt takes two arguments & returns promise 1. password to hash
+                                                            //two - no of rounds that algorithm should run to hash the password
+
+    //We store hashedpassword in db but how this gonna work when user login next time by entering plane text as password in UI
+
+    const isPasswordMatch = await bcrypt.compare('Black12345!', hashedPassword) //returns true if macthed else false
+    behind the scenes bcrypt hash the first argument that we provide {plain text} and compares with second arguments
+    which we fetch from db, both are hashedPasswords. compare returns true or false.
+
+}
+
+
+findByIdAndUpdate do not run validators. Thats why we switched it to .save() so it runs validators
+we used options as runValidators: true
+
+The findByIdAndUpdate bypasses the .pre('save') middleware because it's not a save operation, 
+it's an update therefore if we try to update the password, it's not going to be hashed since our middleware 
+isn't being triggered
+
+*****************************************************:
+const obj = { a: 3, name: "srk" }
+ 
+console.log(obj.a) // outputs 3
+ 
+console.log(obj["a"]) // outputs 3
+console.log(obj["name"]) // outputs srk
+
+For example, this:
+
+user["email"] = req.body["email"]
+Means "Assign the value of the email property in req.body to the email property of user". 
+You when you use obj[key] you're accessing the value of the key in that object. 
+When you use the assignment operator on obj[key] you're assigning a value to the key.
+*****************************************************:
+
+const user = await User.findByIdAndUpdate(req.params.id, {req.body}, {new: true, runValidators: true})
+
+findByIdAndUpdate bypass mongoose so we have to tell express to runValidators.
+
+in current example .save is not called so .pre('save') middleware do not execute so we have to change above code
+code to make use of .save to run middleware.
+
+Securly storing passwords:
+we are storing plain passwords in 2 places 1. registering /users and 2. update users /users/:id
+
+customize user model. mongoose supports middleware, allows us to customize the behavior of your mongoose model.
+
+mongoosejs.com>guide>middleware
+middleware - register some functions to run before or after given events occur
+ex: validate - I can run some code before or after a user is validated/ a user is saved {events - validate, save, remove}
+
+run some code just before a user is saved. some code here is we check if the password is plain text if yes then hash it
+restruturing is user model:
+
+we created a user model const User = mongoose.model('User', {
+    name: {
+        type:String
+        trim: true
+    }
+})
+second argument, we passed a object to the model. behind the scenes converts it to schema.
+Now, we have to create a schema to take advantage of middleware functionality.
+
+const userSchema = new mongoose.Schema({    //obj - defines all of the prop for that schema.
+    name: {
+        type: String,
+        trim: true
+    }
+})
+
+last lines:
+const User = mongoose.model('User', userSchema)
+module.exports = User
+middle line:
+to set the middleware, use a method on userSchema
+
+we have access to two methods on userSchema. pre - before save or before validate and post - events
+
+userSchema.pre('save', async function (next) => {     //ore('event', func). use normal func - arrow functions do not bind this
+
+    //we have access to this - here this is document which is getting saved
+    const user = this       //ind user
+
+    //how does it know that this func is done, 
+
+    //here we hash the password - code
+
+
+    next()  //pass to next middleware
+
+})
+when we send post req from postman to /users, middleware is working but for findByIdAndUpdate middleware is not working. 
+bcz few mongoose queries bypass more advanced feature like middleware so we have to call .save to make use of our middleware
+
+const user = await User.findByIdAndUpdate(req.params.id, {req.body}, {new: true, runValidators: true})
+
+change the above code to
+const user = await User.findById(req.params.id)
+
+ now we have access to instance of user model
+we can now update the prop's that are changed
+ user.name = 'srk' 
+ 
+ cannot hardcode, as the fields will be diff every single time.
+
+ updates.forEach((update)=>{        //updates is a array of strings, here we are getting ind string in update
+    user[update] = req.body[update]
+
+    //we can access obj properties as obj["name"], here we do not know which fields are getting updated.
+    //so we are looping through updates array and getting the prop and value from user[update] and setting the value
+    //provided by user req.body[update]
+
+    //ex: if a user send json as {"name":"srk"} , first we get all these as string array using Object.key(req.body)
+    //then loops through this array to get ind key, now we update the this particular key in a user document, user[update]
+    //and the value we get from req.body[update] 
+
+ }) 
+    //we now updated the value, now save it, as we wrote middleware pre('save), our middleware gonna executed
+
+    await user.save()
+now we can has the password in middleware
+Load in bcrypt in user model
+
+userSchema.pre('save', async function (next) => {   
+    const user = this
+
+    if(user.isModified('password')) //mongoose give isModified method on a document. return true of document value of provided key updated
+                                    //isModified returns true for 1. new value {first time entered pwd} 2. updated password key value
+
+        user.password = await bcrypt.hash(user.password, 8) //user is a document and getting password key value. overwriting the plain text value
+
+    next()
+})
+
+above middleware works for both /users and /users/:id with hashedPassword
+
+Logging in users:
+creating a new router> /users/login> when user login with email and pwd > route verify the user with those credentials.
+
+router.post('/users/login', asyn (req,res)=>{
+    //two ways to structure 1. write all the code here or 2. write resuable method which finds and returns user and call here.
+
+    //work with user model and setup resuable func for finding a user by credentials
+
+    try{
+        const user = await User.findByCredentials(req.body.email, req.body.password) 
+        //we can use available options but creating our custom func findByCredentials
+        //create findByCredentials in user model
+
+        //we have to create a separate schema and pass it to model
+        
+        //userSchema.statis.method name
+    }
+  
+})
+
+in usermodel.js
+
+//we have to create a separate schema and pass it to model
+//userSchema.statics.method name
+when you call User.findByCredentials comes to user model
+
+userSchema.statics.findByCredentials = async (email, password) => { //this binding so using arrow func
+        const user = await User.findOne({email})
+        if(!user) {
+            throw new Error('Unable to login')
+        }
+        //verify the password using compare func of bcrypt. we saved user pwd as hashedPassword
+
+        const isMatch = await bcrypt.compare(password, user.password) 
+        //password - user provided one, user.password = returned user from findOne and its pwd
+
+    //if there is no match
+
+        if(!isMatch) {
+            throw new Error('unable to login')
+        }
+        return user
+}
+ now in user.js (routes)
+
+router.post('/users/login', asyn (req,res)=>{
+
+    try{
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    } catch (e) {
+        res.status(400).send()
+    }
+})
+in the user model, set email field as unique : true {index will be created} so no duplicate email id for the users who login in
+
+
+
+
+
+
+
+
+
+
+
 
 
 
