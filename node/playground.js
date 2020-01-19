@@ -30,3 +30,29 @@ console.log(obj.a) // outputs 3
  
 console.log(obj["a"]) // outputs 3
 console.log(obj["name"]) // outputs srk
+
+// find({})
+//Model.findById()
+//Adventure.findById(id, function (err, adventure) {});
+
+//id «Object|Number|String» value of _id to query by
+
+// A.findByIdAndUpdate(id, update, options)  // returns Query
+// options - new, runValidators
+
+
+//Model.findByIdAndUpdate()
+//A.findByIdAndUpdate(id, update, options)  // returns Query
+//update - obj {}
+
+//A.findByIdAndUpdate(id, update, options)  // returns Query
+//// is sent as
+//Model.findByIdAndUpdate(id, { $set: { name: 'jason bourne' }}, options, callback)
+
+
+//Model.findOneAndDelete()
+//conditions «Object»
+//A.findOneAndDelete(conditions, options, callback) // executes
+
+
+
