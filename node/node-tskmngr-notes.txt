@@ -1171,6 +1171,7 @@ const passwordHashing = async ()=> {
     //We store hashedpassword in db but how this gonna work when user login next time by entering plane text as password in UI
 
     const isPasswordMatch = await bcrypt.compare('Black12345!', hashedPassword) //returns true if macthed else false
+   
     behind the scenes bcrypt hash the first argument that we provide {plain text} and compares with second arguments
     which we fetch from db, both are hashedPasswords. compare returns true or false.
 
@@ -1225,7 +1226,7 @@ we created a user model const User = mongoose.model('User', {
         trim: true
     }
 })
-second argument, we passed a object to the model. behind the scenes converts it to schema.
+second argument, we passed a object to the model. behind the scenes mongoose converts it to schema.
 Now, we have to create a schema to take advantage of middleware functionality.
 ************************************************************
 A Schema is an object that defines the structure of any documents that will be stored in your MongoDB collection; 
@@ -1271,6 +1272,9 @@ userSchema.pre('save', async function (next) => {     //pre('event', func). use 
 when we send post req from postman to /users, middleware is working but for findByIdAndUpdate middleware is not working. 
 bcz few mongoose queries bypass more advanced feature like middleware so we have to call .save to make use of our middleware
 
+//findByIdAndUpdate method uupdates mongoose. it peroforms direct oepration on db that y even set runValidators.
+//we can do more mongoose traditional way to amek sure our middleware works correctly
+
 const user = await User.findByIdAndUpdate(req.params.id, {req.body}, {new: true, runValidators: true})
 
 change the above code to
@@ -1305,7 +1309,7 @@ userSchema.pre('save', async function (next) => {
 
     if(user.isModified('password')) //mongoose give isModified method on a document. return true if provided key value of a doc is updated
                                     //isModified returns true for 1. new value {first time entered pwd} 2. updated password key value
-
+                                    //we should touch if is already modified.
         user.password = await bcrypt.hash(user.password, 8) //user is a document and getting password key value. overwriting the plain text value
 
     next()
@@ -1313,8 +1317,8 @@ userSchema.pre('save', async function (next) => {
 
 above middleware works for both /users and /users/:id with hashedPassword
 
-Logging in users:
-creating a new router> /users/login> when user login with email and pwd > route verify the user with those credentials.
+Logging in users: ///login route - email,pwd>job of the route tat user exists with those cred
+creating a new router> /users/login> when user login with email and pwd > route verify whether user exists with those credentials.
 
 router.post('/users/login', asyn (req,res)=>{
     //two ways to structure 1. write all the code here or 2. write resuable method which finds and returns user and call here.
@@ -1372,7 +1376,7 @@ in the user model, set email field as unique : true {index will be created} so n
 JSON web tokens:
 public routes - accessible to anyone - /users /users/login
 private routes - authentication - correctly authenticate to use it. 
-ex: delete task - you should authenticated before you perform delete.
+ex: delete task - you should authenticated before you perform create task/ delete.
 
 login with my account > get back auth token > perform delete/edit/create operations
 
@@ -1534,7 +1538,6 @@ with middleware:  new request ---> so something --> run route handler
 with middleware we can customize our server to fit our needs.
 do something is a func that executes as we like ex: check valid authenticate token
 
-
 registering our middleware
 
 app.use() // we used to provide something that is created by express. we never explicitly provided our own function
@@ -1576,7 +1579,8 @@ const auth = async (req,res,next) {
 }
 module.exports = auth
 
-earlier we used app.use() to register a middleware, itis associated and used for all routes but we dont want to use this middleware for all routes
+earlier we used app.use() to register a middleware, itis associated and used for all routes 
+but we dont want to use this middleware for all routes
 ex: login and signup are public. 
 
 to use this middle ware for a specific or individual route, pass it as second argument to the route
@@ -1624,7 +1628,7 @@ const auth = async (req,res,next) => {
     const decoded = jwt.verify(token, 'thisissecretkey')
     //decoded is sjnfksjsdffj token value to the payload which we passed ex: _id
     //I think verify verifies the token secretkey with the secretkey we provided
-    f the given token is valid ,if it valid, we can find the user in db, 
+    if the given token is valid ,if it valid, we can find the user in db, 
     we embeded the user id as part of token, grab that _id value {user}
 
    // const user = await User.findOne({_id: decoded._id})
@@ -1734,6 +1738,76 @@ if(pm.response.code === 200) {    //pm - postman - its is a obj and response.cod
 now we have script that sets authtoken automatically. if token expires we can run login req and token is set as env var.
 
 change the status code === 201 in create user.
+
+Logout: create a new router > logout.
+till now we have login where we generate token and auth middleware to validate the token. after validation user can delete
+or update the task
+will figure out how these auth tokens are removed when user is done i.e logout
+
+router.post('/users/logout', auth, async (req,res)=>{ //you have to be authenticated in order to logout.
+        //we need particular token that they used when authenticating
+        //if user login 5 pcs , we dont want to del all token just the pc where he/she clicks logout - del that token
+
+    try {
+        //we authenticated so we have user data.
+
+        req.user ois the user. now we can change the tokens array by eliminating used token - use filter method
+        req.user.tokens =  req.user.tokens.filter((token)=>{ //token is array of obj and token is ind obj which has token prop
+                return token.token !== req.token {auth gives this token}
+
+                //ind token which is obj and which has token prop and _id prop.
+                //return true for the token we are looking at isnt the one used for auth
+
+        ** basically, auth returns a token as req.token, we have to del this token from user.tokens array as user
+        clicked on logout. for this we are looping over tokens array and applying filter method - if the auth provided 
+        token and a token from tokens array are not equal we return true if they are equal we are not saving it
+
+        req.user.tokens = updated /filtered token value where auth passed token we delete
+        now save it to db
+
+        await req.user.save() 
+        res.send()
+        })
+
+    } catch () {
+        res.status(500).send()
+    }
+}) 
+
+make small change in auth func. currently returning/passing only user return req.token = token. other route handlers
+will have access to that token
+
+now logout of all route:
+
+router.post('/users/logoutAll', auth, async (req,res)=>{ 
+    try {
+        req.user.tokens = [] //setting token vth empty array.
+        await req.user.save() 
+        res.send()
+        })
+
+    } catch () {
+        res.status(500).send()
+    }
+}) 
+
+//why post req? for logout
+
+flow --- user signup/login/use login toke /logout.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

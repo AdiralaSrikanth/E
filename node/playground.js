@@ -55,4 +55,4 @@ console.log(obj["name"]) // outputs srk
 //A.findOneAndDelete(conditions, options, callback) // executes
 
 
-
+///login route - email,pwd>job of the route tat user exists with those cred - findByCredentials

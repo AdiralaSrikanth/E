@@ -121,7 +121,7 @@ there are npm libraries which can do above tasks
 
 npm comes along with Nodejs.
 
-1. initialize npm in our project - 
+1. initialize npm in our project - npm init
 creates one configuration file, we can use it to manage dependencies.
 
 creates package.json file.
