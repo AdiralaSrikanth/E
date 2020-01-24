@@ -51,7 +51,7 @@ now serve up public directory ---- run it from correct folder(where public folde
 live-server public
 
 JSX - Javascript xml, templating syntax provided by react. makes easy to build
-structure of our application. everything we return to the screen is return in jsx.
+structure of our application. everything we return to the screen is written in jsx.
 
 install react
 ***Load React library using CDN. later on we load in react,react dom,router & redux using webpack.
@@ -68,7 +68,7 @@ react can be used in diff context - react-vr , react-native
 
 After writing react,react-dom in src attribute of script tag, start the server and check
 react and react-dom variables in console. these are displaying only because we added them in script tag
-they arw global react and global ReactDOM
+they are global react and global ReactDOM
 
 JSX - Javascript XML {Javascript syntax extension}, provided by react.
 define template, can inject/insert data into those templates.
@@ -89,7 +89,7 @@ render method takes two arguments
 var template = <p>This is JSX from app.js</p>
 var appRoot = document.getElementById('app') //defined a div tag and assigned id as app in index.html
 
-reactDOM.render(template, appRoot)
+ReactDOM.render(template, appRoot)
 
 we will get the error as unexpected token <
 
@@ -98,8 +98,8 @@ solution for above issue is take in JSX and convert it to Javascript
 we use tool Babel to do this. (babel is a Javascript compiler.)
 babeljs.io website
 
-babel takes ES6 and ES7 code and compiles to ES5 code
-Browsers like IE8 or 9 do not add latest features like arrow functions etc. 
+babel takes features from ES6 and ES7 code and compiles to ES5 code
+Browsers like IE9 or 10 do not add latest features like arrow functions etc. 
 using babel we can write arrow 
 functions but at the end of the day it is es5 code in browser 
 
@@ -144,13 +144,14 @@ yarn global add babel-cli@6.24.1
 
 if you face any errors use npm install -g babel-cli@6.24.1
 
-Gives access to command line interface to use babel compiler. but it does not give latest js features.
+Gives access to command line interface to use babel compiler. but it does not come with es6,7.. js features or JSX support.
 
 babel --help
 lists all available commands if installed correctly
 
-install react and env install locally in our proj, they wont give any commands like react or env instead
-babel cli use it to convert jsx to CreateElement calls
+install react and env install locally in our proj, they wont give any commands like react or env instead we need their 
+code to live in our project
+babel cli use it to convert jsx to createElement calls
 
 yarn init ---specify dependencies
 hit enter
@@ -182,7 +183,7 @@ ex: babel src/app.js --out-file=public/scripts/app.js --presets=env,react
 hit enter. no errors
 
 go to public/scripts/app.js and observe compiled code i.e React.CreateElement call
-Add --watch command, it watch scripts/app.js file and if there is a change in src/app.js file, 
+Add --watch command, it watches scripts/app.js file and if there is a change in src/app.js file, 
 it gonna generate compiled code again (bascically for every change)
 babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch
 
@@ -222,9 +223,10 @@ var template = (
     </div>
     );
 
-you can see how the above code gets compiled in scripts/app.js file. foe each tag, React.CreateElement(..) will be created
+you can see how the above code gets compiled in scripts/app.js file. for each tag, React.CreateElement(..) will be created
 
 Instead of rendering static data we can render dynamic data in jsx
+{} - takes in js expression.
 var userName = 'srk'
 var age = 27
 var templateOne = (
@@ -258,6 +260,125 @@ var template = (
         </ol>
     </div>
     );
+J24
+Conditional rendering in JSX
+if statements, ternary operators and logical & {and} operator.
+
+we cannot put if statement in {}, it is the place for Javascript expression. we can define a separate function and call it in {}
+
+var user = {
+    name: 'andy',
+    age: 26,
+    location: 'philly'
+}
+
+function getLocation(location) {
+    if(location){
+        return location
+    }else{
+        return 'unknown'
+    }
+}
+
+var templateTwo = (
+    <div>
+        <h1>{user.name}</h1>
+        <p> Age: {user.age}</p>
+        <p>location: {getLocation(use.location)}</p> //1. we can call function from Javascript expression in jsx 2. used if statement.
+    </div>
+)
+
+we can simplify the above templateTwo and getLocation function call.
+1. function can return jsx expression
+2. if the value from func call is undefined, then it wont render anything. 
+
+function getLocation(location) {
+    if(location){
+        return <p>location: {user.location}</p>
+    }
+}
+var templateTwo = (
+    <div>
+        <h1>{user.name}</h1>
+        <p> Age: {user.age}</p>
+        {getLocation(user.location)} //if it returns undefined then the element wont render in UI. if it returns true then that element will be visible.
+    </div>
+)
+
+ternary operator:
+will work on h1 tag, if there is username render name else display anonymous. we will use Ternary operator
+ <h1> {user.name ? user.name.toUpperCase() : 'Anonymous'}</h1>
+
+ternary operator is a expression we can use it inside {}. 
+if true? execute this: else executethis
+ex: true? 'name': 'anonymous'
+
+boolean,null and undefined are ignored by JSX
+Logical AND:
+
+ex: if the user is less than 18, we dont display his age
+true && 'someapps'
+o/p - someapps
+
+if the first one is true then statement two is executed or returned.
+
+false && 'someapps'
+o/p : false
+first value false will be returned. if it false, it will be ignored by jsx
+
+{(user.age && user.age >= 18) && <p>{user.age}</p>}
+first will check for user.age if exists checks for age >=18 else renders nothing
+if age is >=18 then rendres p tag, user.age else do nothing
+
+
+Conditional rendering smry:
+1. ternary is great for - Condition if you want to do one of two things true?printthis:elseprintthis
+2. logical and great for - if you want to do one thing else do nothing true && execute this
+3. can make a functional call {getLocation()} //if the value is undefined renders nothing
+
+var user = {
+    name: 'andy',
+    age: 26,
+    location: 'philly'
+}
+function getLocation(location) {
+    if(location){
+    return <p>location: {user.location}</p>
+    }
+}
+var templateTwo = (
+    <div>
+       <h1> {user.name ? user.name.toUpperCase() : 'Anonymous'}</h1>
+        {(user.age && user.age >= 18) && <p>{user.age}</p>}
+        {getLocation(user.location)}
+    </div>
+)
+
+Task:
+1. only render the subtitle (and a p tag) is subtitle exists- logical AND operator
+2. render new p tag - if options.length>0 "Here are you options" else "No options" - ternary
+
+var app = {
+    title: 'Indecision App',
+    subTitle: 'Put your life in the hands of a computer',
+    options: ['one', 'two']
+}
+
+var templateTwo = (
+    <div>
+        <h1>{app.title}</h1>
+        {app.subTitle && <p>{app.subTitle}</p>}
+        {(app.options.length >0) ? 'Here are your options' : 'No options' }
+    </div>
+)
+
+
+
+
+
+
+
+
 
 
 

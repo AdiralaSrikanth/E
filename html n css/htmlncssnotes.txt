@@ -1,0 +1,281 @@
+J21
+HTML - Hypter text markup language
+Responsible for webpage structure. html elements are building blocks of web
+<element>content</element>
+<h1>heading text</h1> === heading element
+<p> text </p>  == paragraph element
+
+only closing tag 
+<img src='...'/> == image element
+<br/> == line break
+
+chrome and vsc download
+
+first webpage
+index.html - homepage
+everytime you upload ur proj on server it gonna know its ur homepage.
+
+implement html document structure:
+what kind of html this is going to be - <!DOCTYPE html>
+<html> 
+    <head>
+        <title>My first webpage</title>
+    </head>
+    <body>
+        <h1>Name is SRK</h1>
+    </body>
+</html>
+
+live-server extension - currently we are refreshing the browser for every change. 
+under extensions icon - Live-Server install.
+Open with liveserver.
+url in browser - 127.0.0.1:5500/index.html
+
+settings:
+under extensions - show extensions or in search bar @installed. -- displays all installed extensions
+
+gear icon>settings>search bar >fontsize-26 > tabsize - 1> word wrap - ON. >settings.json
+extensions>built in extensions> emmet
+
+emmet
+p tab  -- <p></p>
+! tab - html doc structure
+
+Heading elements: text to standout in the doc
+<h1></h1>
+.
+.
+<h6></h6> //smallest heading
+
+paragraph element: use p tag - <p>lorem ipsum</p>
+
+html is white space collapsing: <h1>heading</h1>  <p>some    text</p>
+though there are spaces and are visible in editor these won't be changing in browser. html ignores the empty spaces.
+
+Lorem ipsum {emmet provides dummy text}
+lorem50 tab - text with 50 words
+
+online - lorem ipsum - generators (or)
+hipster ipsum - some hipster words.
+
+Images:
+<img> tag
+<img src="path of the image" alt="ct">
+src is attribute. attributes describes element
+src -source = where the image is located
+alt - alternative - text if we cannot access image
+
+multiple images: 
+img in another folder -- ./images/image
+./ - pointing to the folder where I am currently in.
+relative path
+
+external images - src="url" - copy image address
+<img/> - self closing - no closing tag.
+
+Free images: copy right free images.
+pexels.com - free images and videos
+pixabay
+gratisography - funny image.
+
+width and height of image: 
+<img src="" alt="" width="246" height="">
+if we only use width,we automatically set the height
+
+crop images
+comments and line break - <!-- comments--> {cntrl + /}
+line break -- <br> -- generate space    / is optional for closing tag.
+
+External link:
+<a href="google url" target="_blank">google</a>
+opens in new window
+
+Internal link
+home >a tag put href as about.html --> navigates to that url.
+
+links within a page: <a href="id of that element - #idname">back to top<a/>
+
+Image links : on clicking image navigates to specified url
+<a href="google.com">
+    <img src="imagepath" alt="">
+</a>
+Empty links:
+<a href="#"></a>
+
+sup and sub elements:
+1st -- st comes on top ---> <sup>st</sup <sub>text</sub> --comes on bottom.
+
+Strong and EM (emphasis) elements.
+<strong>test</strong> - bold
+<em>ttt</em> -- italics
+keep on eye on screen readers while working with strong and em.
+
+special characters in HTML
+<h1>copyright &copy;</h1>      copyright symbols
+syntax: &specialchar;
+
+unordered lists: dots/bullet points
+***we use it for navigation
+<ul>
+    <li><a href="">Home</a></li>
+    <li><a href="">About</a></li>
+    <li><a href="">Contact us</a></li>
+</ul>
+ordered lists: numbering
+<ol>
+    <li>test</li>
+</ol>
+
+Nested lists:
+<ul>
+    <li>john</li>
+    <li>peter</li>
+        <ol>
+            <li>js</li>
+            <li>reactjs</li>
+        </ol>
+    <li>sara</li>
+</ul>
+
+Table:
+<table>
+    <tr> -table headings
+        <th>        table head
+            some info
+        </th>
+        <th>
+            someigfo2
+        </th>
+    </tr>
+    <tr>        --row
+        <td>test</td>        --data/columns
+        <td>testone</td>
+    </tr>
+</table>
+
+Forms:
+<form action="where to send the data" method="how this info is processed - POST- adds data to server">
+    <label for="id for which we need label">name of the label</label>
+
+    <input type="text" name="collecting the data " id="this id can be used for label" placeholder="username">
+
+    <input type="email" value="sss">      //when you enter type - email comes up with some validation ex: @ //value = hardcoded
+
+    <input type="password" > //pwd masked.
+    <button type="submit">submit</button>
+
+    <!--Can use input tag instead of button-->
+    <input type="submit">
+</form>
+
+name attribute: when you click on submit, on the url new values will be appended
+1. input box whixh has name prop defined
+2. gets the value of that input field and appends to url when you click on submit
+url?name="test"
+
+name is something when we write under name attribute - name="name"
+
+-->on clicking on label, the field gets highlighted.
+
+Formspree - email us the data.
+
+Text area:
+<textarea name="" id="" cols="30" rows="30">
+</textarea>
+
+Radio button:
+<p>what are you? </p>
+<input type="radio" name="profession" value="student"> Student
+<input type="radio" name="profession" value="engineer"> Engineer
+1. group all radio buttons via name attribute bcz we have to select only one.
+2. collect the selected value via value attribute
+
+checkbox: select multiple values, attribute checked is used to select the value by default.
+<input type="checkbox" name="profession" value="student"> Student
+<input type="checkbox" name="profession" value="engineer"> Engineer
+
+select box: dropdown
+<select name="languages" >
+    <option value="javascript">javascript</option>
+    <option value="javascript">java</option>
+</select>
+can select multiple values using multiple attribute.
+
+smry: when click on submit, appended to url.
+value ="selected/entered value"
+name="fieldname"
+o/p : fieldname.selected/enetered value
+
+Install prettier - change the settings to on save.
+keyboard shortcuts: gear icon > keyboard shortcuts.
+
+external sources: MDN, w3schools
+head element  - metadata - title,script, meta-charset, viewport - makes responsive.
+
+html coffee proj:
+style="width: 50%;"
+ <img src="./images/banner.jpeg" alt="banner" width="100%">
+<!--100% works based on screen size-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
