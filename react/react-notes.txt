@@ -271,7 +271,6 @@ var user = {
     age: 26,
     location: 'philly'
 }
-
 function getLocation(location) {
     if(location){
         return location
@@ -279,12 +278,11 @@ function getLocation(location) {
         return 'unknown'
     }
 }
-
 var templateTwo = (
     <div>
         <h1>{user.name}</h1>
         <p> Age: {user.age}</p>
-        <p>location: {getLocation(use.location)}</p> //1. we can call function from Javascript expression in jsx 2. used if statement.
+        <p>location: {getLocation(user.location)}</p> //1. we can call function from Javascript expression in jsx 2. used if statement.
     </div>
 )
 
@@ -304,7 +302,6 @@ var templateTwo = (
         {getLocation(user.location)} //if it returns undefined then the element wont render in UI. if it returns true then that element will be visible.
     </div>
 )
-
 ternary operator:
 will work on h1 tag, if there is username render name else display anonymous. we will use Ternary operator
  <h1> {user.name ? user.name.toUpperCase() : 'Anonymous'}</h1>
@@ -321,7 +318,6 @@ true && 'someapps'
 o/p - someapps
 
 if the first one is true then statement two is executed or returned.
-
 false && 'someapps'
 o/p : false
 first value false will be returned. if it false, it will be ignored by jsx
@@ -330,10 +326,9 @@ first value false will be returned. if it false, it will be ignored by jsx
 first will check for user.age if exists checks for age >=18 else renders nothing
 if age is >=18 then rendres p tag, user.age else do nothing
 
-
 Conditional rendering smry:
 1. ternary is great for - Condition if you want to do one of two things true?printthis:elseprintthis
-2. logical and great for - if you want to do one thing else do nothing true && execute this
+2. logical and great for - if you want to do one thing else do nothing. true && execute this
 3. can make a functional call {getLocation()} //if the value is undefined renders nothing
 
 var user = {
@@ -353,60 +348,345 @@ var templateTwo = (
         {getLocation(user.location)}
     </div>
 )
-
 Task:
-1. only render the subtitle (and a p tag) is subtitle exists- logical AND operator
+1. only render the subtitle (and a p tag) if subtitle exists- logical AND operator
 2. render new p tag - if options.length>0 "Here are you options" else "No options" - ternary
-
 var app = {
     title: 'Indecision App',
     subTitle: 'Put your life in the hands of a computer',
     options: ['one', 'two']
 }
-
 var templateTwo = (
     <div>
         <h1>{app.title}</h1>
         {app.subTitle && <p>{app.subTitle}</p>}
-        {(app.options.length >0) ? 'Here are your options' : 'No options' }
+       <p> {(app.options.length >0) ? 'Here are your options' : 'No options' }</p>
+    </div>
+)
+J25
+Const and let:
+var - tons of code is in prod but creates some problems.
+var name = 'srk'
+name = 'mike'
+console.log('name', name)
+
+with var we can not only reassign a value but can re define 
+var name = 'srk'
+var name = 'mike'
+console.log('name', name)
+above statements are valid with var based variables. o/p is mike
+overwriting the variable values and hence creates problems
+
+let nameLet = 'srk'
+nameLet = 'mike'
+console.log(nameLet)
+with let we can reassign a var but cannot redefine. error: duplicate declaration "nameLet" -es6
+
+with const we cannot reassign or redefine variable values
+const nameLet = 'srk'
+nameLet = 'mike' //error
+const nameLet = 'mike' //error
+console.log(nameLet)
+
+Scope:
+var based variables are function scoped. cannot access var which is defined inside a func in outside of func.
+
+function getPetName() {
+    var petName = 'Hai';
+    return petName
+}
+getPetName()
+c.l(petName) //error. petName is not defined
+
+let and const are also function scoped. will get the same error if we define same above func.
+but they are also block level scoped
+
+bound to code blocks - if statement, for loop
+
+var fullName = 'React Javascript'
+if(fullName){
+    var firstName = fullName.split(' ')[0] //spliting string into array of strings and accessing   
+                             //first index one
+}
+c.l(firstName)
+var fullName and firstName are on same scope. we did not define func to change var variable scope
+meaning you can access c.l(firstName) will get the output
+
+if you define firstName variable as const or let, you will get error
+
+if(fullName){
+    let firstName = fullName.split(' ')[0] 
+      c.l(firstName)
+}
+c.l(firstName) //error - firstName is not defined.
+
+Arrow functions:
+arrow functions are anonymous functions.
+const squareArrow = (x) => x*x
+we do not have to use return statement and {}, if we return only one expression.
+
+details of arrow functions
+1. do not bound arguments object
+const add = function (a, b) {
+    c.l(arguments)  //arguments object returns array of passed arguments
+    return a + b
+}
+c.l(add(1,2,3)) //returns 3
+
+but when we use arrow func, we get error for arguments statement. arguments is not defined
+
+2. this keyword no longer bound when using arrow functions.
+
+const user = {
+    name: 'srk',
+    cities: ['hyd','mumbai', 'pune']
+    printPlacesLived: function() {
+        //when you define a method inside a obj, this key is bound to that obj
+        //can access this.name and this.cities
+
+    this.cities.forEach(function (city) {
+        c.l(this.name + ' has lived in '+ city)
+    })
+    }
+}
+when we run above program we get error as Type error: cannot read property 'name' of undefined
+
+when you add a func on to an prop of obj, this value is bind to that obj
+when you define a anonymous func, not bind this value, it is set to undefined
+
+with es6 arrow func, your func no longer bind their own this value. instead they just use this
+ value of the context that they were created in.
+
+    func in forEach uses parent this value, here it is printPlacesLived , here this is obj.
+
+const user = {
+    name: 'srk',
+    cities: ['hyd','mumbai', 'pune']
+    printPlacesLived: function() {
+    this.cities.forEach((city) => {    changed to arrow func. now this.name do not throw error
+        c.l(this.name + ' has lived in '+ city)
+    })
+    }
+}
+
+for above ex, using of arrow func is adv. in some cases arrow func is not suitable
+here if we use printPlacesLived prop func as arrow func we get error for this.cities as it will
+not bind this keyword to the obj and will be mapped to global scope and here it is undefined
+
+we can use es6 method 
+const user = {
+    name: 'srk',
+    cities: ['hyd','mumbai', 'pune']
+    printPlacesLived() { //cannot use arrow func here. use es6 new method definition syntax
+    this.cities.forEach((city) => {    
+        c.l(this.name + ' has lived in '+ city)
+    })
+    }
+}
+
+instead of forEach we can use map array method
+
+forEach: run for each and every item of the array and do not return new array
+ this.cities.forEach((city) => {    
+        c.l(this.name + ' has lived in '+ city)
+    })
+
+map: creates a new array. does not affect this.cities array
+const cityMessages = this.cities.map((city) => {    
+        return this.city + ' has lived in ' + city
+    })
+c.l(cityMessages) -- ['cityone','cityTwo',..]
+
+instead of creating cityMessages var just return it.
+
+events and attributes
+events - user interactions - button click
+<button id="idone" class="button"><button>
+error: unknown DOM property class, Did you mean className?
+we cannot set attribute as class, class is a reserve keyword in Javascript. in JSX instead of class use className. Renamed
+<button id="idone" className="button"><button>
+
+let count = 0
+const templateTwo = (
+    <div>
+        <h1>count: {count}</h1>
+        <button id="someidhere"></button>
+    </div>
+)
+c.l(templateTwo) --- return obj. children > h1 and p > className prop
+google - react DOM elements. in html autofocus but in react dom autoFocus - camelCased
+
+goal is to set up event listner
+we can pass expression to id value
+const someId = 'someIDhere'
+let count = 0
+const templateTwo = (
+    <div>
+        <h1>count: {count}</h1>
+        <button id={someId}>+1</button>
     </div>
 )
 
+we can pass attribute as onClick which is an event and this event is triggered on user click.
+define a function and refer it as value for the prop as jsx expression.
+
+const addOne = () => {
+    console.log('addOne')
+}
+const templateTwo = (
+    <div>
+        <h1>count: {count}</h1>
+        <button onClick={addOne}>+1</button>
+        <button onClick={minusOne}>-1</button> //define minusOne func.
+
+    </div>
+)
+instead of referencing addOne variable name we can create function inside jsx expression. but if we have many function
+readibility issue.
+
+1. templateTwo only renders once, onClick method executes but templateTwo do not rerender. to re-render our 
+template again we have to create a func and put templateTwo and ReactDOM.render() method in that func
+so when a user click on button and a value changes we have to rerenders our template here we just need to call the func which has templateTwo and ReactDOM.render()
 
 
+const addOne = () => {
+    count++
+    rerenderApp()}
+const minusOne = () => {
+    count--
+    rerenderApp()}
+const reset = () => {
+    count = 0
+    rerenderApp()}
+
+let count = 0
+const rerenderApp = () => {
+    const templateTwo = (
+    <div>
+        <h1>Count: {count}</h1>
+        <button onClick={addOne}>+1</button>
+        <button onClick={minusOne}>-1</button>
+        <button onClick= {reset}>Reset</button>
+        </div>)
+ ReactDOM.render(templateTwo, appRoot)
+}
+var appRoot = document.getElementById('app')
+rerenderApp()
+
+Though the value count is updating when user click on +1 but our app is not rerendering the template. to rerender defining func with template and ReactDOM.render() func call and using this func where ever we want our app to rerender.
+
+React virtual dom:
+currently we are rendering whole page only for single value change i.e count 0 or 1
+
+in ui - elements tab
+if you change any dom element there will be animation shown.{flash animation says which element is changed}
+
+we defined h1 element, count is static text and value is dynamic
+react adds comments, react uses these comments
+
+react uses virtual DOM algorithms in JS to determine chnages made in app and renders only that part will be replaced or renders.
+
+single piece of our app state changes like a number, we can rerender the app, updating the user without worrying about slowing down the user and not wasting the resources. virtual dom algo run behind the scenes this is done in js
+virtual dom calculates if any changes to be made calculates min no.of changes hence efficient.
+
+React.createElement() --returns obj represents our entire JSX tree , use algo to compare two objects. this is what react is doing. 
+
+Forms and inputs:::
+create a form 
+
+var app = {
+    title: 'Indecision App',
+    subTitle: 'Put your life in the hands of a computer',
+    options: []
+}
+
+const onFormSubmit = (e) => {
+    e.preventDefault()
+    const option = e.target.elements.inputform.value
+    //target has element which user interacted. target obj has elements and we defined input element with name = input form
+    //we can access input form value fromm value attribute
+
+    if(option) {    //checking if user enter entered anything in input form
+        app.options.push(option)        //pushing user entered text to options array
+        e.target.elements.inputform.value = ''  //setting input field to null after user entering text
+        render()
+    }
+}
+const render = () => {  //creating render method - using this to rerender ui. contains template and reactdom.render method
+    var templateTwo = (
+        <div>
+            <h1>{app.title}</h1>
+            {app.subTitle && <p>{app.subTitle}</p>}
+            <p>{(app.options.length >0) ? 'Here are your options' : 'No options' }</p>
+            {app.options.length} //displaying length count
+            <ol>
+                {app.options.map((option)=>{      //creating ol tag and creating li tags and displaying options array
+                return <li key={option}>{option}</li> //we have to set key else throw error
+                })}
+            </ol>
+            <form onSubmit={onFormSubmit}> //on submit we are calling onFormSubmit func.
+                <input type="text" name="inputform"/>
+                <button> Add option</button>
+            </form>
+        </div>
+    )
+    ReactDOM.render(templateTwo, appRoot)  
+}
+
+var appRoot = document.getElementById('app')
+render()
+Error: when you do not specify key :> Each child in a list should have a unique "key" prop.
+
+JSX works with arrays.
+{
+    [11,22,33, null, undefined] //null and undefined are ignored by JSX. can put number,string , null but not object.
+}
+
+{
+    [99,97, 96] - o/p 999796. jsx takes array and break it to ind peices. each peice has comments {react-text: 8} 
+}
+
+{<p>1</p>} - JSX in JSX.
+{map{jsx}}
+            <ol>
+             {app.options.map((option)=>{
+                return <li key={option}>{option}</li>
+                })}
+            </ol>
+
+Now the task is to : ask computer to select a option. Two steps
+create a button and do function call on clicking on it.
+
+1. <button disabled={app.options.length === 0} onClick={selectOption}>what should I select?</button>
+disabled={treu/false} so we are checking if the length of array is 0, if yes disabled else display
+
+2. const selectOption = () => {
+    const randomNum = Math.floor(Math.random() * app.options.length)
+    alert(app.options[randomNum])
+    render()
+}
+we need random otpion so Math.random() gives random no. in b/w 0 - 0.999 we need to Multiply it with app.options items
+if items 3 then 3 times 
+
+Math.floor rounds the value. decimals values
+
+re render the app -render()
 
 
+Task 2: toggle button - show details - display some text
+create a variable visibility and set it to false. default one.
+let visibility = false; 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const showDetails = () => {
+    visibility = !visibility //flip the var value when user click on it
+    render()
+}
+ <button onClick={showDetails}> //event handler onclick we call showDetails, which flips the value.
+    { visibility ? 'Hide details' : 'Show details'} //default one is false so display show details
+                                    //when user click on button we change button name to hide details
+         </button>
+         <p>{visibility && 'Education, Profile and native place'}</p> //if visibility true we display the text
+    </div>
 
 
 

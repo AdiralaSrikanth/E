@@ -57,7 +57,7 @@ lorem50 tab - text with 50 words
 
 online - lorem ipsum - generators (or)
 hipster ipsum - some hipster words.
-
+J24
 Images:
 <img> tag
 <img src="path of the image" alt="ct">
@@ -82,7 +82,7 @@ width and height of image:
 <img src="" alt="" width="246" height="">
 if we only use width,we automatically set the height
 
-crop images
+crop images :os feature
 comments and line break - <!-- comments--> {cntrl + /}
 line break -- <br> -- generate space    / is optional for closing tag.
 
@@ -217,60 +217,212 @@ style="width: 50%;"
  <img src="./images/banner.jpeg" alt="banner" width="100%">
 <!--100% works based on screen size-->
 
+CSS - Cascading style sheet - Responsible for styling of webpage
+html - structure of the webpage, css - Layout, Look
+selector {
+    property : value
+}
+h1 {
+    color: red;
+}
+
+installing extensions:
+bracket pair colorizer - 
+indent rainbow - indents will be in colors
+highlight matching tag - change settings json
+
+3 ways to add css - inline, internal and external
+inline css - will write css in element
+
+<h1 style="color:red; font-size:50px"></h1>
+when we want to add multiple styles use semi colon and add properties. the more prop we add it is hard to read n maintain
+
+we have to write css for each and every element, re work.changes gonna take time -time consuming.
+
+internal css: under head element, create a style element and place style elements
+
+<head>
+    <style> 
+        h1 {
+            color:red; //this color is applicable for all h1 elements. can create styles for h2 
+        }
+    </style>
+</head>
+
+if we create multile files -index.html, about.html and contact page, we have to create
+style elements in all pages. Not resuable
+
+if we copy paste in all pages, if there is any change in one page, we should change in all pages
+
+External css:
+create a new file style.css or main.css {extension -css}
+
+load or link that file in html file - under head tag
+<link rel="stylesheet" href="./styles.css">
+
+rel-relationship
+./ --same directory
+
+which ever page loads this file, can have the styles applied for all pages.
+
+Power struggle : inline>internal>external
+
+Basic css syntax:
+css rule.
+h1 {
+    color:red;
+}
+h1 - selector
+{} - declaration block
+color:red; - declaration
+property
+property value
+
+semi colon is important,
+
+element selector: name of the element that we want to target h1/h2/p....
+
+grouping selectors: 
+ex: if you want to have a same color for h1 and p?
+use comma to group selectors
+h1,h2,p {
+    color: red;
+}
+
+ID selectors: Target elements using ID attribute
+<h1 id="heading">title heading</h1>
+id must be unique and id uniquely identifies the element, use hash # to define css rule for that element.
+
+#heading {
+    color:red;
+}
+
+class selectors:
+<h1 class="heading">title heading</h1>
+<p class="heading">title heading</p>
+use dot operator to access class, class name can be set to multiple elements hence give us access to handle multiple elements at once {using class name}
+ex: 5 h3 tags - need 3 tags color as green other 2 as red?
+can define class name same for 3 tags and another class name for 2 tags, apply css rule using classname.
+.heading {
+    color:red;
+}
+
+ID and class :
+can add both Id and class, also can add multiple class names
+<h1 id="idOne"class="heading secondclass">title heading</h1>
+
+#idOne {
+    font-size: 50px
+}
+.secondclass {
+    color: red;
+}
+
+DIV and SPAN: used for grouping
+
+h3,p - put under div , can add styles to div and css will be applied for all the elements under this div. can set classname or id to the div.
+
+span also same 
+span inline, div, block level element.
+
+Inheritance in css:
+styles applied for parent element and children element are Inherited unless we specify
+
+ex: div-2p's
+set color to div and are applied to 2p's as well.
+if you specify css to second p, then for second p, parent element css wont be applied. the css we specified for second p will be applied.
+ex: 
+body {
+    font-family: monospace;
+    line-height: 1.5em;
+}
+all of the children elements are Inherited above css properties.
+
+h2 {
+    color: red; //new css rule will be applied
+    line-height: 1em; //existing parent element css will be overwritten
+}
+
+Last rule: 
+div h2 and 2p's
+p {color:red;}
+p{color:pink;} //overwrites red color to pink, bcz css follows last rule and apply lastly applied css.
+
+specificity:
+2p's with classname red
+.red {color:red;}
+p{color:pink;}
+
+last rule wont be applied here, specificity/weight come into picture, classname>element
+id>classname>element
+google specificity measurement in css.
+
+universal selector - *
+* {color:blue;}
+all elements will be blue. universal selector has least specificity
+
+id>classname>element>*
 
 
+CSS Colors:
+color, background-color,background
+color names
+rgb rgba
+hex
+visual studio color options
+external resources
 
+color, background-color:
+#first{
+    color: red;
+    background-color: chocolate;
+    //background: yellow; can use background prop for both color & for image
+}
 
+color names: red,blue etc VSC gives suggestions. 140color names - w3schools
 
+RGB: red green blue
+color- run out of options. can use rgb
+RGB - 0 {small}-255 {largest}
 
+h1{
+color: rgb(255,0,0) //red or rgb (0,255,0)green
+rgb(0,0,0) - all three zeros black
+rgb(255,255,255) - white color
+rgb(100,34,210) - purple color
+}
 
+RGBA: red,green,blue and alpha
+0-1 opacity/transparency
 
+rgb(0,0,0,0.5) -- not totally black color
 
+background: rgb(255,0,0,0) -- background is there but we cannot see it - transparent.
+background: rgb(255,0,0,1) -- can see background color
+for that element if applied 0, we cannot see the change.effect will not be very much.
+if 1, can see the change.
 
+Hex: same as rgb but gives you much more color choices. #RRGGBB
+123456789 A(10) B(11) .... F(15)
+#FF0000 - red
+#00FF00 - green
+FF- highest, 00 - smallest
 
+#AA00FF - some color value
 
+color: #ff0000 - red
+color: #000000 or #000 - black
+color: #ffffff or #fff - white.
 
+vsc color options - on hovering on color, color palette will be displayed.
+external resources - coolers website
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+CSS units:
+Absolute, relative
+pixels
+em, rem
+vw,vh
+font-size, height, width.
 
 
 
