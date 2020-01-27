@@ -1,0 +1,19 @@
+1. virtual DOM - rerender
+
+2. class Person{
+    constructor(name, age=0) { 
+        this.name = name 
+        this.age = age
+    }
+    getGreeting() {
+        return `${this.name} is a student and has age ${this.age}`
+   }
+}
+
+class Student extents Person{ 
+   
+}
+const me = new Student('srk',26)
+c.l(me.getGreeting()) --o/p srk is a student and has age 26
+
+Flow?

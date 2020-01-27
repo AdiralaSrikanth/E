@@ -106,7 +106,7 @@ functions but at the end of the day it is es5 code in browser
 In babel site try it out page,
 var template = <p>This is JSX from app.js</p>
 
-compiles to old js functions which browser can understand. <p>JSX</>, is converted to React.createElement() -- regular function call browser can understand
+compiles to old js functions which browser can understand. <p>JSX</p>, is converted to React.createElement() -- regular function call browser can understand
 var template = React.createElement(
     'p',
     null,
@@ -125,7 +125,7 @@ this will allow you to write jsx in ur editor and automatically compiles to Reac
 and renders in browser/able to view output instantly.
 
 Babel is a compiler. Its not gonna compile by its own. we have to add plugins and presets in order to convert jsx to React.createElement
-on try it out page of babel site, it already selected few presets - few checkboxes(es2015, react) selected 
+on try it out page of babel site, it already selected few presets - few checkboxes(es2015, react) selected.
 preset - is a group of plugins
 
 we need to include react-preset to convert jsx to React.createElement which browsers can understand
@@ -187,11 +187,11 @@ Add --watch command, it watches scripts/app.js file and if there is a change in 
 it gonna generate compiled code again (bascically for every change)
 babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch
 
-make changes to src/app.js file and save, observe scripts/app.js gets change.
+make changes to src/app.js file and save, observe public/scripts/app.js gets change.
 
 start live-server serving up public folder   -- live-server public ---> opens up server and serves up html in browser.
 as of now src/app.js > changes >babel saw change> compiled new code in scripts/app.js > mapped in index.html > live-server saw change in scripts/app.js>
- >restars server > renders index.html in browser.
+ >restarts server > renders index.html in browser.
 
 can delete node_modules folder, can be reinstalled all the versions using yarn install, looks through pkg.json and installs all dependencies
 
@@ -211,7 +211,7 @@ wrap h1 and p inside a div {wrapper div}
 var template = <div><h1>Indecision app</h1><p>some paragraph</p></div>
 valid jsx
 
-for looking good - readabiltiy we can wrap jsx inside ()
+for looking good - readability we can wrap jsx inside ()
 var template = (
     <div>
         <h1>Indecision app</h1>
@@ -231,7 +231,7 @@ var userName = 'srk'
 var age = 27
 var templateOne = (
     <div>
-        <h1>{userName}</h1> //we should use {} to use dynamic data in JSX, inside {}, it takes Javascript expression here we are referencing userName variable
+        <h1>{userName}</h1> //we should use {} to use dynamic data in JSX, inside {}, it takes Javascript expression, here we are referencing userName variable
         
         <p>{userName.toUpperCase()}</p> //inside {}, we can use + to concat or string methods like toUpperCase() etc
         <ol>
@@ -282,7 +282,7 @@ var templateTwo = (
     <div>
         <h1>{user.name}</h1>
         <p> Age: {user.age}</p>
-        <p>location: {getLocation(user.location)}</p> //1. we can call function from Javascript expression in jsx 2. used if statement.
+        <p>location: {getLocation(user.location)}</p> //1. we can call function from Javascript expression in jsx 2.func used if statement.
     </div>
 )
 
@@ -324,7 +324,7 @@ first value false will be returned. if it false, it will be ignored by jsx
 
 {(user.age && user.age >= 18) && <p>{user.age}</p>}
 first will check for user.age if exists checks for age >=18 else renders nothing
-if age is >=18 then rendres p tag, user.age else do nothing
+if age is >=18 then rendres p tag- user.age, else do nothing
 
 Conditional rendering smry:
 1. ternary is great for - Condition if you want to do one of two things true?printthis:elseprintthis
@@ -546,7 +546,7 @@ readibility issue.
 
 1. templateTwo only renders once, onClick method executes but templateTwo do not rerender. to re-render our 
 template again we have to create a func and put templateTwo and ReactDOM.render() method in that func
-so when a user click on button and a value changes we have to rerenders our template here we just need to call the func which has templateTwo and ReactDOM.render()
+so when a user click on button and a value changes we have to rerender our template here we just need to call the func which has templateTwo and ReactDOM.render()
 
 
 const addOne = () => {
@@ -584,10 +584,10 @@ if you change any dom element there will be animation shown.{flash animation say
 we defined h1 element, count is static text and value is dynamic
 react adds comments, react uses these comments
 
-react uses virtual DOM algorithms in JS to determine chnages made in app and renders only that part will be replaced or renders.
+react uses virtual DOM algorithms in JS to determine changes made in app and renders only that part will be replaced or renders.
 
-single piece of our app state changes like a number, we can rerender the app, updating the user without worrying about slowing down the user and not wasting the resources. virtual dom algo run behind the scenes this is done in js
-virtual dom calculates if any changes to be made calculates min no.of changes hence efficient.
+single piece of our app state changes like a number, we can rerender the app, updating the user without worrying about slowing down the user and not wasting the resources. virtual dom algo run behind the scenes this is done in js.
+virtual dom calculates if any changes to be made, calculates min no.of changes hence efficient.
 
 React.createElement() --returns obj represents our entire JSX tree , use algo to compare two objects. this is what react is doing. 
 
@@ -603,8 +603,8 @@ var app = {
 const onFormSubmit = (e) => {
     e.preventDefault()
     const option = e.target.elements.inputform.value
-    //target has element which user interacted. target obj has elements and we defined input element with name = input form
-    //we can access input form value fromm value attribute
+    //target has element which user interacted. target obj has elements and we defined input element with name = inputform
+    //we can access input form value from value attribute
 
     if(option) {    //checking if user enter entered anything in input form
         app.options.push(option)        //pushing user entered text to options array
@@ -658,14 +658,14 @@ Now the task is to : ask computer to select a option. Two steps
 create a button and do function call on clicking on it.
 
 1. <button disabled={app.options.length === 0} onClick={selectOption}>what should I select?</button>
-disabled={treu/false} so we are checking if the length of array is 0, if yes disabled else display
+disabled={true/false} so we are checking if the length of array is 0, if yes disabled else display
 
 2. const selectOption = () => {
     const randomNum = Math.floor(Math.random() * app.options.length)
     alert(app.options[randomNum])
     render()
 }
-we need random otpion so Math.random() gives random no. in b/w 0 - 0.999 we need to Multiply it with app.options items
+we need random option so Math.random() gives random no. in b/w 0 - 0.999 we need to Multiply it with app.options items
 if items 3 then 3 times 
 
 Math.floor rounds the value. decimals values
@@ -673,10 +673,10 @@ Math.floor rounds the value. decimals values
 re render the app -render()
 
 
-Task 2: toggle button - show details - display some text
+Task 2: toggle button - show details - display some text and hide details.
 create a variable visibility and set it to false. default one.
-let visibility = false; 
 
+let visibility = false; 
 const showDetails = () => {
     visibility = !visibility //flip the var value when user click on it
     render()
@@ -688,60 +688,308 @@ const showDetails = () => {
          <p>{visibility && 'Education, Profile and native place'}</p> //if visibility true we display the text
     </div>
 
+React Components: react uses Component based architecture
+allows us to take our big complex app break them into small Components
+
+Components - responsible for user profile, another one is usersignup file
+
+Thinking in React:
+twitter : Components
+
+dashboard page - parent
+children
+<Header/>
+<profileWidget/>
+<Trends/>
+    <Trend/>
+<Tweet/>
+
+Indecision APP:
+<IndecisionApp/>
+<Header/>
+<Action/>
+<options/>
+    <option/>
+<Addoption/>
+
+J27
+Es6 classes:
+goal is to use classes to reuse code. define a class like blueprint, we can create multiple instances using that blue print
+ex: skyscapper blue print we can construct 7 building exact same skyscapper-same features also extra features. unique features like address of the building.
+
+Car class, many instances of the Car - each data will be specific to that car.
+make
+model
+vin 
+getDescription() -- return a string description, like you are looking a used car of some model.
+getDescription can be accessed in all of the instances. resuable one
+
+Person class, each Person has unique attributes among them but also few things are also same. 
+class Person {  --class is a reserve keyword in JS. Person is a className
+        //define our class. not a if/for/func body
+}
+make a instance of class Person
+we use new keyword to make new instance of a class. tell js that we are making instance.
+const me = new Person()
+console.log(me)
+
+o/p: Person {}
+instance of Person. also empty object - this object is specific to Person instance.if it is car instance, it will have make model and vin specific to car instance
+
+Pass in data to instance. we can pass string number boolean or objects and as many as you can to the instance.
+passing string
+
+const me = new Person('srk')
+unique to this instance. 
+o/p is same Person {} because we are passing data but are not using it.
+
+Define the constructor func for the Person class
+constructor func gets called when we make a new instance and gets called with all the arguments passed.
+
+class Person{
+    constructor(name) {     //es6 method definition syntax
+        console.log('test')
+    }
+}
+const me = new Person('srk')
+o/p - 
+test
+Person {}
+because when we use new Person{} , constructor func gets executed.
+
+No data is showing up, we have to customize, not a Person class as a whole but the individual instance of the Person
+
+inside of class methods we have access to this. " 'this' refers to class instance "
+
+class Person{
+    constructor(name) { 
+        this.name = name //own understanding - this.name is equal to me.name {me - instance} and assigning name value'srk' 
+    }
+}
+const me = new Person('srk')
+
+we can create as many instances as we like. 
+const newperson = new Person('abd')
+
+also we can pass multiple arguments and also can set default values
+below ex: 1. two arguments, 2. setting default value to age as 0, if the new instance do not pass age we set it to 0.
+
+class Person{
+    constructor(name, age=0) { 
+        this.name = name 
+        this.age = age
+    }
+}
+const me = new Person('srk', 26) o/p = Person {name:'srk', age:26}
+const newperson = new Person('abd') o/p= Person {name:"abd", age:undefined}
+
+setup a method that can be used in every instance of a Person
+class Person{
+    constructor(name, age=0) {  //implicitly called
+        this.name = name 
+        this.age = age
+    }
+//can define custom methods and are explicitly called
+//methods are available to us in individual instances of the class
+
+    getGreeting() {
+        //return 'hi'     //call it in instance. me.getGreeting() return string 'hi'
+//inside this method we have access to 'this' which is current instance
+
+        return `${this.name} is a student and has age ${this.age}`
+                    //o/p - srk is a student and has age 26
+                    ****getGreeting is a method which is accessible in all the instances of Person class.
+                    //o/p2 - abd is a student and has age 0.
+
+    }
+}
+creating a sub class of a Person class:
+Person and sub class is a Student
+
+we realized that Student is also a Person with some modifications. Person has name and age and student indeed has name and age. student has also a major which we want to track of.
+
+instead of copying and pasting the code from Person class we can just extend Person class in Student
+
+class Student extents Person{ 
+    //extends gives us all of the functionalities of Person and also allows us to override any of the functionalities of Person
+}
+const me = new Student('srk',26)
+c.l(me.getGreeting()) --o/p srk is a student and has age 26
+getGreeting is defined in Person but is also accessible in Student instance
+
+above we created empty class Student. now we do something useful
+1. setup constructor func to take new info ex here: major
+
+const me = new Student('srk',26, 'computer science')
+c.l(me)
+o/p Student {name:'srk',age:26}
+computer science is not visible because we did not use it in Student class. define constructor func and use major argument
+we also need age and name which are defined under Person class. how do we access age and name from Person class in Student class? we need to override Person class
+Ans: using super() method
+
+class Student extends Person{ 
+    constructor(name, age, major) { //arguments passed while creating instance
+    
+    question: do we have to set default values to name and age {which we did in Person class} and do we have to configure their properties? ans No 
+    we have to call parent constructor to do its thing  {configuring name and age }
+    and then we need to do our thing {configuring major}
 
 
+    super(name, age) 
+    //super refers to parent class here Person andif we call it as func,we are accessing constructor func of Person
+    //call it with correct data name and age. Person class will take care of defaults and all
+    this.major = major;
+
+    }   
+}
+const me = new Student('srk',26, 'computer science')
+c.l(me)
+o/p: Student {name: 'srk', age: 26, major: 'computer science'}
+const me = new Student('abd',26)
+o/p: Student {name: 'srk', age: 26, major: undefined}
 
 
+we can add new methods to Student class
 
+class Student extents Person{ 
+    constructor(name, age, major) { 
+    super(name, age) 
+    this.major = major;
+    }  
+    hasMajor() {
+        // '' ==> false. !'' = true {flipping false to true}. !!'' == false {take false>true>false}
+        // !!undefined ==> {false>true>false}
+        //because we get Major as undefined if we do not use while creating a instance
 
+        return !!this.major --'this' is instance and the value will be string or undefined --> {undefined -false>true>false}
+        {string - true>false>true}
+    
+    } 
+}
+const me = new Student('srk',26, 'computer science')
+c.l(me.hasMajor())
+o/p: true
+const other = new Student()
+c.l(other.hasMajor()) -- false
 
+Now that we have seen tack on new data and new methods {major string and hasMajor method}
+also we know how to access data from parent
+but
+How do we override parent data?
 
+override getDescription() method:
+1. 
+class Student extents Person{ 
+    constructor(name, age, major) { 
+    super(name, age) 
+    this.major = major;
+    }  
+    hasMajor() {
+        return !!this.major
+    } 
 
+    getDescription(){
+        return 'testing'
+    }
+}
 
+const me = new Student('srk',26, 'computer science')
+c.l(me.getDescription(())
+o/p: testing
+getDescription method is also there in parent - Person class. we completly overridden the method in child - Student class
+hence ouptut is testing string
 
+2. instead of completly overridding the parent func we can use it in child and customize it based on child need
 
+class Student extends Person{ 
+    constructor(name, age, major) { 
+    super(name, age) 
+    this.major = major;
+    }  
+    hasMajor() {
+        return !!this.major
+    } 
+    getDescription(){
+        //creating a variable to store parent func return value
+        //super() calls parent constructor. we need methods of parent so super.methodName
 
+        let description = super.getDescription()
+        //description var stores return value from getDescription() method of parent.
 
+        //will add text, if the student has major add it to this func return value
 
+        if(this.hasMajor()) //we are accessing instance so this
+        {
+             description = description + `has major in ${this.major}` //appending text to returned text from parent
+        }
+        return description
 
+    }
+}
 
+const me = new Student('srk',26, 'computer science')
+c.l(me.getDescription(())
 
+o/p: srk is 26 years and has major in computer science
+const other = new Student()
+c.l(other.getDescription())
 
+o/p: unknown is 0 years old {defined defaults name= unknown, age=0 }
 
+Creating a React Component:
+clear app.js file. creating Header Component
 
+react Component is just a es6 class. goal is to take in es6 class and convert it to Component by extending something whcih is given by react. global React and global ReactDOM.
+Access Component class from React object
+Now Header gets all of the features of react
 
+imp: React Component require one method to be defined. this is a special method that it calls. i.e render()
+with es6 it is ok not to define methods but in react Component you must define render
 
+render takes no arguments. returns JSX
 
+class Header extends React.Component {
+    render() {
+        return <p>This is from Header Component</p>
+    }
+}
+Above is perfectly valid react Component
 
+To render in dom, use ReactDOM.render()
+define jsx:
 
+const jsx = (
+    <div>
+        <p> this is some title</p> {instead of using elements we can use react Components that we created and render them}
+        <Header /> {Component name which looks like html} --this will get render
+        <Header />
+        <Header /> {react Components are resuable } 3instances of Header Component, no need of writing them again
+    </div>
+)
+ReactDOM.render(jsx, document.getElementById('app'))
 
+es6 class name Header or header is fine, capital letter is just a convention where as in React Component
 
+if we write header it treats as html. react differentiates html and react Component with capitalization Header - Component
+and header is html
 
+if we write <header/> instead of <Header /> , in React.createElement('header', null) assumes <header/>as html
+where as if we use <Header /> , React.createElement(Header, null) , it refers to to the Component / header class 
 
+so initial capital letter in important in React
 
+class Action extends React.Component {
+    render() {
+        return ( instead of returning single jsx we can return multiple by creating root div element
+            <div>
+                <button>What should I do? </button>
+            </div>
+        )
+    }
+}
+call this Action in JSX. in ui we are getting data from Components.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Nesting Components:
 
 
 
