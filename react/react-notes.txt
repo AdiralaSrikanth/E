@@ -968,7 +968,7 @@ const jsx = (
 )
 ReactDOM.render(jsx, document.getElementById('app'))
 
-es6 class name Header or header is fine, capital letter is just a convention where as in React Component
+for es6 class name Header or header is fine, capital letter is just a convention where as in React Component
 
 if we write header it treats as html. react differentiates html and react Component with capitalization Header - Component
 and header is html
@@ -976,7 +976,7 @@ and header is html
 if we write <header/> instead of <Header /> , in React.createElement('header', null) assumes <header/>as html
 where as if we use <Header /> , React.createElement(Header, null) , it refers to to the Component / header class 
 
-so initial capital letter in important in React
+so initial capital letter is important in React
 
 class Action extends React.Component {
     render() {
@@ -988,8 +988,539 @@ class Action extends React.Component {
     }
 }
 call this Action in JSX. in ui we are getting data from Components.
+J28
+Nesting Components: one component can render another component
 
-Nesting Components:
+Parent Component -Indecision, child Components - Header,Action,Options and Addoption
+class IndecisionApp extends React.Component{
+    it has child Components - Header,Action,Options and Addoption
+}
+Options has child option
+remove jsx
+ const jsx = (
+    <div>
+    <Header />
+    <Action />
+    <Options />
+    <Addoptions />
+    </div>
+)
+
+Instead of writing JSX we can directly pass Component to ReactDOM.render(<IndecisionApp/>, documentbyid(''))
+
+Task : create option component under options 
+class Options extends React.Component {
+    render(){
+        return {
+            <div>
+                <Option /> create Option component and pass it here.
+            </div>
+        }
+    }
+}
+can write component name as <Option><Option/> or <Option/>
+
+Component Props: allows components to communicate with one another.
+ex: Header component currently is static. where ever we use the instance of Header component we get the same static data
+but we need header to change in each page ex: About page, Profile page etc
+
+In order to do that, Pass data in when we intilialize the instance of the component. that data is called Props
+similar like html attributes key value pairs
+
+<Header title="test value"/>
+
+We passed data to header component. How can we access this title data in Header component?
+inside our component we have access to this {under render method}. 'this' is reference to current instance of the component. reacts gives us access to our props on a object this.props
+
+c.l(this.props)
+o/p: Object{title: "test value"}
+
+coverts title="test value" to Object {title: "value", object is props}
+
+can access title value as <h1>{this.props.title}</h1>
+
+in Indecision component we are passing title=value, this value we can pass from a variable defined else where
+
+class Indecision extends React.Component{
+    render(){
+        const title = 'Indecision'
+        const subTitle = 'Put your life in hands of a computer'
+        return {
+            <Header title={title} subTitle={subTitle} /> //passing data to instance of header, when this header component try to render 
+            //component has access to the values passed via props. this.props
+        }
+    }
+}
+this.props is a object with the properties passed
+
+we successfully passed title and subTitle as props to Header component and rendered those props in Header comp.
+
+Now the goal is to create a variable options =['','',''] and pass it to Options component, this Options component then
+sends data to Option component where it renders each/individual option.
+
+Task : 
+setup options prop for Options component
+render the length of the array
+
+1. In the Indecision component create var const options = ['','',''] and pass it to Options component
+    const options = ['Thing one','Thing two','Thing three']
+     <Options options={options}/>
+2. Access this passed props in Options Component and get the length    
+    <p>{this.props.options.length}</p>
+
+Instead of rendering length we can render the items in array as individual p tags in Options component
+<div>
+     {this.props.options.map((option)=>{
+     return <p key={option}>{option}</p>
+    })}        
+</div>
+
+if you do not specify key attribute, you will get an error as "Each child in a list should have a unique "key" prop
+
+==> instead of rendering paragraphs we can render instance of Option
+
+implicitly return instance of Option
+if we are creating a array of JSX we have to define a key on each whether it is li,p or component
+key is reserved name
+
+optionText={option}
+access this props optionText in Option component
+
+
+Options component:
+<div>
+    {this.props.options.map((option)=>{
+    return <Option key={option} optionText={option}/>
+     })}        
+</div>
+
+Option component:
+<div>
+    Options: {this.props.optionText}
+</div>
+Adv: components are super flexible and super resuable.
+
+
+Imp: 
+1. when we create instance of component we can also choose to pass data into it. key={value} array
+2. when we pass data to component we can access passed data inside the component,via this.props
+this gave us to setup one way communication. IndecisionApp component can communicate some information with Header, Action
+Components. Opions can communicate some information with Option.
+Above ex's create one way communication
+
+what if when user use AddOption to add an option and we want that data in IndecisionApp component to insert/update Options array? {two way to communication? till now parent is sending info to child and we need also child to send info to parent}
+
+event and methods:
+event handlers:
+do something on button click. we know onClick={ref func}
+
+earlier we created global func ex: onFormSubmit, onRemoveAll. now we create class methods {like es6 class methods}
+
+class Action extends React.Component{
+    handlePick(){                   //create a func. it does something on button click
+        alert('handle pick')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handlePick}>What should I do?</button> 
+                //this.handlePick --> this is component class instance
+                //ref the func do not call it. it gets called on ///button click
+            </div>
+        )
+    }
+}
+
+Task1: Add button to action component. remove all button. setup handleRemoveAll method and onClick method {same as handlePick methods}
+
+Task2: we need to create a form in AddOption component, input field and submit button. onSubmit call a method
+define handleAddOption method. 1. fetch the value typed 2. if typed then alert
+
+class Addoptions extends React.Component {
+    handleFormSubmit(e){
+        e.preventDefault()
+        const option = (e.target.elements.addoption.value.trim())
+        if(option) {
+            alert(option)
+        }
+    }
+    render() {
+        return (
+            <div>
+                <form onSubmit={this.handleFormSubmit}>
+                <input type="text" name="addoption"/>
+                <button>Submit</button>
+                </form>
+            </div>
+        )
+    }
+}
+
+Method binding: this binding
+
+class Options extends React.Component {
+    handleRemoveAll() {
+        console.log(this) //error
+        console.log(this.props.options) //error - uncaught type error: Cannot read property 'props'of null
+        console.log('check where is this keyword pointing to')
+        // alert('handle remove all')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handleRemoveAll}>RemoveALL</button>
+                {this.props.options.map((option)=>{
+                    return <Option key={option} optionText={option}/>
+                })}        
+             </div>
+        )
+    }
+}
+in es6 class ex, methods are bound to class instances. we are able to access the data this.major inside major method 
+
+Options class has handleRemoveAll and render methods. for render method we are able to access this binding. this.handleRemoveAll works
+
+but we broken the this binding for handleRemoveAll() method, in handleRemoveAll() method
+        console.log(this) //error
+        console.log(this.props.options) //error - uncaught type error: Cannot read property 'props'of null
+trying to access props on 'this' which is undefined hence getting error
+
+we are clearly losing the this binding. 'this' no longer refers to our class instance
+myunderstanding: when we reference a func which is defined under a obj we break the this binding
+EX:
+ const obj ={
+    name: 'vikky',
+    getName() {
+        return this.name;
+    }
+}
+c.l(obj.getName()) //o/p -- vikky
+this binding is working fine. above is similar to es6 class
+
+const getName = obj.getName
+c.l(getName())
+o/p - instead of seeing vikky we are getting uncaught typeerror cannot read property of 'name' of undefined.
+
+when we create getName we are referencing obj.getName, both are running same code. context it ran is different.
+obj.getName is in context of an obj so we have access to the object with this binding.
+but when we break it into func we actually loose the context, the context is not get transferred.
+
+Now we just have regular function. regular func have undefined for their this by default
+
+const func = function () {
+    console.log(this)
+}
+func()
+o/p: undefined
+
+{afz once told me that obj.getName -- where ever the func get called, this key word points to that obj {here obj.getName - getName this is pointing to obj}
+
+we need to figure out how we can set the this binding, we do it by using .bind() method available on a function in JS.
+
+{this binding in handleRemoveAll() is undefined. normal func this binding is undefined. we need to set the this binding}
+
+const obj ={
+    name: 'vikky',
+    getName() {
+        return this.name;
+    }
+}
+const getName = obj.getName
+//bind is accessible on a func. here getName is a func so add .bind and call it, when we call it we get our func back 
+which means obj.getName and obj.getName.bind() are same
+
+cool thing abt bind is, you can use first argument to set this context, we can set it to equal to obj. this brngs back context what we expect
+
+const obj ={
+    name: 'vikky',
+    getName() {
+        return this.name;
+    }
+}
+const getName = obj.getName.bind(obj)
+c.l(getName())
+o/p: vikky
+
+we can pass obj or inline obj {name: 'abd'} by doing this we forced 'this' context of const getName function to be the inline object to use the name returns abd instead of vikky.
+
+we loose this binding in event handlers also in some places eventhandlers of js so we use can this binding
+
+mdn bind - we are using it for reset the context
+
+Implement this in our program:
+goal is to able to log out the options array inside handleRemoveAll func
+
+a. <button onClick={this.handleRemoveAll}>RemoveALL</button>
+
+we referenced handleRemoveAll and this gets called on later, here breaks this binding we can call .bind.
+render is not a eventhandler and has a correct this binding. able to access this.props and this.handleRemoveAll
+
+b. <button onClick={this.handleRemoveAll.bind(this)}>RemoveALL</button>
+
+we set .bind(this) this makes the this context for handleRemoveAll and render() has exact same.
+
+technique defined above works .bind(this) but is inefficient. It requires us to rerun bind everytime component rerenders we do it often.
+ 
+instead we can override the constructor function for React.component, 
+
+1.step 1 create a constructor
+
+constructor(props) { //gets called with props obj same as this.props in render method
+    super(props)        
+    //we need to make sure that we dont break anything, we call super with props. if we dont use super
+    //(props) we do not have access to this.props
+
+    //if you want to overide constructor func we need to use above two steps. yet, it doesnot add on any behavoir
+    //goal is to bind handleRemoveAll
+        //setting the value
+    this.handleRemoveAll = this.handleRemoveAll.bind(this)
+    //constructor func is not a eventhandler so the this context is correct by default.
+
+    //by doing above, we are making sure whatever we call handleRemoveAll the context is correct. if we use handleRemoveAll for multiple times 1. we dont have to type .bind() calls multiple times and 2. it just runs binding once when the component runs not need to rebound everytime component Renders
+}
+
+o/p: gets the array
+class Options extends React.Component {
+    constructor (props) {
+        super(props)
+        this.handleRemoveAll = this.handleRemoveAll.bind(this)
+    }
+
+    handleRemoveAll() {
+        console.log(this.props.options)
+        console.log('check where is this keyword pointing to')
+        // alert('handle remove all')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handleRemoveAll}>RemoveALL</button>
+                {this.props.options.map((option)=>{
+                    return <Option key={option} optionText={option}/>
+                })}        
+             </div>
+        )
+    }
+}
+
+setting up our react components to render data have real time binding so when the data changes automatically rerenders the UI.
+
+component state: allows our components to manage data
+think about an obj with various key value pairs. and when that data changes the component will automatically rerender to
+reflect those changes.
+
+without state, we you change the array we have to manually call rerender {ex: JSX we used earlier for counter app}
+with component state all we have to manipulate the data, component gonna take care of rerender itself
+
+ex:
+component counter:
+earlier we created and manipulated count variable.
+
+1. <Counter />
+2. default set of values. default state value. in case of react component we use obj
+
+default state obj
+{
+    count: 0
+}
+
+3. our component rerenders itself for first time with default value. in UI count: 0
+we never call render manually, 
+4. user clicked on plus button, handlePlusOne method executed and increase count by 1
+{
+    count:1
+}
+change state based on event
+
+{button click or network request to fetch some data}
+
+5. application rerender itself it brings ui with up to date with component state. ui count: 1
+
+we just chnaged the state, react component sees the change and updates UI
+
+
+Building counter app using component state:
+1. set up a default state object 
+oick all of the state properties we need, here count: 0
+how to setup default state obj?
+this happen inside constructor func. is similar to es6 ex setting up name and age properties. this.name = name
+
+this.state = {  //obj, we deinfe all the pieices of state that we want, here just count
+    count: 0
+}
+
+2. render that to screen
+
+<h1>count: {this.state.count} </h1>
+this.state is a object and can't write obj directly {remember} , access count property
+Count: 0 is shown
+
+3. change the state based on event
+add or plus one
+
+we know that this.state is a object. we are trying to update the state, we do not just update that obj. it is not gonna work
+handleOne(){
+    this.state.count = this.state.count + 1
+    console.log(this.state)
+}
+
+o/p: Object {count:1}
+Object {count:2}
+Object {count:3}
+
+count is updating but our component is not rerendering itself. when we are working with class based components if we want to change the state we do not manually update the obj instead we call a method on component instance
+
+setState allows us to manipulate state object. it is a func. after updating the state our component rerenders automatically. gets called with one argument which is a func. in this func we gonna define the updates we wanna make
+how do we gonna define those updates? we just return the object, we specify various state values that we wanna change and new values that we want to assigne
+we change count here
+
+this.setState(()=>{
+    return {
+        count: 1
+    }
+})
+
+count should go to 1 on clicking on +1. state is getting manipulated and we are refreshing the component
+
+inside of setState we have access to current state values via the first argument commonly called prevState - our state object before tyur changes applied
+
+this.setState((prevState)=>{
+    return {
+        count: prevState.count + 1 //current count plus one. multiple clicks on +1 , increases count and refreshes screen
+    }
+})
+
+similarly do for handleMinusOne and handleReset.
+
+if you have multiple pieces of state on your component. you do not have to provide them all in setState. you just updated 
+what you need/want to change
+
+this.state{
+    count: 0,
+    name: 'vikky'
+}
+
+this.setState((prevState)=>{
+    return {
+        count: prevState.count + 1
+    }
+})
+observe count value changes on clicking on +1. not that using this.setState we are changing/overridding the state completly. Just changing specific values here count.
+
+Alternate setState syntax:
+instead of passing func to this.setState, earlier version we can pass obj directly.
+
+this.setState({
+    count:1
+})
+but when we have two this.setState(), we do not do it single component but multiple func can trigger at same time
+ this.setState({
+    count: this.state.count + 1
+})
+this.setState({
+    count:0
+})
+ this.setState({
+    count: this.state.count + 1 //no prevState as we are not using cb
+})
+so the expected o/p will be 1 when you click on 14 times but it prints 15. setState is asynchronous 
+
+when you start the process of changing count:0 it doesnot mean the count value should be updated in very next line
+thats y we get this.state.count old value hence old value plus one. started the process to set count to 0 but is not finished.
+
+lot of scenes going on while updating the obj. react merge old state obj with new one then it creates virtual dom and does the changes. 
+
+we will end up with the results that we did not expect.
+
+Will do same with 
+this.setState(()={
+    return {
+        count: 0
+    }
+})
+this.setState((prevState)={
+    return {
+        count: prevState + 1
+    }
+})
+we defined above methods on handleReset(), on clicking on reset we will get the o/p as 1.correct
+
+How?
+first func - react starts executing it, while it is processing, before finishing it, before rerendering , it sees another setState and sees any changes to state so it figures out, out of two, which one should I pick up
+
+figures out what need to change. passes new state {prevState} to second func.
+
+***Task: Adding state to visibility toggle
+class VisibilityToggle extends React.Component{
+    constructor(props){
+        super(props)
+        this.handleToggleVisibility = this.handleToggleVisibility.bind(this)
+        this.state = {
+            visibility : false
+        }
+    }
+    handleToggleVisibility() {
+        this.setState((prevState)=>{
+            return {
+                visibility: !prevState.visibility
+            }
+        })
+    }
+    render(){
+        return (
+            <div>
+                <h1>Visibility Toggle</h1>
+             <button onClick ={this.handleToggleVisibility}>{this.state.visibility ? 'Hide details' : 'Show Details'}</button>
+        <p>{this.state.visibility && 'Profile, Education and Location'}</p>
+            </div>
+        )
+    }
+}
+ReactDOM.render(<VisibilityToggle />, document.getElementById('app'))
+
+Indecision state:
+class IndecisionApp extends React.Component {
+    render() {
+        const title = 'Indecision'
+        const subTitle = 'Put your life in the hands of a computer'
+        const options = ['Thing one','Thing two','Thing three',' Thing four']
+        return (
+            <div>
+                <Header title={title} subTitle={subTitle} />
+                <Action />
+                <Options options={options}/>
+                <Addoptions />
+            </div>
+        )
+    }
+}
+class Header extends React.Component {
+    render() {
+        return (
+            <div>
+                <h1>{this.props.title}</h1>
+                <h2>{this.props.subTitle}</h2>
+            </div>
+        )
+    }
+}
+
+*** passing title value to Header component via Props from IndecisionApp component
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

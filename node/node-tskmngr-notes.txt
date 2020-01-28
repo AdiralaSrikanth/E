@@ -7,7 +7,7 @@ file uploads for user profile pic
 email notifications
 CRUD
 Database - we are using mongodb to store user data.
-J14
+J14/J27
 mongodb.com --- open source and available for all operating systems
 
 No sql - not only structured query language
@@ -38,12 +38,14 @@ Terminal:
 cd ~  --Navigates to user directory
 pwd - print working directory
 return path /users/aaaa
+
 to start mongodb server - 
 <path to mongod executable> --dbpath=<path to data folder>
 /users/aaa/mongodb/bin/mongod --dbpath=/users/aaa/mongodb-data
 
 initialize database and gets the db up and running. 
 now go to mongodb-data and observe data is generated. 
+mongodb is up and running and default port is 27017.
 
 installing database GUI viewer: robo3t (earlier robomongo) - mongodb admin tool - open source
 download and install mongo 3t
@@ -88,10 +90,11 @@ instead of localhost we are using ip address sometimes localhost has strange iss
 const databaseName = 'task-manager'
 connect to our database/server
  
-MongoClient.connect() -- connect method, takes 3 arguments 1. connectionurl 2. options object {useNewUrlParser : true -->parses url}
+MongoClient.connect() -- connect method, takes 3 arguments 1. connectionurl 2. options object {useNewUrlParser : true -->parses url} original url parser used by default is depreciated. url to be parsed correctly so using useNewUrlParser
+
 3. callback function- takes two arguments error and client, if we fail to connect to db, gives error and if we succeed, gets client
 
-Connecting to a database is asynchronous operation. takes time for connection. callback will run when the connection is complete
+Connecting to a database is asynchronous operation. takes time for connection. callback will run when the connection is complete.
 
 MongoClient.connect(connectionurl, {useNewUrlParser : true -->parses url}, (error, client)=>{
         if(error) {
@@ -106,12 +109,11 @@ in second terminal where we are running node app, it is still hanging and hasnt 
 once the connection is opened, node process is up and running as long as connection active. can shut down.
 
 insert doc:
-
 MongoClient.connect(connectionurl, {useNewUrlParser : true -->parses url}, (error, client)=>{
         if(error) {
             return console.log('Unable to connect to database')
         }
-       const db =  client.db('databaseName') //we store database name in databaseName variable, you dont have to mention, mongodb will create db if you dont mention
+       const db =  client.db(databaseName) //we store database name in databaseName variable, you dont have to mention, mongodb will create db if you dont mention
                         //db method takes database name and return database reference. can be used to manipulate data
 
 //collection is a function and expects name of the collection
@@ -120,7 +122,7 @@ MongoClient.connect(connectionurl, {useNewUrlParser : true -->parses url}, (erro
             age: 26
         })
     //call a method on collection reference - insertOne() expects object as argument
-    //inserting a document into users collection.
+    //inserting a document into users collection. document will be JSON/bson. key value pairs in strings
      })
 save the file and run node mongodb.js
 open robo3t --> right click the connection and refresh the shell > 
@@ -143,7 +145,7 @@ if we want to handle errors or want to know that our operation performed as expe
             if(error) {
                 return console.log('Unable to insert user')
             }
-            console.log(result.ops) //on result we use one property called 'ops' - contains all of the documents (array of documents) that were inserted
+            console.log(result.ops) //on result we use one property called 'ops' - contains all of the documents (array of documents) that were inserted with this statement/method. result has ops,insertedCount, insertedCount,connection etc.
         })
      })
 save the file and run node mongodb.js command in terminal
@@ -169,11 +171,14 @@ db.collection('users').insertMany([{
      })
 save the file and run node mongodb.js command in terminal
 open robo3t and verify the inserted docs. 
+
+Task: create collection, insertMany tasks and log result.ops
+
 J15
 The objectID:
 automatically created by mongodb and stores unique identifier for each document you insert into database.
 
-GU ids - globally unique identifier. ability to scale up in a distributed system. 
+GU ids - globally unique identifier. ability to scale well in a distributed system. 
 multiple database servers running instead of one, allowing us to handle heavy traffic, multiple queries coming in
 there is no chance of ids collision across all database servers. with increment id approach of sql, there may be a chance
 of ids collision. a user will have a increment id (id=2)in one database server

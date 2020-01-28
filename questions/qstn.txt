@@ -17,3 +17,53 @@ const me = new Student('srk',26)
 c.l(me.getGreeting()) --o/p srk is a student and has age 26
 
 Flow?
+
+3. Bind
+
+ const obj ={
+    name: 'vikky',
+    getName() {
+        return this.name;
+    }
+}
+c.l(obj.getName()) //o/p -- vikky
+this binding is working fine
+
+const getName = obj.getName
+c.l(getName())
+
+class Options extends React.Component {
+    constructor (props) {
+        super(props)
+        this.handleRemoveAll = this.handleRemoveAll.bind(this)
+    }
+
+    handleRemoveAll() {
+        console.log(this.props.options)
+        console.log('check where is this keyword pointing to')
+        // alert('handle remove all')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handleRemoveAll}>RemoveALL</button>
+                {this.props.options.map((option)=>{
+                    return <Option key={option} optionText={option}/>
+                })}        
+             </div>
+        )
+    }
+}
+
+
+4.  this.state and this.setState
+handleAddOne() {
+        this.setState((prevState)=>{
+            return {
+                count: prevState.count + 1
+            }
+        }) 
+    }
+ReactDOM.render(<Counter />, document.getElementById('app'))
+
+I think <Counter /> is instance that why this
