@@ -67,3 +67,5 @@ handleAddOne() {
 ReactDOM.render(<Counter />, document.getElementById('app'))
 
 I think <Counter /> is instance that why this
+
+5. can't I change the state from child?

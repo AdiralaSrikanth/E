@@ -1086,7 +1086,6 @@ key is reserved name
 optionText={option}
 access this props optionText in Option component
 
-
 Options component:
 <div>
     {this.props.options.map((option)=>{
@@ -1099,7 +1098,6 @@ Option component:
     Options: {this.props.optionText}
 </div>
 Adv: components are super flexible and super resuable.
-
 
 Imp: 
 1. when we create instance of component we can also choose to pass data into it. key={value} array
@@ -1157,7 +1155,6 @@ class Addoptions extends React.Component {
 }
 
 Method binding: this binding
-
 class Options extends React.Component {
     handleRemoveAll() {
         console.log(this) //error
@@ -1338,7 +1335,6 @@ change state based on event
 
 we just chnaged the state, react component sees the change and updates UI
 
-
 Building counter app using component state:
 1. set up a default state object 
 oick all of the state properties we need, here count: 0
@@ -1506,15 +1502,183 @@ class Header extends React.Component {
 }
 
 *** passing title value to Header component via Props from IndecisionApp component
+J29:
+Indecision state:
+goal is to take data like options array and turn it into state
+because options gonna change overtime
 
+define constructor and define default state.
+constructor (props) {
+    super(props)
+    this.state = {
+        options = ['thing one', 'thing two', 'thing three']
+    }
+}
+current set up from IndecisionApp component passing options array to Options component and option component render individual option.
+IndecisionApp component:
+<Options options={options}/>
 
+Options component:
+<div>
+    <button onClick={this.handleRemoveAll}>RemoveALL</button>
+     {this.props.options.map((option)=>{
+       return <Option key={option} optionText={option}/>
+      })}        
+</div>
 
+Option component:
+<div>
+    {this.props.optionText}
+</div>
+rendering array data in UI.
 
+check where ever we need to use this array? Action component has a button what should I do?
+this button should enable only when there are items in the array {arraylenth>0 display button}
 
+Action does not need the options array values it just need array length.
+IndecisionApp component : <Action  hasOptions={this.state.options.length  > 0}/>
+hasOptions is either true of false. using it we are going to enable or diable what should I do button
 
+Passing array length to Action component via props. and button disabled{true/false}
+Action component : 
+<button disabled={!this.props.hasOptions} onClick={this.handlePick}>What should I do?</button>
+hasOptions will be true if lenght is greater than 0, disable true is to hide the button so flip the hasOptions.
 
+Q: how do we manipulate Options array ?
+earlier: single component> handleRemoveAll or handleFormSubmit > these func changes thesetSttate
 
+but in our case we have children that need to manipulate the state of parent.
+ex: add option component needs to get the text from user and manipulate the state in parent. add something to array
+that actually gonna render.
 
+Options component also needs to able to manipulate the state. able to remove individual option or remove all Options
+All of the above needs us to run some code in parent based of an events that trigger in child.
+
+how gonna we achieve that?
+we know props is one way street. props can get passed from parent to child.
+IndecisionApp can pass props to Header, Action, Options Components but these components cannot pass props upstream
+to solve this problem, solve one way data flow, we gonna pass functions in as props
+
+in parent : handleDeleteOptions() //has all the logic to call setState and set options to empty array[]. wiping all of the array values.
+
+we pass this func to child component whereever is needed. child component can call this func whic is passed as a props to child and take that action here delete all options.
+
+smy : props is a one way street. can pass props from parent to child. to make it two way data flow, we can define the func in parent which changes the state {setState} and pass it to required child as props. now child can call this func based on the event ex we took here is on clicking on RemoveALL button in options component we change the state in parent 
+here empty the options array.
+
+IndecisionApp component
+handleRemoveAll(){
+        this.setState(()=>{
+            return {
+                options: []
+            }
+        })
+    }
+
+func passing as props to child:
+<Options 
+ handleRemoveAll = {this.handleRemoveAll}
+options={this.state.options}/>
+
+we passed func as props to Options component. calling it on button click.
+<button onClick={this.props.handleRemoveAll}>RemoveALL</button>
+
+*** taking a method passing to child and having it to call there {child} that allows us to reverse the data flow
+instead of just passing data to options {child}, we can pass func, allowing options {child} to do something in parent.
+in this case deleting all options on user button click in child.
+
+****we already seen component state cause individual component to rerender. but this time state changes obivously render gets called ,but it causes child components to rerender as well.
+
+options is getting rerender with new set of props
+:we are changing options in a state and passing as props to options component.
+<Options 
+ handleRemoveAll = {this.handleRemoveAll}
+options={this.state.options}/>
+
+value for options prop is changed, imp to note, component do not change its own props. new prop values can be passed from parent and those will trigger rerender in child.
+we saw ex earlier in component we tried to set empty array value to option but got error
+ this.props.options = [] because props are read only. it is valid for parent to pass new props, when parent does, the child rerenders.
+
+Task 1: on clicking on what should I do? button we should display the random option from array as alert
+Task2 : 
+pass data to upstream. user add option, add it to options array
+Indecision component:
+handleAddOption(option){ //AddOption returns user enetered text as option
+        if(!option){ //checking if user eneter empty option 
+            return 'Enter valid value to add'   //returns error message to Action component.
+        } else if (this.state.options.indexOf(option) > -1 ) {  //checking if enetred option already exists
+                                                                // return 0 or +num, if >-1 means found match
+            return 'This option already exists'             //return error string
+        } 
+        this.setState((prevState)=>{            //changing the options array in state
+            return{
+                options: prevState.options.concat(option) //we can use push method but updating state directly so we can //concat the passed option to the array. can pass [option] or option both can concat
+            }
+        })
+    }
+
+AddOptions component:
+class Addoptions extends React.Component {
+    constructor(props){
+        super(props)
+        this.handleFormSubmit = this.handleFormSubmit.bind(this) //binding this in handleFormSubmit func
+        this.state = {
+            error: undefined
+        }
+    }
+    handleFormSubmit(e){
+        e.preventDefault()
+        const option = (e.target.elements.addoption.value.trim())
+        const error = this.props.handleAddOption(option) //parent func returns error string else undefined.func's return
+        //undefined if we do not return anything from a func.
+        
+        this.setState(()=>{ //setting state for returned value either error or undefined
+            return {
+                error
+            }
+        })   
+    }
+    render() {
+        return (
+            <div>
+                {this.state.error && <p>{this.state.error}</p>}
+                //checking if error is some value, if yes return that error. if it is undefined it will be false.
+
+                <form onSubmit={this.handleFormSubmit}>
+                <input type="text" name="addoption"/>
+                <button>Submit</button>
+                </form>
+            </div>
+        )
+    }
+}
+
+Props vs State:
+<MyComponent /> 
+render by ReactDOM.render() or by another component.
+parent comp > MyComponent > child of MyComponent
+data props flow from one direction
+parent comp @@props (if any)> MyComponent @@ props(if any) > child of MyComponent
+
+MyComponent renders something to screen.rendered output is JSX. we have access to props and state
+
+props                                       state
+{}                                          {}
+1. An object                                1. An object
+2. can be used when rendering               2. same
+    ex: title prop                          ex: error message             
+3. changes (from above) cause rerenders     3. changes cause rerenders. component itself can change the data it does by                                                    this.setState call
+
+for props - cannot change its own props, if the props for an component are gonna change  as becausethey are get passed
+down from parent.
+
+Options rerenders the list when Indecision component passed new array.  parent component maintains changing the data and pass new props that causes rerender
+
+diff:
+props come from above from parent
+state is defined in the component itself
+
+props cannot be changed by component itself. if a string is passed to MyComponent and rendered it to screen. I wouldnt be able to change this.props.somedata in order to see rerender fails. if you want to track changing data you have to use state. state can be changed by component itself
 
 
 
