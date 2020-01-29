@@ -1681,6 +1681,218 @@ state is defined in the component itself
 props cannot be changed by component itself. if a string is passed to MyComponent and rendered it to screen. I wouldnt be able to change this.props.somedata in order to see rerender fails. if you want to track changing data you have to use state. state can be changed by component itself
 
 
+functional components: simply defined as a Javascript function
+one is useful for one situation and another one is useful in other situation.
+
+Stateless functional component: 
+component - React component
+functional - function
+stateless - no state
+
+IndecisionApp manages state so we use class based component. 
+Header component gets the information passed to it and renders it to screen. this can be converted to sfc. 
+these are not concerned with state.
+
+const User = () =>{
+    //this func is similar to the class comp render method. it gets called and what ever comes back showed to screen
+    //same thing true here
+    return JSX(
+        <div>
+            <p>Name: </p>
+            <p>Age: </p>
+        </div>
+    )
+}
+ReactDOM.render(<User />, d.ge('app'))
+renders name and age to screen.
+
+these functional component obivously do not manage state but they do still allow props. we can pass data as props
+
+sfc do not have access to this. how we gonna access props then?
+earlier we used to access it like this.props.name
+
+props are passed to the func as first argument as props
+
+const User = (props) =>{ //props is similar as this.props in cbc. props a obj with key value pairs {passed}
+    return (
+        <div>
+            <p>Name: {props.name}</p>
+            <p>Age: {props.age}</p>
+        </div>
+    )
+}
+ReactDOM.render(<User name="srk", age:26 />, d.ge('app'))
+renders name and age with values in screen.
+
+we cannot use state inside sfc but we can use props.
+Adv: 
+1. faster than cbc. do not come with class and react.com code ex: code that allows us to manage state
+2. little bit easier to read
+
+React.createElement(html/string,var-cbc/sfc)
+
+Make changes to IndecisionApp by making use of sfc.
+
+cbc - if we need features like state use cbc else {class with just render method} use sfc.
+
+default props: we know that our comp whether they are cbc or sfc can get props passed into them
+what if we dont send props, we can set default
+Header component has title and subtitle. if we want to setup default value for title, it did not need to be provided
+title can be in many pages also you can override it when you passed ur own title.
+
+subtitle to not have a default and apply conditional rendering
+
+Header.defaultProps = { //we can specify the props that we want
+    title: 'some default'
+}
+IndecisionApp comp:
+<Header /> //not passing any props
+
+Header comp:
+return (
+    <p> {props.title}</p>
+)
+
+if we do not send props then the defaults value of props will be rendered
+o/p: some default
+
+will Keep title to Indecision. will allow other pages to overide it
+
+<Header/>
+const Header = (props) =>{
+    return (
+        <div>
+            <h1>{props.title}</h1>
+            {props.subTitle && <h2>{props.subTitle}</h2>}
+        </div>
+    )
+}
+title will be rendered from default props and if we do not pass subtitle it wont be rendered bcz of &&.
+
+we can also pass default props to IndecisionApp component, currently not passing any props. we can pass default props for IndecisionApp component - options array in state
+
+this.state = {
+            options : []
+        }
+
+to 
+this.state = {
+            options : props.options
+        }
+by using defaultProps 
+IndecisionApp.defaultProps ={
+    options: []
+}
+we can pass data to props in the instancee
+ReactDOM.render(<IndecisionApp  options= {['one', 'two', 'three']}/>, document.getElementById('app'))
+o/p: one two three and we add and update array
+if we do not pass props then defaultProps here empty array will be taken.
+
+Task: counter app - set defaultProps count to 0.
+this.state = {
+            count: props.count
+        }
+
+Counter.defaultProps = {
+    count: 0
+}
+Advantage of defaultProps is, if we send props data
+ReactDOM.render(<Counter count={10}/>, document.getElementById('app'))
+o/p: 10
+
+if we do not send props data, the defaultProps count value be taken
+ReactDOM.render(<Counter />, document.getElementById('app'))
+o/p: 0
+
+debugging:
+ReactDev Tools: chrome extension - chrome react dev tools - install extension.
+components and profiler tabs
+
+components tab will have tree structure of components.
+we can see the state array gets change when you add options.
+
+and also can see props for IndecisionApp component. currently passing [] via defaultProps.
+can search Components. we can edit state and props and can see values changing in UI. cannot add new items.
+
+$r is not there. old v of video
+
+simplified approach:
+this.setState(()=>{
+    return {
+        options: []
+    }
+})
+when using arrow functions we can simplify the func. const sum = () => 12 + 2; omit return statement and {}.
+same approach can be followed to setState but here it is returning obj. diff b/w func body and object? how can we use simplified version here
+this.setState (() => ({}))
+
+when returning object use parenthesis around obj -- ({}).
+use above syntax for all setState in our app.
+most of the time we return obj from setState so use above simplified syntax
+
+Removing individual options:
+Adding a button to each individual item/option and removing the option when user clicked on remove button.
+
+steps: define a method > method responsible for taking in option that you want to delete and using setState to remove it.
+
+handleDeleteOption(option) {
+    console.log('hdo', option)
+}
+currently in IndecisionApp comp we have only Options comp called, not option. option comp is under Options comp.
+
+so when user click on remove button we have run a func in parent here IndecisionApp comp because we have to change the state which is in parent. so we have to pass this func as prop to Options comp and then pass it to Option comp.
+IndecisionApp comp.
+<Options 
+  handleRemoveAll = {this.handleRemoveAll}
+  handleDeleteOption = {this.handleDeleteOption}
+  options={this.state.options}
+ />
+options component: 
+  props.options.map((option)=> (
+            <Option 
+            key={option} 
+            optionText={option}
+            handleDeleteOption = {props.handleDeleteOption}
+            />)
+            )} 
+option component:
+<button onClick={props.handleDeleteOption}>remove</button>
+
+we are not passing optionText so when you click on remove button triggers handleDeleteOption func and return the event {func gets called with event} we do not want event we want optionText {user typed text}
+
+{{ Danger: should not write like this: I tried and getting message print on add option not on remove button
+<button onClick={props.handleDeleteOption(props.optionText)}>remove</button>    }}
+
+Define inline func:
+<button 
+onClick={(e)=> {                arrow func gets called with event e as argument, when button gets clicked
+    props.handleDeleteOption(props.optionText)
+}
+}
+>remove
+</button>
+on defining arrow func. getting correct message on clicking on remove button.
+worked even if I remove event e as argument in arrow func.
+**imp: when you call the func on onclick we are sending event so we need to write a inline func and then call the method.
+<button onClick={props.handleDeleteOption}>remove</button>    }}
+
+Now we need to work on handleDeleteOption func. so when user click on remove button handleDeleteOption executes and we need to call setState to remove the Option from Options array.
+
+
+handleDeleteOption(optionToRemove) {
+        this.setState((prevState)=>({
+            options: prevState.options.filter((option)=> optionToRemove !== option
+            )
+        }))
+    }
+we passed optionText as argument to handleDeleteOption func. now we need to change the state use setState method. we need prevState - passed as argument. now the goal is to update options array to new array value with deleting user clicked remove button for the option. we use filter method. filter returns true/false if true creates new array.
+
+optionToRemove !== option
+not equal because passed optionToRemove should not be in updated array if not equal becomes false we are not pushing it to new array.
+
+
+
+
 
 
 

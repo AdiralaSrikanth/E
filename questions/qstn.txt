@@ -68,4 +68,7 @@ ReactDOM.render(<Counter />, document.getElementById('app'))
 
 I think <Counter /> is instance that why this
 
-5. can't I change the state from child?
+5. state and props
+
+6. if you change the state in parent and passed a property from state to child Component as props. so if we change
+the state , all the components under parent rerenders? 
