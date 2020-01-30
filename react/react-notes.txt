@@ -7,7 +7,7 @@ Reasons:
 Small learning curve we can up and running with fundamentals of react in short time.
 The Core idea is - Components.
 ex: login, application header. Multiple Components together end up a complete application 
-Components based architecture forces you to break complex app into small peices 
+Components based architecture enforces you to break complex app into small peices 
 which are easy to build, maintain, test & debug
 React is fast. Renders and rerenders app very quickly. 
 keep up to date with the latest changes in ur app data
@@ -135,6 +135,7 @@ go to babel site > doc > plugins page.
 1. click on react preset, it has plugins part of it. 
 all these sub plugins are responsible for to convert jsx to React.CreateElement
 2. preset -env which has es2015,16,17. now we can use latest js features- arrows functions, const, rest and spread operators etc
+responsible for taking es6 & above and convert to es5 code.
 
 install 3 things
 Babel
@@ -177,14 +178,14 @@ and index.html file gonna render this file
 
 in terminal type in babel command
 
-babel <path to our code which we want to compile> --out-file=<output file, overwrite this file for every babel run> <presets we want to use, comma seperated presets>
+babel <path to our code which we want to compile> --out-file=<output file, overwrite this file for every babel run> --<presets we want to use, comma separated presets>
 
 ex: babel src/app.js --out-file=public/scripts/app.js --presets=env,react
 hit enter. no errors
 
 go to public/scripts/app.js and observe compiled code i.e React.CreateElement call
 Add --watch command, it watches scripts/app.js file and if there is a change in src/app.js file, 
-it gonna generate compiled code again (bascically for every change)
+it gonna generate compiled code again (basically for every change)
 babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch
 
 make changes to src/app.js file and save, observe public/scripts/app.js gets change.
@@ -324,7 +325,7 @@ first value false will be returned. if it false, it will be ignored by jsx
 
 {(user.age && user.age >= 18) && <p>{user.age}</p>}
 first will check for user.age if exists checks for age >=18 else renders nothing
-if age is >=18 then rendres p tag- user.age, else do nothing
+if age is >=18 then renders p tag- user.age, else do nothing
 
 Conditional rendering smry:
 1. ternary is great for - Condition if you want to do one of two things true?printthis:elseprintthis
@@ -510,10 +511,10 @@ let count = 0
 const templateTwo = (
     <div>
         <h1>count: {count}</h1>
-        <button id="someidhere"></button>
+        <button id="someidhere" className="button">button</button>
     </div>
 )
-c.l(templateTwo) --- return obj. children > h1 and p > className prop
+c.l(templateTwo) --- return obj{kind of global one}.     console>props- children > h1 and button > className prop {not find it now}
 google - react DOM elements. in html autofocus but in react dom autoFocus - camelCased
 
 goal is to set up event listner
@@ -538,16 +539,28 @@ const templateTwo = (
         <h1>count: {count}</h1>
         <button onClick={addOne}>+1</button>
         <button onClick={minusOne}>-1</button> //define minusOne func.
-
     </div>
 )
 instead of referencing addOne variable name we can create function inside jsx expression. but if we have many function
 readibility issue.
+let count = 0
+const addOne = () => {
+    console.log('addOne')
+    count = count + 1
+    console.log(count)
+}
+const templateTwo = (
+    <div>
+        <h1>count: {count}</h1>
+        <button onClick={addOne}>+1</button>
+    </div>
+)
 
-1. templateTwo only renders once, onClick method executes but templateTwo do not rerender. to re-render our 
-template again we have to create a func and put templateTwo and ReactDOM.render() method in that func
+1. templateTwo only renders once, onClick method executes but templateTwo do not rerender. 
+count is 0 in UI but in console {as per code}, count is increasing on addOne button click.
+
+to re-render our template again we have to create a func and put templateTwo and ReactDOM.render() method in that func
 so when a user click on button and a value changes we have to rerender our template here we just need to call the func which has templateTwo and ReactDOM.render()
-
 
 const addOne = () => {
     count++
@@ -576,7 +589,7 @@ rerenderApp()
 Though the value count is updating when user click on +1 but our app is not rerendering the template. to rerender defining func with template and ReactDOM.render() func call and using this func where ever we want our app to rerender.
 
 React virtual dom:
-currently we are rendering whole page only for single value change i.e count 0 or 1
+currently we are rendering whole page only for single value change i.e count 0 or 1 {update this statement in future}
 
 in ui - elements tab
 if you change any dom element there will be animation shown.{flash animation says which element is changed}
@@ -589,7 +602,7 @@ react uses virtual DOM algorithms in JS to determine changes made in app and ren
 single piece of our app state changes like a number, we can rerender the app, updating the user without worrying about slowing down the user and not wasting the resources. virtual dom algo run behind the scenes this is done in js.
 virtual dom calculates if any changes to be made, calculates min no.of changes hence efficient.
 
-React.createElement() --returns obj represents our entire JSX tree , use algo to compare two objects. this is what react is doing. 
+React.createElement() -parent----returns obj represents our entire JSX tree , use algo to compare two objects. this is what react is doing. 
 
 Forms and inputs:::
 create a form 
@@ -643,7 +656,7 @@ JSX works with arrays.
 }
 
 {
-    [99,97, 96] - o/p 999796. jsx takes array and break it to ind peices. each peice has comments {react-text: 8} 
+    [99,97, 96] - o/p 999796. jsx takes array and break it to ind peices. each piece has comments {react-text: 8} 
 }
 
 {<p>1</p>} - JSX in JSX.
@@ -671,7 +684,6 @@ if items 3 then 3 times
 Math.floor rounds the value. decimals values
 
 re render the app -render()
-
 
 Task 2: toggle button - show details - display some text and hide details.
 create a variable visibility and set it to false. default one.
@@ -834,9 +846,8 @@ class Student extends Person{
     we have to call parent constructor to do its thing  {configuring name and age }
     and then we need to do our thing {configuring major}
 
-
     super(name, age) 
-    //super refers to parent class here Person andif we call it as func,we are accessing constructor func of Person
+    //super refers to parent class here Person and if we call it as func, we are accessing constructor func of Person
     //call it with correct data name and age. Person class will take care of defaults and all
     this.major = major;
 
@@ -848,9 +859,7 @@ o/p: Student {name: 'srk', age: 26, major: 'computer science'}
 const me = new Student('abd',26)
 o/p: Student {name: 'srk', age: 26, major: undefined}
 
-
 we can add new methods to Student class
-
 class Student extents Person{ 
     constructor(name, age, major) { 
     super(name, age) 
@@ -863,7 +872,6 @@ class Student extents Person{
 
         return !!this.major --'this' is instance and the value will be string or undefined --> {undefined -false>true>false}
         {string - true>false>true}
-    
     } 
 }
 const me = new Student('srk',26, 'computer science')
@@ -886,8 +894,7 @@ class Student extents Person{
     }  
     hasMajor() {
         return !!this.major
-    } 
-
+    }
     getDescription(){
         return 'testing'
     }
@@ -939,14 +946,14 @@ o/p: unknown is 0 years old {defined defaults name= unknown, age=0 }
 Creating a React Component:
 clear app.js file. creating Header Component
 
-react Component is just a es6 class. goal is to take in es6 class and convert it to Component by extending something whcih is given by react. global React and global ReactDOM.
+react Component is just a es6 class. goal is to take in es6 class and convert it to Component by extending something which is given by react. global React and global ReactDOM.
 Access Component class from React object
 Now Header gets all of the features of react
 
 imp: React Component require one method to be defined. this is a special method that it calls. i.e render()
 with es6 it is ok not to define methods but in react Component you must define render
 
-render takes no arguments. returns JSX
+render takes no arguments. es6 method definition syntax render() {} inside func we return JSX
 
 class Header extends React.Component {
     render() {
@@ -970,11 +977,11 @@ ReactDOM.render(jsx, document.getElementById('app'))
 
 for es6 class name Header or header is fine, capital letter is just a convention where as in React Component
 
-if we write header it treats as html. react differentiates html and react Component with capitalization Header - Component
-and header is html
+if we write header it treats as html. react differentiates html and react Component with capitalization.
+ Header - Component and header is html
 
 if we write <header/> instead of <Header /> , in React.createElement('header', null) assumes <header/>as html
-where as if we use <Header /> , React.createElement(Header, null) , it refers to to the Component / header class 
+where as if we use <Header /> , React.createElement(Header, null) , it refers to the Component / header class 
 
 so initial capital letter is important in React
 
@@ -1013,7 +1020,7 @@ class Options extends React.Component {
     render(){
         return {
             <div>
-                <Option /> create Option component and pass it here.
+                <Option /> //create Option component and pass it here.
             </div>
         }
     }
@@ -1030,7 +1037,7 @@ similar like html attributes key value pairs
 <Header title="test value"/>
 
 We passed data to header component. How can we access this title data in Header component?
-inside our component we have access to this {under render method}. 'this' is reference to current instance of the component. reacts gives us access to our props on a object this.props
+inside our component we have access to this {under render method}. 'this' is reference to current instance of the component. reacts gives us access to our props on a object - this.props
 
 c.l(this.props)
 o/p: Object{title: "test value"}
@@ -1046,7 +1053,7 @@ class Indecision extends React.Component{
         const title = 'Indecision'
         const subTitle = 'Put your life in hands of a computer'
         return {
-            <Header title={title} subTitle={subTitle} /> //passing data to instance of header, when this header component try to render 
+            <Header title={title} subTitle={subTitle} /> //passing data to instance of header when this header component try to render 
             //component has access to the values passed via props. this.props
         }
     }
@@ -1059,7 +1066,7 @@ Now the goal is to create a variable options =['','',''] and pass it to Options 
 sends data to Option component where it renders each/individual option.
 
 Task : 
-setup options prop for Options component
+setup options prop for Options component instance
 render the length of the array
 
 1. In the Indecision component create var const options = ['','',''] and pass it to Options component
@@ -1100,7 +1107,7 @@ Option component:
 Adv: components are super flexible and super resuable.
 
 Imp: 
-1. when we create instance of component we can also choose to pass data into it. key={value} array
+1. when we create instance of component we can also choose to pass data into it. key={value}, value- array
 2. when we pass data to component we can access passed data inside the component,via this.props
 this gave us to setup one way communication. IndecisionApp component can communicate some information with Header, Action
 Components. Opions can communicate some information with Option.
@@ -1112,7 +1119,7 @@ event and methods:
 event handlers:
 do something on button click. we know onClick={ref func}
 
-earlier we created global func ex: onFormSubmit, onRemoveAll. now we create class methods {like es6 class methods}
+earlier we created global func ex: onFormSubmit, onRemoveAll. now we create class methods or comp methods? {like es6 class methods}
 
 class Action extends React.Component{
     handlePick(){                   //create a func. it does something on button click
@@ -1132,7 +1139,7 @@ class Action extends React.Component{
 Task1: Add button to action component. remove all button. setup handleRemoveAll method and onClick method {same as handlePick methods}
 
 Task2: we need to create a form in AddOption component, input field and submit button. onSubmit call a method
-define handleAddOption method. 1. fetch the value typed 2. if typed then alert
+define handleFormSubmit method. 1. fetch the value typed 2. if typed then alert
 
 class Addoptions extends React.Component {
     handleFormSubmit(e){
@@ -1238,7 +1245,7 @@ const getName = obj.getName.bind(obj)
 c.l(getName())
 o/p: vikky
 
-we can pass obj or inline obj {name: 'abd'} by doing this we forced 'this' context of const getName function to be the inline object to use the name returns abd instead of vikky.
+we can pass obj or inline obj {name: 'abd'} by doing this we forced 'this' context of const getName function to be the inline object to use the name. returns abd instead of vikky.
 
 we loose this binding in event handlers also in some places eventhandlers of js so we use can this binding
 
@@ -1282,7 +1289,6 @@ class Options extends React.Component {
         super(props)
         this.handleRemoveAll = this.handleRemoveAll.bind(this)
     }
-
     handleRemoveAll() {
         console.log(this.props.options)
         console.log('check where is this keyword pointing to')
@@ -1306,8 +1312,8 @@ component state: allows our components to manage data
 think about an obj with various key value pairs. and when that data changes the component will automatically rerender to
 reflect those changes.
 
-without state, we you change the array we have to manually call rerender {ex: JSX we used earlier for counter app}
-with component state all we have to manipulate the data, component gonna take care of rerender itself
+without state, when you change the array we have to manually call rerender {ex: JSX we used earlier for counter app}
+with component state all we have to do ismmanipulate the data, component gonna take care of rerender itself
 
 ex:
 component counter:
@@ -1333,22 +1339,22 @@ change state based on event
 
 5. application rerender itself it brings ui with up to date with component state. ui count: 1
 
-we just chnaged the state, react component sees the change and updates UI
+we just changed the state, react component sees the change and updates UI
 
 Building counter app using component state:
 1. set up a default state object 
-oick all of the state properties we need, here count: 0
+pick all of the state properties we need, here count: 0
 how to setup default state obj?
 this happen inside constructor func. is similar to es6 ex setting up name and age properties. this.name = name
 
-this.state = {  //obj, we deinfe all the pieices of state that we want, here just count
+this.state = {  //obj, we define all the pieces of state that we want, here just count
     count: 0
 }
 
 2. render that to screen
 
 <h1>count: {this.state.count} </h1>
-this.state is a object and can't write obj directly {remember} , access count property
+this.state is a object and can't write obj directly {remember}, access count property
 Count: 0 is shown
 
 3. change the state based on event
@@ -1364,10 +1370,10 @@ o/p: Object {count:1}
 Object {count:2}
 Object {count:3}
 
-count is updating but our component is not rerendering itself. when we are working with class based components if we want to change the state we do not manually update the obj instead we call a method on component instance
+count is updating but our component is not rerendering itself. when we are working with class based components if we want to change the state we do not manually update the obj instead we call a method on component instance.
 
 setState allows us to manipulate state object. it is a func. after updating the state our component rerenders automatically. gets called with one argument which is a func. in this func we gonna define the updates we wanna make
-how do we gonna define those updates? we just return the object, we specify various state values that we wanna change and new values that we want to assigne
+how do we gonna define those updates? we just return the object, we specify various state values that we wanna change and new values that we want to assign
 we change count here
 
 this.setState(()=>{
@@ -1378,7 +1384,7 @@ this.setState(()=>{
 
 count should go to 1 on clicking on +1. state is getting manipulated and we are refreshing the component
 
-inside of setState we have access to current state values via the first argument commonly called prevState - our state object before tyur changes applied
+inside of setState we have access to current state values via the first argument commonly called prevState - our state object before your changes applied
 
 this.setState((prevState)=>{
     return {
@@ -1388,7 +1394,7 @@ this.setState((prevState)=>{
 
 similarly do for handleMinusOne and handleReset.
 
-if you have multiple pieces of state on your component. you do not have to provide them all in setState. you just updated 
+if you have multiple pieces of state on your component. you do not have to provide them all in setState. you just update 
 what you need/want to change
 
 this.state{
@@ -1409,7 +1415,7 @@ instead of passing func to this.setState, earlier version we can pass obj direct
 this.setState({
     count:1
 })
-but when we have two this.setState(), we do not do it single component but multiple func can trigger at same time
+but when we have two this.setState(), we do not do it in single component but multiple func can trigger at same time
  this.setState({
     count: this.state.count + 1
 })
@@ -1514,7 +1520,7 @@ constructor (props) {
         options = ['thing one', 'thing two', 'thing three']
     }
 }
-current set up from IndecisionApp component passing options array to Options component and option component render individual option.
+current set up, from IndecisionApp component passing options array to Options component and option component render individual option.
 IndecisionApp component:
 <Options options={options}/>
 
@@ -1537,7 +1543,7 @@ this button should enable only when there are items in the array {arraylenth>0 d
 
 Action does not need the options array values it just need array length.
 IndecisionApp component : <Action  hasOptions={this.state.options.length  > 0}/>
-hasOptions is either true of false. using it we are going to enable or diable what should I do button
+hasOptions is either true of false. using it we are going to enable or disable what should I do button
 
 Passing array length to Action component via props. and button disabled{true/false}
 Action component : 
@@ -1590,6 +1596,7 @@ in this case deleting all options on user button click in child.
 ****we already seen component state cause individual component to rerender. but this time state changes obivously render gets called ,but it causes child components to rerender as well.
 
 options is getting rerender with new set of props
+
 :we are changing options in a state and passing as props to options component.
 <Options 
  handleRemoveAll = {this.handleRemoveAll}
@@ -1603,8 +1610,8 @@ Task 1: on clicking on what should I do? button we should display the random opt
 Task2 : 
 pass data to upstream. user add option, add it to options array
 Indecision component:
-handleAddOption(option){ //AddOption returns user enetered text as option
-        if(!option){ //checking if user eneter empty option 
+handleAddOption(option){ //AddOption returns user entered text as option
+        if(!option){ //checking if user enter empty option 
             return 'Enter valid value to add'   //returns error message to Action component.
         } else if (this.state.options.indexOf(option) > -1 ) {  //checking if enetred option already exists
                                                                 // return 0 or +num, if >-1 means found match
@@ -1669,7 +1676,7 @@ props                                       state
     ex: title prop                          ex: error message             
 3. changes (from above) cause rerenders     3. changes cause rerenders. component itself can change the data it does by                                                    this.setState call
 
-for props - cannot change its own props, if the props for an component are gonna change  as becausethey are get passed
+for props - cannot change its own props, if the props for an component are gonna change as because they are get passed
 down from parent.
 
 Options rerenders the list when Indecision component passed new array.  parent component maintains changing the data and pass new props that causes rerender
@@ -1678,8 +1685,7 @@ diff:
 props come from above from parent
 state is defined in the component itself
 
-props cannot be changed by component itself. if a string is passed to MyComponent and rendered it to screen. I wouldnt be able to change this.props.somedata in order to see rerender fails. if you want to track changing data you have to use state. state can be changed by component itself
-
+props cannot be changed by component itself. if a string is passed to MyComponent and rendered it to screen. I wouldnt be able to change this.props.somedata in order to see rerender fails. if you want to track changing data you have to use state. state can be changed by component itself.
 
 functional components: simply defined as a Javascript function
 one is useful for one situation and another one is useful in other situation.
@@ -1737,7 +1743,7 @@ cbc - if we need features like state use cbc else {class with just render method
 
 default props: we know that our comp whether they are cbc or sfc can get props passed into them
 what if we dont send props, we can set default
-Header component has title and subtitle. if we want to setup default value for title, it did not need to be provided
+Header component has title and subtitle. if we want to setup default value for title, it did not need to be provided.
 title can be in many pages also you can override it when you passed ur own title.
 
 subtitle to not have a default and apply conditional rendering
@@ -1753,7 +1759,7 @@ return (
     <p> {props.title}</p>
 )
 
-if we do not send props then the defaults value of props will be rendered
+if we do not send props then the default value of props will be rendered
 o/p: some default
 
 will Keep title to Indecision. will allow other pages to overide it
@@ -1840,7 +1846,7 @@ handleDeleteOption(option) {
 }
 currently in IndecisionApp comp we have only Options comp called, not option. option comp is under Options comp.
 
-so when user click on remove button we have run a func in parent here IndecisionApp comp because we have to change the state which is in parent. so we have to pass this func as prop to Options comp and then pass it to Option comp.
+so when user click on remove button we have to run a func in parent here IndecisionApp comp because we have to change the state which is in parent. so we have to pass this func as prop to Options comp and then pass it to Option comp.
 IndecisionApp comp.
 <Options 
   handleRemoveAll = {this.handleRemoveAll}
@@ -1889,6 +1895,253 @@ we passed optionText as argument to handleDeleteOption func. now we need to chan
 
 optionToRemove !== option
 not equal because passed optionToRemove should not be in updated array if not equal becomes false we are not pushing it to new array.
+
+Lifecycle methods:
+differences b/w class based comp and stateless func comp
+we look into built in methods available on class based Components that we cannot add to stateless func comp.
+
+these are lifecycle methods and they fire at various times in a given components life
+
+ex: 
+when IndecisionApp comp first gets renders to screen
+when its get removed from screen
+when something in the component updates - like the props or state 
+
+populates options array with data from database when comp first gets mounted/render to browser
+will be able to save the data as the comp updates - watch the changes to state and when state changes will be able to save things
+
+we will use localstorage to persist data
+1. componentDidMount()
+method fires when comp first gets mounted to dom 
+
+we do not call these methods explicitly, gets called internally. spelling is imp
+componentDidMount() {
+    console.log('comp did mount')
+}
+run the app, display in console, bz we mount single instance of IndecisionApp
+
+these methods are only accessed in class based components. if you want to use lifecycle methods you will have to use cbc not sfc.
+The above is another reason why stateless comp are fast
+1. do need to manage state
+2. dont have to manage life cycle
+
+2. componentDidUpdate() - fires after the comp updates. after the state or prop value change
+
+componentDidUpdate(){
+    c.l('did update')
+}
+initial we do not see any c.l, add option text, which leads to change in state {options array} > componentDidUpdate fires as there is change in state.
+
+same with remove Option
+
+inside of componentDidUpdate we have access to this.state and this.props for the new state and props values.
+but we have also 2 arguments passed to componentDidUpdate. 1. prevProps and 2. prevState
+
+3. componentWillUnmount() - fires when component goes away
+fires just before your component goes away.
+ex: homepage and about page
+when you go to about page, homepage goes away - component unmount.
+
+in console
+ReactDOM.render(React.createElement('p'), d.getElementById('app'))
+above statement replace Indecision app with empty para tag. componentWillUnmount fires as component goes away
+
+google - react comp lifecycle
+
+mounting
+constructor componentDidMount render
+updating
+render componentDidUpdate
+unmounting
+componentWillUnmount
+
+will be using localstorage to save 
+componentDidMount - fetching data
+  componentDidUpdate -  saving data
+
+J30
+use localstorage and lifecycle methods to save our options and refresh them when user comes back.
+basics of localstorage:
+localstorage is a key value store
+to set item.
+
+localstorage.setItem('name', 'srk')
+storing name in localstorage.
+we can fetch it by key name
+
+localstorage.getItem('name')
+prints srk
+
+even after page reload we can get value of name
+
+can remove item by its key
+localstorage.removeItem('name')
+
+**localstorage only works with string data. even if you try to save number, it converts to string. 
+how can we store array or object as localstorage only works with string data?
+
+we use json data - string representation of js obj.
+
+const json = JSON.stringify({age: 26})
+o/p: {"age":"26"}
+converts object into string
+
+JSON.parse(json)
+converts string into object.
+
+JSON.parse(json).age 
+26.
+
+Lifecycle methods:
+componentDidMount(){
+ console.log('fetching data')
+    }
+componentDidUpdate(){
+console.log('saving data')
+    }
+componentWillUnmount() {
+  console.log('component will Unmount')
+    }
+
+will use componentDidUpdate to save options data to localstorage when user add option
+
+
+componentDidUpdate(prevProps, prevState){//gets called with prevProps and prevState - order is important
+        console.log('saving data')
+    }
+
+currently on clicking removeALL, componentDidUpdate is getting fired this is because we are updating state in removeALL func.
+we are saving empty array on clicking on removeAll button. saving same data multiple times {redundant}. componentDidUpdate is firing even if those updates do not resolved in a change. changing state from empty array to new empty array that is considered as change componentDidUpdate will fire
+ we want to fire componentDidUpdate only when there is a change in state from prevState. we will use if condn.
+
+componentDidUpdate(prevProps, prevState){
+    if(prevState.options.length !== this.state.options.length){
+    c.l('save data')
+    }
+}
+
+we are checking old state with new state if there is any change we are saving the data. we save in json format and save in localstorage
+
+componentDidUpdate(){
+    if(prevState.options.length !== this.state.options.length){
+        const json = JSON.stringify(this.state.options) //options array is in state and converting it to json
+        localstorage.setItem('options', json)
+    }
+}
+changing options to localstorage everytime if there is any change.
+localstorage.getItem('options') //prints string representation of our obj.
+
+Read the data from localstorage
+componentDidMount() { 
+    const json = localstorage.getItem('options')
+    const options = JSON.parse(json) //we get the obj data - array
+
+    this.setState(()=>({options})) //updates state with the data fetched from localstorage
+}
+ add 3 options - remove 1 option - refresh the page - will have two options still displayed - bcz of storing in localstorage
+
+validations:
+1. initially componentDidMount renders what if options is null i.e localstorage.getItem('options') we get null
+if we parse null JSON.parse(json) - json has null value - we will get null. we dont want to change the state. setState options = null
+
+componentDidMount() { 
+    const json = localstorage.getItem('options')
+    const options = JSON.parse(json)
+    if(options){                            //if there are options we use setState
+        this.setState(()=>({options}))
+    } 
+}
+
+2. const options = JSON.parse(json) what if the passed json is wrong
+ex: JSON.parse('[12}')
+error:unexpected token } in JSON at position 3
+
+we need to catch the error if the data is wrong in json so that our program do not catch
+
+componentDidMount() { 
+    try{
+
+    const json = localstorage.getItem('options')
+    const options = JSON.parse(json)
+    if(options){                            
+        this.setState(()=>({options}))
+    } 
+    catch (e){
+        //if json is invalid comes here and not sending anything.
+
+        //only valid json calling setState else options value will be empty array from defaultProps
+    }
+}}
+
+clear user input after user entering option:
+AddOption component:
+if there is error returned we are rendering that error via changing the state in AddOption component
+if there is no error, if user add new otpion, we can clear the user input for user to add another option.
+
+if(!error) {
+    e.target.elements.addoption.value = ''
+}
+Add some text - if there is no data {initial page}
+{props.options.length === 0 && 'Please add an option to get started!'}
+
+Task: use localstorage and life cycle method for counter app.
+tackle count
+
+we are not going to use JSON methods as we are working with a number - here count number
+localstorage is a string based key value store. we have a number we dont have string
+
+const num = '12'
+cannot perform match operations on number.
+num + 3 = "123".
+
+parseInt(string, base) - parseInt(num, 10) -base10 - o/p - 12 {number}.
+
+parseInt(num, 10) + 1 ==> 13.
+what if the data stored in localstorage is alphanumeric characters or decimals??
+
+parseInt('abc', 10)
+NaN - no a number.
+
+"a" * 33 == NaN
+JS error - not a number
+
+check it is a number and not a NaN
+use isNaN("a", 10) ==> returns true
+isNaN(10, 10) ==> returns false
+
+NaN ===NaN false :( use isNaN()
+
+*** increase the count till 9 and refresh the page, it should not get change or display 9 only.
+
+    componentDidMount(){
+            const count = localStorage.getItem('count')
+            //get string value 
+            const parsedCount = parseInt(count, 10)
+            //making it to number
+
+            if(!isNaN(parsedCount)){
+                //checking the parsedCount value - when you clear the localstorage it is given as NaN -bcz-'' in parseInt is NaN so checking it is not NaN
+                this.setState(()=>({count: parsedCount}))
+            }
+        }
+
+    componentDidUpdate(prevProps, prevState){ 
+        if(prevState.count !== this.state.count){
+            //on cliking on reset button, this lifecycle is getting fired though the value is 0 for many reset clicks
+            //if there is any change in previous state and current state we are updating it in localstorage
+            localStorage.setItem('count', this.state.count)
+        }
+    }
+
+default value in localstorage is string - '' - so parseInt-> gives NaN when passed string --> parseInt('', 10) - NaN is output > so on componentDidMount we are getting '' >trying to parseInt and if we donot use if condn and change the state , the state will be NaN instead of 0 so checking the value isNaN before setting the state.
+ 
+
+
+
+
+
+
+
 
 
 

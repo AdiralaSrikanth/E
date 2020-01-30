@@ -1,4 +1,5 @@
 1. virtual DOM - rerender
+count=0  and some static headings in UI.
 
 2. class Person{
     constructor(name, age=0) { 
@@ -31,7 +32,17 @@ this binding is working fine
 
 const getName = obj.getName
 c.l(getName())
-
+================
+Vconst obj ={
+    name: 'vikky',
+    getName() {
+        return this.name;
+    }
+}
+const getName = obj.getName.bind(obj)
+c.l(getName())
+o/p: vikky
+============================
 class Options extends React.Component {
     constructor (props) {
         super(props)
@@ -72,3 +83,24 @@ I think <Counter /> is instance that why this
 
 6. if you change the state in parent and passed a property from state to child Component as props. so if we change
 the state , all the components under parent rerenders? 
+b) or the component for which we pass the new props rerender?
+
+7. remove this in this.handlePick
+class Action extends React.Component{
+    handlePick(){                  
+        alert('handle pick')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handlePick}>What should I do?</button> 
+                </div>
+        )
+    }
+}
+ReactDOM.render(<Action />, document.getElementById('app'))
+
+8. parent state and child components called in parent
+one of the child has state and we changed state in same comp, rendering mechanism?
+
+9. parentt send new props to child - will child rerender?
