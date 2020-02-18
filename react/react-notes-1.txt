@@ -1,0 +1,339 @@
+j31
+webpack is a asset bundler, combines all of the assets that make up our application, with all of the assests needed from third party libraries.
+allows us to
+1. use third party libraries ex: date picker
+2. our app break into multiple files
+
+what webpack is?
+module bundler for modern js apps
+help
+1. organise our js - when we run our app through webpack , we gonna get a single js file back
+that file called bundle, its gonna contain everything that our app needs to run ,contain dependencies and our app code
+
+eod single script tag instead of multiple scipts tags in index.html
+else if we add 1. more files 2. more dependencies - all the files we need to add as script tags - slowdown the app, we need to make all of those requests before you run, can take a lot of time
+instead we make single request for single scipt file.
+
+gulp and grunt does it from long time. how webpack is diff.
+we are not blindly concatinating all of our js files and dependencies and minfying it and outputing a single file instead webpack is breaking up all of the files in our app into their own island. these islands can communicate using es6 import/export syntax
+
+we break our app into multiple files , those files can communicate one another.
+
+ex: in our app.js I want to take advantage of func defined in another file
+//grab the add func from add.js file in the utils folder
+    call add func in app.js add(2,4) and gets the results. add func is written in another file
+putting into its own location.ecah thing lives in its own place helps in scable
+
+we are not only making our into multiple files, we are also install dependencies via npm or yarn and use those in app.js 
+ex: grab react from the react npm module
+grab the 3rd party dependencies that were installed via npm or yarn which are under node_modules folder.
+manage our dependencies in pkg.json
+
+user interactions, effects
+
+public
+index.html
+
+utils.js    react.js
+react-dom.js    app.js
+
+we have to load all of them via scripts tag in index.html and should load in correct order else run into issues.
+
+after:
+
+public/
+index.html      creates bundle.js {has app.js,utils.js,reacr.js}
+src/
+app.js  utils.js {app.js communicate with all other files}
+node_modules/
+react.js  react-dom.js
+
+will run app.js which is our main file  through webpack and bundles all the assests and creates bundle.js file. {compress all the files and creates one}
+
+webpack can also run babel for us. we wont be running separate babel command, instead we can allow webpack to do that everytime we run
+
+all these above setsup our app to scale well. we add multiple files instead of writing ton of code in single file {makes hard to debug and maintain}.
+
+Avoid global modules: 
+bad idea to install global modules. 
+so far we installed babel cli and live-server globally
+but it is not ideal, reasons
+1. in pkg.json it will not define the dependencies we installed globally, team mem do not know that we used babelcli and live-server 
+2. if we install globally and if we have 5 or 6 react apps , all these apps use same version of babelcli.
+its ideal to define all the dependencies and exact versions in pkg.json file
+
+currently we are entering long commmand in terminal for babel, we can specify it in pkg.json under scripts tag {kind of alias}
+
+uninstall global dependencies: yarn global remove babel-cli live-server
+or npm uninstall -g babel-cli live-server.
+type babel in cmd : error -cannot find the directory
+
+install them in local - proj :: yarn live-server 
+installs locally can see under pkg.json
+
+cannot access babel in terminal yet, we have to setup scripts in pkg.json
+scripts:{
+    "serve","live-server public/",
+    "build-babel","babel file --outfile=o/p file --presets=env,react --watch"
+}
+yarn run serve
+run live-server
+
+yarn build-babel
+app runs 
+{own understanding - we run webpack before babel }
+
+adv:
+1. all of our dependencies listed in pkg.json. team mem can work without dependency problems
+2. version defined
+3. creates scripts - run scripts by name
+
+installing and configuring webpack
+
+install webpack locally: yarn add webpack
+installs locally when you install locally you can access them in scripts tag.
+
+add script tag in pkg.json: 
+scripts:{
+    "build": "webpack"
+}
+dont have to use commmands in build prop value, we will setup webpack.config.js file
+for babel we have 3 or 4 commmands --outfile --watch but for webpack we will have more commmands and we setup them in config file
+
+yarn run build
+gets error there is no configuration file found
+default webpack does nothing we have to tell webpack what to do
+
+create app.js file in src folder and enter c.l('abc') {client side js is setup}
+
+create webpack config file in root {webpack checks for the file in roo}
+webpack.config.js
+its a node script.
+in order to webpack work we need to provide two critical information
+1. entry point - where does our app kick off here {src/app.js}
+2. output bundle file - where to put our big file contains all modules and dependencies
+
+we create a prop on module exports
+
+module.exports = { //way to expose this obj to another file
+    //put all webpack configurations
+
+    entry: "./src/app.js",  //tell webpack where to start
+    output: {
+        path: path.join(__dirname, 'public'),
+
+        //__dirname = gives the absolute path to our proj 
+        //load require('path')
+        //we use path module to combine __dirname with public folder. path.join('/foo', 'bar')
+        //absoulte path on ur machine. where to put bundle.js file. we put it public
+
+        filename: "bundle.js" //final generated file
+    }
+}
+check all of the configuration in webpack.js.org site
+yarn run build
+or npm run build --asked to install one pkg webpack cli. installed webpack-cli.
+gets some output
+Hash: 
+bundle version
+gives output and input file names and sizes
+
+***inside of public folder, we will now see bundle.js file
+similar like babel output, bottom of the file can see the code we wrote
+
+see the output in browser:
+we wrote c.l('abc') in src/app.js and provided this as entry in webpack.config.js
+and ouput as public/bundle.js
+earlier we displayed/rendered public/scripts/app.js code and loaded in index.html which then showed on browser
+now we have desired output in bundle.js so delete app.js form scripts folder.
+now serve bundle.js in index.html file
+
+src="bundle.js"
+our c.l('abc') will be shown in browser console.
+
+changes in src/app.js does not reflecting everytime so use --watch for webpack as well in pkg.json
+
+yarn run build
+waiting for files to change - continous work - for new changes
+
+smry:
+installed webpack locally
+setup command in scripts tag which allows us to run webpack
+if you run without config file it fails, we need to setup webpack.config.js file
+you have provide entry - files taking in and output - take input files combine them and where should I put. input - relative path, output - absolute path
+
+ES6 import/export - 
+used to break you application into multiple files. instead of having 1big file that contains everything your app needs to run. we gonna have multiple smaller files that can communicate with each other. allows us to scale as we add more components.
+
+1. load in own files
+2. load in 3rd party modules - react and react-dom
+basic webpack app config is enough to use import and export
+
+file1 - app.js {entry point for webpack to run}
+file2 - add another file - utils.js
+enter c.l('this is utils app') and observe didnt even refresh and we are not able to see the content{utils file} as well. reasons
+1. it is not entry for the webpack application
+2. it is not being imported from entry point {app.js}
+currently utils is not exists, we need to bring it to our app
+either change entry point which we dont and 2. import it in app.js - we do this
+
+how we import?
+import 'relative path to the file we want to import' -- under the quotes
+import './utils.js'
+
+now in browser we get the content we wrote in utils.js file. also in terminal where we are running webpack {npm run build}, we can see the output file is bundle.js but the input files are
+0 - app.js and 1. utils.js
+
+currently we are just importing the file, we can do more useful things, like we can add a utility func and import it in app.js and call that func.
+
+utils.js file
+const square = (x) => x * x
+in app.js {we had import 'file' - statements which imports utils file}
+
+in app.js call that func
+console.log(square(4))
+o/p
+1. utils is running message {c.l in utils}
+2. app.js is running message {c.l in app.js}
+3. we got the error - uncaught ref error - square is not defined
+
+reasons:
+1. all of the files maintain their own local scope which means variables defined in app.js arent simple access by all the files where imported
+just bcz if we use import statement doesnot mean we can access vars, if it is acessible then webpack is polluting global name space, if we define more files there will be a naming conflict
+mess up our app.
+
+how we get values from utils ?
+utils have to choose to export the values.
+have two exports - 1. default exports - single default export 2.named exports - many exports per file.
+utils.js
+exports {named exports}
+{} - not a object
+named exports - references to various things that we want to export. ex: square var we defined
+
+exported square from utils.js now we have to import it in app.js
+app.js
+//import './utils.js' --comment the previous import 
+import {named exports variables} from {path of the file we want to immport}
+import {square} from './utils.js'
+gets the desired output - square - 16
+
+can export multiple values export {add,substract,square}
+can import all or few import {add, substract} from './utils' --- here we are not importing square
+order doesnot matter but variable names should be the correct one.
+
+alternate way of exporting named exports:
+we can export individual var which we defined
+ex: export const add = (a, b) => a + b
+
+cannot export without a variable name --> export 'test' throws error , webpack will crash
+
+Task: person.js file - exports two named exports - func1 isAdult - true if adult else false func2 - canDrink - true if age 21 and over else false.
+
+import isAdult and canDrink in app.js
+person.js
+const isAdult = (age) => age>=18
+const canDrink=(age) => age>=21
+export {isAdult, canDrink}
+
+app.js
+import {isAdult, canDrink} from './person'
+console.log(isAdult(18))
+console.log(canDrink(18))
+
+we can have as many as named exports but only one default export.
+each file can choose upto 1 default export.
+
+export {square, add as default} - square is named export and add is default export. cannot set two as default
+how are we gonna import that default var? if we use current import {} we get error
+in app.js
+import {square, add} from './utils.js'
+console.log(add(100,10)) - we get reference error bcz we are trying to import a default export value
+to get the default value put it before {}
+ex: import add, {square} from './utils.js'
+importing named and default exports
+
+whats makes default special?
+you dont have to specify the same var name in import.
+you can specify any name instead of add you can mention adding and use it in c.l(adding(10,2)) gets the same result.
+
+with default naming is not important but for named imports naming is important.
+one big component can use default and if we have multiple components can use named export
+
+cannot do inline - default export, if we do inline then it will become named export
+we use export default.
+diff b/w export default and export
+
+export default cannot come before var where it is defined
+export default const add () ==> throws error
+
+we should use export default add  {variable name}
+
+another way 
+export defaut (a,b) => a-b; 
+works fine.
+
+smry:
+named export
+export {add, substract}
+or export const add = (a, b)=> a + b
+
+default export:
+export default add {export default varName}
+or export default (a,b)=> a+b
+or 
+export {substract as default, add} ==> combo of named and default export
+
+cannot use export default const add = (a, b) => a+b
+
+Task: person.js
+single new func - isSenior - true if senor citizen {65} else false - use default export
+
+can use this : 
+export default (age) => age>=65
+at the time of import we can specify name as per our wish
+import isSenior, {isAdult, canDrink} from './person'
+used name isSenior.
+
+same for : add export as default and in import we can put any name
+
+person.js
+const isAdult = (age) => age>=18
+const canDrink=(age) => age>=21
+export default (age) => age>=65
+// export default isSenior 
+// export {isAdult, canDrink, isSenior as default}
+export {isAdult, canDrink}
+
+app.js
+// import './utils'
+import isSenior, {isAdult, canDrink} from './person'
+console.log(isAdult(18))
+console.log(canDrink(18))
+
+console.log(isSenior(65))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

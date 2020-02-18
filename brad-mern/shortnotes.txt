@@ -1,0 +1,50 @@
+findOne returns promise
+.then(user=>{})
+user will be false if it did not find. does not go to catch
+
+
+
+
+Project:
+express - server
+routes - express.Router()
+mongoose - connection, models
+models - instances / documents.  const newUser = new User({})
+registeration
+insert - ex:email and pwd, validate - jwt sign() - generate - jwt token - 
+
+
+routes:
+/register
+checks if user already exists if yes throw error
+then, creates new user based on user schema
+before saving user details to db we take in plain pwd and using bcrypt we gen salt, bcrypt.genSalt()==>salt and hash the pwd , bcrypt.hash()==> hash pwd and store it in db
+after saving the user we send the saved user back
+
+/login
+we get the email and pwd which user entered as req body.
+will check whether user exists in db , will check user with his/her email
+will check whether user entered valid pwd using bcrypt.compare method - takes in req body pwd and user pwd from db
+we get user pwd when we check user email in db via findOne which returns user
+
+once the user email and pwd matched we generate jwt token for that user
+using jwt.sign() method we generate token and it takes payload ,secretkey and expiration
+payload will have user info. secretkey we defined it in config file.
+
+in the call back of jwt.sign() we send token appending Bearer text. 
+--------------------------------------------------------
+we defined jwt strategy in config>passport file
+passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{}
+
+opts obj - we send method as one of the prop value to extract auth token from header and secretkey
+using JwtStrategy we get the payload which has user info, first we check whether that user which we get from payload exists in db if yes we send it via done func 
+
+Accessing private route:
+routes has to use middleware - passport.authenticate('strategy-name') to access private routes.
+this will go config passport file where we definded strategy, once they authenticated returns user via done func , they can access route handler - (req,res)=>{}
+we are sending user info from passport and this info can be accessed in route handler under req i.e req.user
+
+--------------------------------------------------------
+/current
+
+Just uses passport middleware, once authenticated, we are sending user id ,name and email

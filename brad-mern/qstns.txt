@@ -1,0 +1,36 @@
+1. express.Router() -class, router.get(), app.use(api/users, users) - users route
+2. bodyParser - middlewares -urlencoded
+    app.use(express.json())
+3. const newUser = new User({}) -- creating a instance of a model while creating a user -- I think you will get the defined schema when you create a instance.
+4. explaining Restful api, resource
+5. bcrypt method and diff in hash and encryption
+
+6. is User model we created is accessible in all the route handlers ? loaded User model
+no scoping issue?
+
+7. 013 video - authentication
+app.use(passport.initialize())
+require('./config/passport')(passport)
+sending loaded passport or grabbing passport?
+
+is it okay if req.user.id not _id
+
+
+feb7
+resource
+router
+when we create a schema, is it creating a model and we are importing User model in server.js so if I use findOne
+is it gonna search in imported model
+    app.use(bodyParser.urlencoded({extended:false}))
+    app.use(bodyParser.json())
+
+const newUser = new User({}) //creating a resource we use new
+
+const JwtStrategy = require('passport-jwt').Strategy
+const ExtractJwt = require('passport-jwt').ExtractJwt
+
+passport and passport-jwt
+
+
+
+

@@ -1,0 +1,1051 @@
+social network app
+mongodbsetup: using mLab
+signup/login to mLab
+
+Deployments > New> cloud provider amazon > sandbox - 0.5GB free > select region> database Name
+>summary>o/p - key/dbname - click on it.
+
+Panel - collections , users, stats, backups, tools
+first create user {user is required to create a collection}
+collections - we will create it from our web app
+
+Panel shows: To connect using a driver via the standard mongodb uri
+uri: mongodb://<dbuser>:<dbpassword>@someid.mLab.com:port/dbname
+
+npm init
+
+install dependencies:
+npm i express mongoose passport passport-jwt jsonwebtoken body-parser bcryptjs validator
+
+dev dependency - npm i nodemon --save-dev
+
+entry point : server.js
+
+create a express app
+const express = require('express')
+const app = express() - creating a express app
+
+creating a route
+app.get('/', (req,res)=>{
+    res.send('home route')
+})
+
+const port = process.env.PORT || 5000
+
+app.listen(port, ()=> console.log(`server running on port ${port}`))
+run node server.js {file name is optional}
+
+open browser - localhost:5000 --gets the output as home route which we choose to send.
+
+we can enter nodemon server.js but we can add scripts in pkg.json
+underscripts:
+"start": "node server.js"
+"server": "nodemon server.js"
+
+npm start - runs the server
+npm run server - nodemon runs the server, nodemon tracks the changes and restarts the server.
+Now we have server up and running.
+
+setup - mongoose to connect to mongodb
+setup - routes - do not want to put all routes in single file - create folder
+
+connect mongoose with mongodb {atlas}.
+
+create a config folder> file keys.js
+making the object accessible outside of the file.
+module.exports = {
+    mongoUri:  'mlab - uri- use ur cred - username and pwd '
+}
+
+for me: used Atlas , first we have to create project and then cluster>select free cluster>aws>region>create cluster
+
+require mongoose in server.js file
+const mongoose = require('mongoose')
+
+//DB config
+const db = require('./config/keys').mongoUri
+
+//connect to mongodb through mongoose
+mongoose.connect(db).then(()=>{console.log('connected')}).catch((e)=>{console.log(e)})
+
+connect returns promise
+o/p: connected
+
+if you change mongoUri key in config file, you will get error
+
+//will use express router so that we will have separate files for each of the resource
+we will have 3 main resources - user, profile, posts resources.
+
+folder - routes
+this is only backend. we are not rendering anything. we are serving json and picking up that json from react
+
+routes>api folder
+file: users.js
+authentication, login -passport
+file2-profile.js
+create users profile,location,bio,experience and education, social network
+
+file3: posts.js
+user posts and comments
+
+bring all the above files in server.js
+const users = require('./routes/api/users')
+
+//Use Routes    
+app.use('/api/users', users)
+
+in users.js file
+const express = require('express')
+const router = express.Router()
+
+if we want api/users/test, we can only write /test in route/path because
+in server.js it looks into /api/users and we passed 
+app.use('/api/users', users)
+so it gonna look into users and come to users module/file and executes /test route 
+
+router.get('/test', (req,res)=>res.json({msg: "users works"}))
+res.json sends json, it will send status as 200
+
+we need to export the router in order to server to pick it up.
+
+module.exports = router;
+
+same process in profiles and posts files
+you dont have to change route path
+router.get('/test',()=>{})
+the above route points to api/profiles/test
+we defined in server.js
+
+can add descriptions to the routes:
+//@route GET api/posts/test
+//@desc Test Post Route or @desc Test users route
+//@access Public
+
+
+private routes - only logged in users to be able to do
+we dont want anyone to perform POST request to create profile without logging in
+
+they get unauthorized error. jsonwebtoken is used for it, in order to access private route you have to send token along with it.
+
+create a file .gitignore and put node_modules {tells git what files not to push to our repository}
+/node_modules
+package-lock.json
+
+initialize git repository
+git init
+git add . {git add all}
+git commit -m 'initial express server and route files'
+
+creating user model:
+users, authentication, jsonwebtoken , protecting routes, login
+
+create a models folder>file: User.js - model {convention start with capital letter and should be singular}
+
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema;
+
+//create Schema
+const UserSchema = new Schema({ //pass object, put fields, what is our User model gonna have
+    //name,email,pwd,avatar {gravatar - gravatar register>avatar>pull it here}and date.
+
+    name: {
+        type: String,
+        required: true
+    },email,pwd,avatar - dont set it to required true - we will get this if user gmail/email id has profile photo using gravatar we will pick it up.
+
+    date:{
+        type: Date,
+        default: Date.now()  --gives the current date
+    }
+})
+
+module.exports = User {variable name} = mongoose.model('users', UserSchema)
+creating a variable User and the value is - creating a model with name and Schema
+
+User Registration: create a user and add to mongodb, before saving to db we do password encryption
+requests>post requests to register route we need http client>postman
+
+we can send get,post requests, authorization header - send tokens
+getpostman.com>download app
+
+http response 200ok - success
+if they send invalid email we will respond with 400
+if they try to access profile which doesnot exists we will send 404
+500- server error
+304 - redirect.
+
+Now, users.js file
+create a route for Registration
+//@route POST api/users/register
+//@desc Register a user
+//@access Public
+
+router.post('/register', (req,res)=>{
+    //will use mongoose to find if the email exists. do not want duplicates
+    //import User model const User = require('../../models/User')
+    //can use mongoose methods on User model
+    //findOne({}) takes object, search criteria, from react we send form data which we under body
+   
+    //import bodyParser in server.js and add pieces of middlewares
+    app.use(bodyParser.urlencoded({extended:false}))
+    app.use(bodyParser.json())
+    //we can use callback or promise when using findOne
+
+    User.findOne({email: req.body.email})
+    .then((user)=>{
+        if(user){   //if we found user means duplicate - throw error
+            return res.status(400).json({email: 'Email already exists'})
+        } else { 
+            //need to install npm install gravatar and import gravatar node library{in user.js}, if my
+             //gmail id has avatar it pulls the gmail id avatar
+             //gravatar.url(email, options)
+            //options - s:200, size, r:pg, rating, d:404,default we will use mm - default icon when there is no image just like wtsapp.
+
+            const avatar = gravatar.url(req.body.email, {
+                s:'200',
+                r: 'pg',  
+                d: 'mm'
+            })
+            
+            //create new user
+            const newUser = new User({ //creating a resource we use new
+                name: req.body.name,
+                email: req.body.email,
+                avatar, 
+                password: req.body.password
+            })
+            //need to encrypt the password - load bcryptjs
+            //generate salt - bcrypt.genSalt(no of rounds, cb(Error, generatedSalt))
+
+            bcrypt.genSalt(10, (err, salt)=>{
+                //creating hash password. hash(plaintextpwd, salt, cb())
+                //we have plain text password in newUser object
+                
+                bcrypt.hash(newUser.password, salt, (err, hash)=>{
+                    //hash is encrypted password which we save in db
+                    if(err) {throw err}
+                    newUser.password = hash 
+                    //setting up generated hashed password to newUser object password
+                    //from plain text password to hashed/encrypted password
+
+            //save it to db- will use save() method of mongoose. returns promise, success -
+            returns saved obj/document here user else err
+
+                newUser.save()
+                .then(user=>res.json(user)) //sending user
+                .catch(err=> c.l(err))
+                })
+            })
+        }
+    })
+})
+
+route: /register
+
+router.post('/register', (req,res)=>{
+    User.findOne({email: req.body.email})
+    .then((user)=>{
+        if(user){   
+            return res.status(400).json({email: 'Email already exists'})
+        } else { 
+            const avatar = gravatar.url(req.body.email, {
+                s:'200',
+                r: 'pg',  
+                d: 'mm'
+            })     
+            //create new user
+            const newUser = new User({ 
+                name: req.body.name,
+                email: req.body.email,
+                avatar, 
+                password: req.body.password
+            })
+            bcrypt.genSalt(10, (err, salt)=>{   
+                bcrypt.hash(newUser.password, salt, (err, hash)=>{
+                    if(err) {throw (err)}
+                    newUser.password = hash 
+
+                newUser.save()
+                .then(user=>res.json(user)) //sending user
+                .catch(err=> c.l(err))
+                })
+            })
+        }
+    })
+})
+
+Test it in postman
+we can send data via 1. Body x-www-form-urlencoded - type in key value pairs -form data
+2. raw and select json and send
+
+send name,email,pwd via postman - body - returns json of newly created user
+
+register route:
+1. check for duplicate user email - findOne() - yes throw error
+2. no duplicate - create user - we will get form data via body
+3. before saving it to db, encrypt the password and save it
+
+current folder structure:
+models
+    -User.js
+routes
+    api
+      -posts.js
+      -profile.js
+      -users.js
+
+
+Email password login:
+once user email and pwd verified , gonna get back token using jsonwebtoken module
+once they get token then will send along with the request when they try to access private route.
+
+token is validated using passport jwt
+jsonwebtoken creates the token and passport jwt validates token
+
+validate email and pwd - login route
+
+router.post('/login', (req, res)=>{
+    const email = req.body.email
+    const password = req.body.password
+
+    //find user by email
+
+    User.findOne({email})
+    .then(user=>{   //query runs but results will null/false/undefined?
+        if(!user){      //checking if there is no user
+            return res.status(404).json({email:'user not found'})
+        }
+    //if there is user, email verification is done. now we will validate password
+        
+    //check password - user types in plain password but we stored hashed password while
+            user registration. will use bcrypt to compare entered pwd and stored pwd.
+
+        bcrypt.compare(plain pwd, model-doc-field- user obj.pwd) returns promise with true or false
+
+        bcrypt.compare(password, user.password) //findOne returns user above
+
+            .then(isMatch =>{   //returns true or false storing it in isMatch
+                if(isMatch) {   //checking if true means pwd correct.
+                    //we generate token here but temporarily
+                    res.json({msg: 'success'})
+                } else {
+                    res.status(400).json({password: 'password incorrect'})
+                    //msg names are imp as we are going to use them in react/frontend
+                }
+            })
+         //didnt use catch yet
+    })
+})
+
+route: Login
+//@route POST api/users/login
+//@desc Login user /returning jwt token
+//@access Public
+
+router.post('/login', (req, res)=>{
+    const email = req.body.email
+    const password = req.body.password
+    User.findOne({email})
+    .then(user=>{   
+        if(!user){  
+            return res.status(404).json({email:'user not found'})
+        }
+        bcrypt.compare(password, user.password) //findOne returns user above
+            .then(isMatch =>{   
+                if(isMatch) {   
+                    res.json({msg: 'success'})
+                } else {
+                    res.status(400).json({password: 'password incorrect'})
+                }
+            })
+    })
+})
+
+currently sending res.json({msg: 'success'}) will send token now.
+create a token and send it back to user we can take that and use it to access private routes.
+
+load in jsonwebtoken
+const jwt = require('jsonwebtoken')
+
+bcrypt.compare(password, user.password) //findOne returns user above
+            .then(isMatch =>{   
+                if(isMatch) { 
+                    //user matched
+
+                    //sign token
+                    jwt.sign() take in payload what we gonna include in token,
+                     payload include user information when that token is sent to server, we can decode and we needs to know whats the user it is
+                    //we need to send secret key, and expiration - expires in
+    //create  a payload - object with all the User information
+    //user we got from findOne
+
+    const payload = { id: user.id, name: user.name, avatar: user.avatar}
+    //creating a payload for that user
+
+    //secret key can be anything, put it in config>keys file and load in the users.js file. 
+    secretOrKey: 'secret'
+    //third argument for sign is expires in - 1hour or 1day or 1 week 
+    //fourth one is callback - err or token. will send this token as response
+            jwt.sign(payload, secretKey, {expiresIn: 7d},
+            (err, token)=>{
+                res.json({
+                    success: true,
+                    token: "Bearer " + token
+                    //we configure it in authorization - header and add token 
+                    //test it in postman, for successful login we need token
+                })
+            })
+                } else {
+                    res.status(400).json({password: 'password incorrect'})
+                }
+            })
+    })
+
+will taken this token and put it in header as authorization, then send it to server
+server will validate the user and get the user information.
+how will server validates? while creating a token we added user id,name and avatar to payload, so server validates
+user who is logging in who has token which has user id,name and avatar value so in db server checks for that user 
+id,name or avatar{this we search} so if user found then returns user else throw err.
+
+
+route: Login route sends jwt token after email and pwd validation.
+//@route POST api/users/login
+//@desc Login user /returning jwt token
+//@access Public
+
+router.post('/login', (req, res)=>{
+    const email = req.body.email
+    const password = req.body.password
+    User.findOne({email})
+    .then(user=>{   
+        if(!user){  
+            return res.status(404).json({email:'user not found'})
+        }
+        bcrypt.compare(password, user.password) //findOne returns user above
+            .then(isMatch =>{   
+                if(isMatch) {   
+                    //User matched
+
+                    //jwt sign in
+            
+        const payload = {id: user.id, name: user.name, avatar: user.avatar}
+
+                jwt.sign(payload, keys.secretKey-{filename.obj prop}, expiresIn: 3600, (err, token)=>{
+                    res.json({
+                        success: true,
+                        token: 'Bearer' + token
+                    })
+                } )
+                } else {
+                    res.status(400).json({password: 'password incorrect'})
+                }
+            })
+    })
+})
+passport jwt authentication strategy:
+we got the token, token includes payload which has user information
+we will have to use passport to verify that token and make routes private
+
+**Load in passport in server.js file
+passport has many authentication options - local - email/pwd, google OAuth - login with google account.
+lot of diff submodules to passport you can use, jwt is one of them.
+
+Add a middleware in server.js
+//passport middleware
+app.use(passport.initialize())
+
+everything else we do in passport, we put in config file
+
+//passport config
+strategy - for local we use local strategy, google OAuth - google strategy,
+we use jwt strategy that will be in config file
+
+in server.js file
+require('./config/passport')(passport)
+
+in config folder > passport.js
+we create our strategy in this file.
+documentation - passport-jwt
+
+const JwtStrategy = require('passport-jwt').Strategy
+const ExtractJwt = require('passport-jwt').ExtractJwt
+
+//extract the token from auth header
+const mongoose = require('mongoose')
+we gonna search for user which comes from payload
+
+//require User model
+const User = mongoose.model('users')
+'users' we created a model which we also export
+//require keys file
+bcz we are sending secretOrKey along with the request 
+const keys = require('./config/keys')
+
+create a empty object for options
+const opts = {}
+opts.jwtFromRequest =  ExtractJwt.fromAuthHeaderAsBearerToken()
+//think gonna fetch token from the request header
+
+opts.secretOrKey = keys.secretOrKey
+//passport - brad said we passed passport {7.08min}
+//gonna use jwt strategy - new JwtStrategy
+//JwtStrategy takes two arguments 1. opts object 2. done, i think it is a func/cb
+//jwt_payload will have payload which has user info - which we used to while jwt signin
+
+module.exports =  passport => {
+    passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{
+        console.log(jwt_payload)
+    }))
+}
+
+current passport config file:
+
+const JwtStrategy = require('passport-jwt').Strategy
+const ExtractJwt = require('passport-jwt').ExtractJwt
+const mongoose = require('mongoose')
+const User = mongoose.model('users')
+
+const keys = require('./config/keys')
+const opts = {}
+opts.jwtFromRequest =  ExtractJwt.fromAuthHeaderAsBearerToken()
+opts.secretOrKey = keys.secretOrKey
+
+module.exports =  passport => {
+    passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{
+        console.log(jwt_payload)
+    }))
+}
+
+The only way we gonna use above config is we specify it in route
+
+in user.js file, bring in passport - const passport = require('passport')
+create a protected route.
+
+//@route GET api/users/current - will return the user whoever the token belongs to
+//@desc Return current user
+//@access Private
+
+//the second arg to the route is passport.authenticate('strategy here jwt', {session: false} - not using session)
+//third argument for the route is callback which is our req and res
+
+router.get('/current', passport.authenticate('jwt', {session:false}), (req,res)=>{
+    res.json({msg: 'success'}) //currently just sending msg if user has access to private route
+})
+
+test it in postman without sending auth token in header
+o/p unauthorized
+
+Now get the token via /login route - which sends the token
+grab the token and in new request of post man, add header
+key: Authorization
+value: grabbed auth token.
+hit send
+
+now we will get the o/p in the terminal as we did console.log in passport config file
+output has payload. payload has id,name, avatar, iat- issued at and exp - expiresIn
+
+
+module.exports =  passport => {
+    passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{
+        console.log(jwt_payload)
+    }))
+}
+
+instead of c.l we can get the user from db {we have payload info which has user}
+//findById is mongoose method and returns promise
+//in .then if we find user - return 
+//done is a func pass as argument, 
+//done(error, user which we get)
+if we dont find user we return done(error-as -null, false -as we didnot find user )
+//put .catch if something goes wrong kind of db issue throw err
+
+module.exports =  passport => {
+    passport.use(new JwtStrategy(opts, (jwt_payload, done)=>{
+        User.findById(jwt_payload.id)
+        .then((user)=>{
+            if(user){
+                return done(null, user)
+            }else{
+                return done(null, false)
+            }
+        }).catch(err=>{
+            c.l(err)
+        })
+    }))
+}
+
+Test it in postman, o/p we get is msg:success as we are sending json in /current route
+
+router.get('/current', passport.authenticate('jwt', {session:false}), (req,res)=>{
+    ****we are returning user from passport method - passport.authenticate, this user will be in
+        req.user of the route handler.
+    res.json(req.user)
+})
+
+*****
+/login we got the token, accessing protected route, in /current we are sending that token as header and if authenticate correctly we send user info else unauthorized.
+
+user has password as well, just send an object with the user information
+router.get('/current', passport.authenticate('jwt', {session:false}), (req,res)=>{
+      res.json({
+          id: req.user.id, //is it okay if req.user.id not _id
+          name: req.user.name,
+          email: req.user.email
+      })
+})
+//this way we are not sending password.
+
+Learning validators: server side validation
+Ex: when user enter blank/invalid email we need to send error
+
+create a folder for validation and add files like login, register etc all these files will have rules for specific page.
+
+module we installed is validator, which does string validation ex: isEmail, isHex, isJson, isEmpty()
+all these should be string. isEmpty(str) should be string.
+
+current folder structure:
+config
+    keys
+    passport
+models
+    -User.js
+routes
+    api
+      -posts.js
+      -profile.js
+      -users.js  
+validation
+    register.js
+    login.js
+
+bring in validator in register.js
+
+const validator = require('validator')
+module.exports = function validateRegisterInput(data){
+    let errors = {}
+    if(!validator.isLength(data.name, {min: 2, max: 30}){
+        errors.name = 'Name must be between 2 and 30 characters'
+    })
+    return  {
+        errors,
+        isValid: isEmpty(errors)
+    }
+}
+what we are doing above is, we created a function validateRegisterInput to check the form data that is passing to register
+route basically doing sever side validation. if user enter invalid name i.e less than 2 char or more than 30 characters
+we throw error
+
+we call this func in the routes where fields validation is needed.
+
+first we created a variable let errors = {} which is object and stores all the error messages 
+checking the length of the name field data.name not in the length of 2 and 30 char's using validator npm module.
+if it is less than 2 and more than 30 we add name prop to error obj and a err msg
+if there is no error we return a object which has errors object and a prop as isValid and the value is
+isEmpty func. isEmpty(errors) meaning, if there are no errors then form has valid data
+
+isEmpty func works only for string, we get errors as obj so we create a global isEmpty func. we can use it on obj, string & null
+
+in validation folder create a new file - is-empty.js
+function isEmpty(value){
+    return (
+        value === undefined ||
+        value === null ||
+        (typeof value === 'object' && Object.keys(value).length === 0) || //check for empty obj
+        (typeof value === 'string' && value.trim().length === 0)
+    )
+}
+module.exports = isEmpty
+
+in register.js file
+const isEmpty = require('path to is-empty.js')
+
+load in newly created function validateRegisterInput in api/users.js file
+
+and in /register route before doing anything pull errors and isValid from validateRegisterInput func {destructuring}
+validateRegisterInput is giving us obj which has errors and isValid properties.
+
+router.post('/register', (req,res)=>{
+    const {errors, isValid} = validateRegisterInput(req.body)
+    //sending req.body to validateRegisterInput. It does two things 1. creates empty obj{errors} and pushes if there is any error for name or any other prop.
+    //2. isEmpty func runs and if the errors obj is null,undefined or length is zero it tells that sent input data is valid
+
+    //checking if isValid is null/undefined --> if yes isEmpty returns true so flip it
+
+    //check validation
+    if(!isValid){
+        return res.status(400).json(errors) //returning error obj if errors array contains any of the err
+    }
+    User.findOne({})
+    if(user){
+        errors.email = 'Email already exists' //updating errors obj with duplicate email err msg
+        return res.status(400).json(errors)
+    }
+
+})
+
+test in postman
+/register route
+send body and name with one character
+gets error - name must be between 2 and 30 {we wrote this err msg in validateRegisterInput func} 
+
+**use this validateRegisterInput for any route which takes in req.body
+
+skip:validation 2 video.
+Feb16
+continue validation part2 video
+
+we will now check whether name field is empty::::
+in function validateRegisterInput(data)
+  Validator only works for string. so if we use Validator.isEmpty(name) and if user does not send any data 
+    this wont work so we need to use our custom isEmpty func to check user name field is empty or not
+
+our custom isEmpty checks for the passed value whether it is undefined/null/string with length 0/obj with keys empty
+returns true if null/undefined...
+
+    data.name = !isEmpty(data.name) ? data.name : ''
+if the value is null/undefined etc we need opp of it so flipping it and if the value is not null we are using ternary operator and putting the user passed value else putting empty string. now we can use validator isEmpty method to check the value is empty.{avoiding libraries}
+
+    if(Validator.isEmpty(data.name)){
+        errors.name = 'Name field is required'
+    }
+
+similar way we will check email, password and confirm password
+
+    data.email = !isEmpty(data.email) ? data.email : ''
+    data.password = !isEmpty(data.password) ? data.password : ''
+    data.password2 = !isEmpty(data.password2) ? data.password2 : ''
+
+    if(Validator.isEmpty(data.email)){
+        errors.name = 'Name field is required'
+    }
+    if(Validator.isEmail(data.email)){
+        errors.name = 'Email is required'
+    }
+check the same for password. use isEmpty to check the password value is empty or not. use isLength to check the pwd length
+if(!validator.isLength(data.password, {min:6, max: 30})){)
+    errors.password = 'password must be at least 6 characters'
+}
+if you pass password value as 5 letters isLength returns false we flip to to true bcz if condn runs for true value and we send error message if value is true.
+
+use equals method to compare password and confirmpassword
+
+if(!Validator.equals(data.password, data.password2)){
+        errors.password2 = 'passwords must match'
+    }
+if both passwords are not equal we send error message
+
+Test it in postman 
+if you do not send any data from req body you will get errors as name,email,password and password must match errors
+
+
+****summary::::
+in the /register route we are first sending req body to validateRegisterInput. 
+const {errors, isValid} = validateRegisterInput(req.body)
+
+func returns obj with erros obj and isValid prop and its value is isEmpty custom func we defined. custom func checks
+if the errors obj is null/undefined/string with length 0/obj with keys empty returns true if any one of the condn matches
+return  {
+        errors,
+        isValid: isEmpty(errors)
+    }
+errors obj will have prop with field names and values as error messages for those fields. isValid will have true or false
+isEmpty is true if error obj is empty, false if error obj has error messages
+
+so in register route we check isValid if it is false we flip it to true we send errors obj else we find that user if we find a user its duplicate  will throw error else we create and save user
+
+if(!isValid){
+        return res.status(400).json(errors) 
+    }
+
+we already created a file login.js in validations folder. create a func validateLoginInput  and copy all the code 
+from validateRegisterInput and just put email and password req and valid if conditions code.
+
+Load login.js file from validations folder in api>users file where we have /register and /login
+before doing anything in /login route
+call validateLoginInput in /login route and pass req.body to that func
+const {errors, isValid} = validateLoginInput(req.body)
+
+in login route if we dont find user we are sending json response as user not found, put/push error message to errors object
+errors.email = 'User not found '
+now res.json(errors)
+where ever we are using messages in json add error message to errors object and send errors object {instead of sending messages}
+
+folder structure:
+models
+    User
+config
+routes
+    apis
+     users - /register, /login
+     profile
+     posts
+validations
+    is-empty.js
+    login.js  -- validates user input while login
+    register.js --validates user input while registering
+
+f17
+creating the profile model - All the user information - school,degree,company and social accounts
+create a new file in models folder - Profile
+bring in mongoose and Schema
+
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
+const ProfileSchema = new Schema({
+    //we want to associate the user with profile
+    //we want to know whose profile is this?
+
+    user: {                                 //just a property called user and its value is from users collection
+        type: Schema.Types.ObjectId,
+        ref: 'users' //referencing users collection
+    },
+    handle: {   //seo friendly. user can visit devconctr/profile/myname it displays my name
+        type: String,
+        required: true,
+        max: 40
+    },
+    company: {
+        type: String
+    },
+    website:{type: String},
+    location: {
+        type: String,
+        required: true
+    },
+    status:{           //gonna be a selectbox, developer, jnr developer, instructor etc
+        type:String,
+        required: true
+    },
+    skills: { type: [String], required: true}, //array of strings. csv values html,css etc we write logic and display in UI
+    bio: {type: String},
+    githubUsername: {type: String},
+    
+    //user may have multiple experience i.e jobs
+    //experience is array of obj. each prop of a obj is again a obj
+    experience: [{
+        title: {
+            type: String,
+            required: true
+        },
+        company:{
+            type: String,
+            required: true
+        },
+        location: {type: String},
+        from:{
+            type: Date,
+            required: true
+        },
+        to:{
+            type: Date
+        },
+        current: {
+            type: Boolean,
+            default: false
+        },
+        description: {type:String},
+
+        //education is also same as experience array obj
+
+        education:[{
+            school:{
+                type: String,
+                required: true
+            },
+            degree: {
+                type: String,required: true
+            },
+            fieldOfStudy:{type:String, required:true},from,to,current and description
+            social:{
+                youtube: {
+                    type: String
+                }, twitter,facebook,Linkedin and instagram.
+            },
+            date: {type: Date, default: Date.now}
+        }]
+    }]
+})
+
+module.exports = Profile = mongoose.model('profile', ProfileSchema)
+
+**
+open profile file under routes/api
+bring in mongoose, passport and profile & user models
+mongoose bcz we query on Profile model - findOne
+passport bcz we create private route which needs authentication.
+
+we are not doing api/profile/:id
+because we get the user info when we do auth {auth has token in which we have user id,name and avatar info}
+
+/ in the router path because we already having api/profile in server.js 
+router.get('/', passport.authenticate('jwt', {session : false}), (req,res)=>{
+    // we are sending user from auth that gonna be in req.user. can get the id of user req.user.id
+    //gonna search the user profile in Profile model. Profile model has user prop which is referenced to users collection
+    //we get current info in req.user.id , we will search this current user in profile model
+
+    const errors = {}
+    Profile.findOne({user: req.user.id})
+        .then((profile)=>{  //after running the query,we wil get user either user or empty result
+            if(!profile){    //check if we dont find user from query, if we dont find we will send 404
+            errors.noProfile = 'There is no profile for this user.'
+                return res.status(404).json(errors) //instead of sending error message as string we create errors obj and pass that obj
+            }
+            //if we find profile we send profile
+
+            res.json(profile)
+
+        }).catch((err)=>{
+                res.status(404).json(err) //sending err
+        })
+})
+Test in postman, we should get there is no profile for this user message as we did not added user info like company education etc
+
+router.get('/', passport.authenticate('jwt', {session : false}), (req,res)=>{
+    const errors = {}
+    Profile.findOne({user: req.user.id})
+        .then((profile)=>{  
+            if(!profile){   
+            errors.noProfile = 'There is no profile for this user.'
+                return res.status(404).json(errors)
+            }
+            res.json(profile)
+        }).catch((err)=>{
+                res.status(404).json(err) //sending err
+        })
+})
+when we register we do not have profile
+app default takes you to dashboard where you will see the message "there is no profile..." with 404, a button like update profile then update the profile
+
+register is first thing. we send user from register
+/login we take in email and pwd and send token, accessing protected route, gets user info as token, put that token in api/profile if we find user we send user profile
+
+Create Update Profile Routes:
+we have 1. user model which has name,email,avatar and pwd. 2. Profile model which has company,edu etc
+we now use POST route to create a profile.
+F18
+//@route POST api/profile
+//@desc Create or edit/update user profile
+//@access Private
+
+router.post('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
+    // all the input fields will be in req.body
+    //create a obj profileFields and push all the input fields data to that obj.
+    //couple of things do not come from input fields 1. user which we get from payload - auth/token
+
+    const profileFields = {}
+    profileFields.user = req.user.id //req.user will have logged in user which we get from auth. user has email,name,avatar
+
+    //checking user input fields. check if they send input fields if yes then push it to profileFields obj
+    if(req.body.handle) profileFields.handle = req.body.handle;
+    if(req.body.company) profileFields.company = req.body.company;
+    if(req.body.website) profileFields.website = req.body.website;
+    if(req.body.location) profileFields.location = req.body.location;
+
+    if(req.body.bio) profileFields.bio = req.body.bio;
+    if(req.body.status) profileFields.status = req.body.status; also githubUsername
+
+    //Skills - Split into array
+    if(typeof req.body.skills !== 'undefined'){
+        profileFields.skills = req.body.skills.split(',') //gives array of skills
+    }
+
+    //social links. social is its own obj
+    
+    profileFields.social = {} 
+    
+    //creating empty obj, pushing youtube etc properties to social obj. why are we creating empty social obj?
+    //because we cannot add youtube etc prop directly to social obj - redo
+
+    if(req.body.youtube) profileFields.social.youtube = req.body.youtube;
+    if(req.body.twitter) profileFields.social.twitter = req.body.twitter;
+    if(req.body.instagram) profileFields.social.instagram = req.body.instagram; also Linkedin and facebook
+
+    //experience and education are not defined yet, it will have separate form/page and separate Routes
+    //experience and education add object to an array.
+
+    //now we will check whether user has profile. if user has profile then it is update else we create profile
+
+    Profile.findOne({user: req.user.id})
+      .then(profile =>{
+          if(profile) { //will check if profile exists,if yes then we update profile
+
+            Profile.findOneAndUpdate({user: req.user.id}, {$set: profileFields}, {new: true})
+                //think findOneAndUpdate and update does all things - profileFields and matching
+                //properties ? 
+
+                .then(profile =>{ //returns updated profile
+                    res.json(profile)
+                })
+
+          } else { //if there is no profile we create new profile
+            
+            //will check first whether the handle exists. checking duplicate handles
+            Profile.findOne({handle: profileFields.handle})
+                .then(profile =>{
+                    if(profile) { //if it returns a profile then the handle is duplicate
+                        errors.handle = 'That handle already exists'
+                        res.status(400).json(errors)
+                    }
+                    //Save profile
+                    new Profile(profileFields).save().then(profile =>{
+                        res.json(profile)
+                    })
+                })
+          }
+      })
+})
+before testing above will do validations - ex check whether user entered input fields etc
+
+
+//@route POST api/profile
+//@desc Create or edit/update user profile
+//@access Private
+
+router.post('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
+    const profileFields = {}
+    profileFields.user = req.user.id
+    if(req.body.handle) profileFields.handle = req.body.handle;
+    if(req.body.company) profileFields.company = req.body.company;
+    if(req.body.website) profileFields.website = req.body.website;
+    if(req.body.location) profileFields.location = req.body.location;
+
+    if(req.body.bio) profileFields.bio = req.body.bio;
+    if(req.body.status) profileFields.status = req.body.status; also githubUsername
+
+    //Skills - Split into array
+    if(typeof req.body.skills !== 'undefined'){
+        profileFields.skills = req.body.skills.split(',') 
+    }
+    profileFields.social = {} 
+    if(req.body.youtube) profileFields.social.youtube = req.body.youtube;
+    if(req.body.twitter) profileFields.social.twitter = req.body.twitter;
+    if(req.body.instagram) profileFields.social.instagram = req.body.instagram; also Linkedin and facebook
+
+    Profile.findOne({user: req.user.id})
+      .then(profile =>{
+          if(profile) { 
+            Profile.findOneAndUpdate({user: req.user.id}, {$set: profileFields}, {new: true})
+                .then(profile =>{ 
+                    res.json(profile)
+                })
+          } else { 
+            Profile.findOne({handle: profileFields.handle})
+                .then(profile =>{
+                    if(profile) { 
+                        errors.handle = 'That handle already exists'
+                        res.status(400).json(errors)
+                    }
+                    new Profile(profileFields).save().then(profile =>{
+                        res.json(profile)
+                    })
+                })
+            }
+        })
+})
+
+
+custom validations - Validation folder > Profile.js file
+similar to login.js file which we created for fields validations.
+
+

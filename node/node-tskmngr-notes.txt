@@ -174,7 +174,7 @@ open robo3t and verify the inserted docs.
 
 Task: create collection, insertMany tasks and log result.ops
 
-J15
+J15/J30
 The objectID:
 automatically created by mongodb and stores unique identifier for each document you insert into database.
 
@@ -637,7 +637,7 @@ create index.js file under src folder
 const express = require('express')
 const app = express() //create express app.
 const port = process.env.PORT || 3000 //as we deploy to heroku so using port from env variable
-const user = require('./')
+const user = require('./') //think it is user model?
 
 app.post('/users', (req,res)=>{ 
     res.send('testing')
@@ -648,7 +648,7 @@ app.listen(port, ()=>{console.log('listening at port'+ port)})
 postman>createcollection>request>users
 post localhost:3000/users    send //gets the response
 
-data from client to server -- json data via req body
+****data from client to server -- json data via req body
 body tab>raw>json
 
 {
@@ -684,7 +684,6 @@ app.post('/users', (req,res)=>{
     }).catch((error)=>{
         res.status(400).send(error)     //we need to send status code as well, currently for error it is sending status code as 200, change it 400
     })                  
-
 })
 senddata to server via http req using predefined operation we are able to perform some manipulation on database
 
